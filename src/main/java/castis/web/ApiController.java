@@ -13,9 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class ApiController {
 	
-	@Autowired
-	ApplicationContext context;
-
 	private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 	
 	@RequestMapping(value = "/api/v1/ping", method = RequestMethod.GET)

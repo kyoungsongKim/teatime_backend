@@ -1,7 +1,7 @@
 package castis.domain.board;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,82 +12,82 @@ import java.io.IOException;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class BoardGroupCtr {
 
-	@Autowired
-	private BoardGroupSvc boardSvc;
+    private BoardGroupSvc boardSvc;
 
-	/**
-	 * 리스트.
-	 */
-	@RequestMapping(value = "/boardGroupList")
-	public String boardList(ModelMap modelMap) {
-		List<?> listview = boardSvc.selectBoardGroupList();
+    /**
+     * 리스트.
+     */
+    @RequestMapping(value = "/boardGroupList")
+    public String boardList(ModelMap modelMap) {
+        List<?> listview = boardSvc.selectBoardGroupList();
 
-		TreeMaker tm = new TreeMaker();
-		String treeStr = tm.makeTreeByHierarchy(listview);
+        TreeMaker tm = new TreeMaker();
+        String treeStr = tm.makeTreeByHierarchy(listview);
 
-		modelMap.addAttribute("treeStr", treeStr);
+        modelMap.addAttribute("treeStr", treeStr);
 
-		return "board9/BoardGroupList";
-	}
+        return "board9/BoardGroupList";
+    }
 
-	/**
-	 * 게시판 그룹 쓰기.
-	 */
-	@RequestMapping(value = "/boardGroupSave")
-	public void boardSave(HttpServletResponse response, BoardGroupVO bgInfo) {
+    /**
+     * 게시판 그룹 쓰기.
+     */
+    @RequestMapping(value = "/boardGroupSave")
+    public void boardSave(HttpServletResponse response, BoardGroupVO bgInfo) {
 
-		boardSvc.insertBoard(bgInfo);
+        boardSvc.insertBoard(bgInfo);
 
-		ObjectMapper mapper = new ObjectMapper();
-		response.setContentType("application/json;charset=UTF-8");
+        ObjectMapper mapper = new ObjectMapper();
+        response.setContentType("application/json;charset=UTF-8");
 
-		try {
-			response.getWriter().print(mapper.writeValueAsString(bgInfo));
-		} catch (IOException ex) {
-			System.out.println("오류: 게시판 그룹에 문제가 발생했습니다.");
-		}
-	}
+        try {
+            response.getWriter().print(mapper.writeValueAsString(bgInfo));
+        } catch (IOException ex) {
+            System.out.println("오류: 게시판 그룹에 문제가 발생했습니다.");
+        }
+    }
 
-	/**
-	 * 게시판 그룹 읽기.
-	 */
-	@RequestMapping(value = "/boardGroupRead")
-	public void boardRead(HttpServletRequest request, HttpServletResponse response) {
+    /**
+     * 게시판 그룹 읽기.
+     */
+    @RequestMapping(value = "/boardGroupRead")
+    public void boardRead(HttpServletRequest request, HttpServletResponse response) {
 
-		String bgno = request.getParameter("bgno");
+        String bgno = request.getParameter("bgno");
 
-		BoardGroupVO bgInfo = boardSvc.selectBoardGroupOne(bgno);
+        BoardGroupVO bgInfo = boardSvc.selectBoardGroupOne(bgno);
 
-		ObjectMapper mapper = new ObjectMapper();
-		response.setContentType("application/json;charset=UTF-8");
+        ObjectMapper mapper = new ObjectMapper();
+        response.setContentType("application/json;charset=UTF-8");
 
-		try {
-			response.getWriter().print(mapper.writeValueAsString(bgInfo));
-		} catch (IOException ex) {
-			System.out.println("오류: 게시판 그룹에 문제가 발생했습니다.");
-		}
-	}
+        try {
+            response.getWriter().print(mapper.writeValueAsString(bgInfo));
+        } catch (IOException ex) {
+            System.out.println("오류: 게시판 그룹에 문제가 발생했습니다.");
+        }
+    }
 
-	/**
-	 * 게시판 그룹 삭제.
-	 */
-	@RequestMapping(value = "/boardGroupDelete")
-	public void boardDelete(HttpServletRequest request, HttpServletResponse response) {
+    /**
+     * 게시판 그룹 삭제.
+     */
+    @RequestMapping(value = "/boardGroupDelete")
+    public void boardDelete(HttpServletRequest request, HttpServletResponse response) {
 
-		String bgno = request.getParameter("bgno");
+        String bgno = request.getParameter("bgno");
 
-		boardSvc.deleteBoardGroup(bgno);
+        boardSvc.deleteBoardGroup(bgno);
 
-		ObjectMapper mapper = new ObjectMapper();
-		response.setContentType("application/json;charset=UTF-8");
+        ObjectMapper mapper = new ObjectMapper();
+        response.setContentType("application/json;charset=UTF-8");
 
-		try {
-			response.getWriter().print(mapper.writeValueAsString("OK"));
-		} catch (IOException ex) {
-			System.out.println("오류: 게시판 그룹에 문제가 발생했습니다.");
-		}
-	}
+        try {
+            response.getWriter().print(mapper.writeValueAsString("OK"));
+        } catch (IOException ex) {
+            System.out.println("오류: 게시판 그룹에 문제가 발생했습니다.");
+        }
+    }
 
 }

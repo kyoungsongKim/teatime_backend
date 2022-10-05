@@ -3,6 +3,7 @@ package castis.web;
 import castis.domain.point.PointHistoryDao;
 import castis.domain.model.AgentPointOnMonth;
 import castis.domain.model.PointHistory;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +22,16 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@RequiredArgsConstructor
 public class AgentController {
 	
-	@Autowired
-	ApplicationContext context;
-
+	private PointHistoryDao pointHistoryDao;
 	private static final Logger logger = LoggerFactory.getLogger(AgentController.class);
 	
 	@RequestMapping(value = "agent_info/{currentYear}/{currentMonth}", method = RequestMethod.GET)
 	public String MonthlyStat(@PathVariable("currentYear") int currentYear, @PathVariable("currentMonth") int currentMonth, Model model) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String name = user.getUsername(); // get logged in username
-		PointHistoryDao pointHistoryDao = context.getBean("pointHistoryDao", PointHistoryDao.class);
 		List<PointHistory> pointHistoryList = pointHistoryDao.getPointHistoryByUser(name);
 		int totalPoint = 0;
 		for (PointHistory pHistory : pointHistoryList) {

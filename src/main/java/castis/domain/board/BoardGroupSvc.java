@@ -1,7 +1,6 @@
 package castis.domain.board;
 
 import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,8 +8,11 @@ import java.util.List;
 @Service
 public class BoardGroupSvc {
 
-@Autowired
 private SqlSessionTemplate sqlSession;
+
+    public BoardGroupSvc(SqlSessionTemplate sqlSession) {
+        this.sqlSession = sqlSession;
+    }
 
     public List<?> selectBoardGroupList() {
         return sqlSession.selectList("selectBoardGroupList");
