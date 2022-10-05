@@ -1,0 +1,31 @@
+<configuration>
+    <property name="appName" value="CASTIS.TeaTimeBE"/>
+    <!--<property name="productVersion" value="0.0.1"/>-->
+
+    <appender name="DR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_PATH}/${appName}.log</File>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${appName},%X{productVersion},%d{yyyy-MM-dd HH:mm:ss.SSS},%p,[%F:%L],thread[%t],%X{history}%m%X{processingTimeMSec}%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${appName}.log.%d{yyyy-MM-dd}</fileNamePattern>
+        </rollingPolicy>
+    </appender>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${appName},%X{productVersion},%d{yyyy-MM-dd HH:mm:ss.SSS},%p,[%F:%L],%X{history}%X{processingTimeMSec}%m%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="com.danga" level="ERROR"/>
+    <logger name="org.springframework.web.servlet" level="INFO"/>
+    <logger name="org.springframework.web.context" level="INFO"/>
+    <root level="INFO">
+        <appender-ref ref="DR"/>
+        <appender-ref ref="stdout"/>
+    </root>
+</configuration>

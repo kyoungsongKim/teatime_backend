@@ -1,0 +1,52 @@
+server:
+  #ip: 127.0.0.1 # 설정없이 디폴트 ip 설정.
+  port: 8080
+  servlet:
+    context-path: /
+
+tomcat:
+  ajp:
+    protocol: 'AJP/1.3'
+    address: 0.0.0.0
+    port: 18082
+    enabled: false
+
+logging:
+  file:
+    path: logs/teatime
+  config: config/logback.xml
+spring:
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://172.16.48.45/ims
+    username: root
+    password: Castis365*
+#    hikari:
+#      jdbc-url: jdbc:mariadb://172.16.48.45/ims
+#      username: root
+#      password: Castis365*
+  jpa:
+    show-sql: true
+    format_sql: true
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+      jdbc.batch_size: 100
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    generate-ddl: true
+
+jasypt:
+  encryptor:
+    bean: jasyptStringEncryptor
