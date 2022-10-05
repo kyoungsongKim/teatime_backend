@@ -1,5 +1,5 @@
 <configuration>
-    <property name="appName" value="CASTIS.TeaTimeBE"/>
+    <property name="appName" value="Teatime.be"/>
     <!--<property name="productVersion" value="0.0.1"/>-->
 
     <appender name="DR" class="ch.qos.logback.core.rolling.RollingFileAppender">

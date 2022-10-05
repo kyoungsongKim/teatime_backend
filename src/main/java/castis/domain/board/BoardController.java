@@ -4,8 +4,7 @@ import castis.domain.model.PointHistory;
 import castis.domain.point.PointHistoryDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
@@ -23,10 +22,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Controller
+@Slf4j
 @RequiredArgsConstructor
 public class BoardController {
-
-    private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
 
     private BoardSvc boardSvc;
     private BoardGroupSvc boardGroupSvc;
@@ -160,7 +158,7 @@ public class BoardController {
                     String validYoutubeVideoId = youtubeRegexMatcher.group(1);
                     validYoutubeVideoIdList.add(validYoutubeVideoId);
                 } catch (Exception ex) {
-                    logger.error("some exception:", ex);
+                    log.error("some exception:", ex);
                 }
                 isFindYoutubeURL = true;
             }
@@ -171,7 +169,7 @@ public class BoardController {
                     try {
                         token = "<a href='" + token + "' target='_blank'>" + token + "</a>";
                     } catch (Exception ex) {
-                        logger.error("some exception:", ex);
+                        log.error("some exception:", ex);
                     }
                 }
                 newMemo += (token + "<br>");

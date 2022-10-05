@@ -7,6 +7,7 @@ import castis.domain.point.PointHistoryDao;
 import castis.domain.project.ProjectDao;
 import castis.domain.team.TeamDao;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +30,7 @@ import java.util.*;
  * Handles requests for the application home page.
  */
 @Controller
+@Slf4j
 @RequiredArgsConstructor
 public class AdminController {
 
@@ -40,20 +42,18 @@ public class AdminController {
     private AuthoritiesDao authoritiesDao;
     private ProjectDao projectDao;
 
-    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
-
     /**
      * Simply selects the home view to render by returning its name.
      */
     @RequestMapping(value = {"/login_page", "/"}, method = RequestMethod.GET)
     public String home(Locale locale, Model model) {
-        logger.info("this is 'login' page. {}.", locale);
+        log.info("this is 'login' page. {}.", locale);
         return "login_page";
     }
 
     @RequestMapping(value = "/register_member", method = RequestMethod.GET)
     public ModelAndView showRegistrationForm(@ModelAttribute Users user) {
-        logger.info("Here is /register_member");
+        log.info("Here is /register_member");
         List<Team> teamList = teamDao.getAll();
         List<String> teamNameList = new ArrayList<String>();
         for (Team t : teamList) {
@@ -160,12 +160,12 @@ public class AdminController {
         String title = "[퇴근후티타임] " + req.getParameter("title");
         String recvEmail = req.getParameter("recvemail");
 
-        logger.info("send mail sendServiceRequestEmail, sendUserName:{} recvEmail:{} title:{}", sendUserName, recvEmail, title);
+        log.info("send mail sendServiceRequestEmail, sendUserName:{} recvEmail:{} title:{}", sendUserName, recvEmail, title);
         Map<String, Object> response = new HashMap<String, Object>();
 
         Users user = userDao.get(sendUserName);
         if (user == null) {
-            logger.error("get user info fail");
+            log.error("get user info fail");
             response.put("isSuccess", false);
             return response;
         }
@@ -201,9 +201,9 @@ public class AdminController {
 
             Transport.send(msg);
             response.put("isSuccess", true);
-            logger.info("send mail {} to {} success", sendUserName, user.getEmail());
+            log.info("send mail {} to {} success", sendUserName, user.getEmail());
         } catch (MessagingException mex) {
-            logger.error("{}", mex.getMessage());
+            log.error("{}", mex.getMessage());
             response.put("isSuccess", false);
             response.put("errorString", mex.getMessage());
             mex.printStackTrace();
@@ -283,9 +283,9 @@ public class AdminController {
     public String updateEndDate(HttpServletRequest request, HttpServletResponse response, Model model, @RequestParam("site") String site, @RequestParam("projectname") String projectname) {
         try {
             request.setCharacterEncoding("UTF-8");
-            logger.info("deleteProject site:{} projectname:{}", site, projectname);
+            log.info("deleteProject site:{} projectname:{}", site, projectname);
             Number isSuccess = projectDao.updateEndDate(new Date(), site, projectname);
-            logger.info("deleteProject isSuccess:{}", isSuccess);
+            log.info("deleteProject isSuccess:{}", isSuccess);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             try {

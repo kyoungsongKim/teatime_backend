@@ -5,6 +5,7 @@ import castis.domain.model.Users;
 import castis.domain.model.VacationHistory;
 import castis.domain.vacation.VacationHistoryDao;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -22,13 +23,12 @@ import java.util.List;
 import java.util.Properties;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class VacationScheduler {
 
     private VacationHistoryDao vacationHistoryDao;
     private UserDao userDao;
-
-    private static final Logger logger = LoggerFactory.getLogger(VacationScheduler.class);
 
     private static final int SUMMARY_START_TIME = 9; // from 09:00 ~
 
@@ -46,7 +46,7 @@ public class VacationScheduler {
                     for (VacationHistory vh : vacationHistoryList) {
                         if (vh.getStatus() != null && vh.getStatus().equalsIgnoreCase(VacationHistory.STATUS_READY)) {
                             //need to send email
-                            logger.info("vacation ticket toDayString:{} size:{}", toDayString, vacationHistoryList.size());
+                            log.info("vacation ticket toDayString:{} size:{}", toDayString, vacationHistoryList.size());
                             boolean sendSuccess = sendEmail(vh);
                             if (sendSuccess) {
                                 vh.setStatus(VacationHistory.STATUS_DONE);
@@ -66,7 +66,7 @@ public class VacationScheduler {
         String sendUserName = vh.getUserId();
         Users user = userDao.get(sendUserName);
         if (user == null) {
-            logger.error("get user info fail [sendUserName={}]", sendUserName);
+            log.error("get user info fail [sendUserName={}]", sendUserName);
             return false;
         }
         String title = "[휴가 일정 공유] " + user.getUsername() + "님은 오늘 휴가입니다.";
@@ -110,11 +110,11 @@ public class VacationScheduler {
                 msg.setContent(multipart);
 
                 Transport.send(msg);
-                logger.info("send mail {} to {} success", sendUserName, mailto);
+                log.info("send mail {} to {} success", sendUserName, mailto);
                 //100ms sleep
                 Thread.sleep(100);
             } catch (MessagingException | InterruptedException mex) {
-                logger.error("{}", mex.getMessage());
+                log.error("{}", mex.getMessage());
                 mex.printStackTrace();
             }
         }

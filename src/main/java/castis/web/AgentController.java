@@ -4,6 +4,7 @@ import castis.domain.model.AgentPointOnMonth;
 import castis.domain.model.PointHistory;
 import castis.domain.point.PointHistoryDao;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,11 +21,11 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@Slf4j
 @RequiredArgsConstructor
 public class AgentController {
 
     private PointHistoryDao pointHistoryDao;
-    private static final Logger logger = LoggerFactory.getLogger(AgentController.class);
 
     @RequestMapping(value = "agent_info/{currentYear}/{currentMonth}", method = RequestMethod.GET)
     public String MonthlyStat(@PathVariable("currentYear") int currentYear, @PathVariable("currentMonth") int currentMonth, Model model) {
@@ -44,7 +45,7 @@ public class AgentController {
         model.addAttribute("username", name);
         model.addAttribute("userlevel", userLevel);
 
-        logger.info("this is 'agent_info" + "/" + currentYear + "/" + currentMonth + "'");
+        log.info("this is 'agent_info" + "/" + currentYear + "/" + currentMonth + "'");
 
         // [key]username, [value]userStatOnMonth object list
         Map<String, List<AgentPointOnMonth>> agentStatMap = new HashMap<String, List<AgentPointOnMonth>>();

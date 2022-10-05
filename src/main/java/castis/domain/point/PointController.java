@@ -4,6 +4,7 @@ import castis.domain.dao.UserDao;
 import castis.domain.model.PointHistory;
 import castis.domain.model.Users;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,12 +26,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Handles requests for the application home page.
  */
 @Controller
+@Slf4j
 @RequiredArgsConstructor
 public class PointController {
 
     private UserDao userDao;
     private PointHistoryDao pointHistoryDao;
-    private static final Logger logger = LoggerFactory.getLogger(PointController.class);
 
     String calendarTimeFormat = "yyyy-MM-dd";
     DateFormat format = new SimpleDateFormat(calendarTimeFormat);
@@ -49,7 +50,7 @@ public class PointController {
                 userIdList.add(curUser.getUserid());
             }
         }
-        logger.info("this is 'pointhistory" + "/" + currentYear + "'");
+        log.info("this is 'pointhistory" + "/" + currentYear + "'");
         List<PointHistory> pointHistoryList = pointHistoryDao.getAllPointHistory();
         int totalPoint = 0;
         List<PointHistory> pointHistoryThisYearList = new ArrayList<PointHistory>();
@@ -106,7 +107,7 @@ public class PointController {
                 userIdList.add(curUser.getUserid());
             }
         }
-        logger.info("this is 'getTotalPointHistory");
+        log.info("this is 'getTotalPointHistory");
         List<PointHistory> pointHistoryList = pointHistoryDao.getAllPointHistory();
         int totalPoint = 0;
         List<PointHistory> pointHistoryThisYearList = new ArrayList<PointHistory>();
@@ -152,7 +153,7 @@ public class PointController {
             String name = user.getUsername(); // get logged in username
 
             request.setCharacterEncoding("UTF-8");
-            logger.info("getPointCode userId:{} pointStr:{} memo:{}", userId, pointStr, memo);
+            log.info("getPointCode userId:{} pointStr:{} memo:{}", userId, pointStr, memo);
             int point = Integer.parseInt(pointStr);
             PointHistory newPointHistory = new PointHistory();
             newPointHistory.setSender(name);
@@ -166,7 +167,7 @@ public class PointController {
             shortUUID = shortUUID.toUpperCase().substring(0, 4);
             newPointHistory.setCode(shortUUID);
             pointHistoryDao.addPointHistory(newPointHistory);
-            logger.info("getPointCode shortUUID:{}", shortUUID);
+            log.info("getPointCode shortUUID:{}", shortUUID);
             return shortUUID;
         } catch (Exception e) {
             e.printStackTrace();
@@ -186,7 +187,7 @@ public class PointController {
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String name = user.getUsername(); // get logged in username
             inputPointCode = inputPointCode.toUpperCase();
-            logger.info("getPoiprocessInputCoce inputPointCode:{}", inputPointCode);
+            log.info("getPoiprocessInputCoce inputPointCode:{}", inputPointCode);
             PointHistory pointHistory = pointHistoryDao.getByCode(inputPointCode);
             if (pointHistory == null) {
                 return "fail-[" + inputPointCode + "] is not exist.";

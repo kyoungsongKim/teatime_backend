@@ -48,6 +48,8 @@ dependencies {
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	testImplementation 'org.springframework.security:spring-security-test'
 
+	implementation 'org.springframework.security.oauth:spring-security-oauth2:2.5.2.RELEASE'
+	implementation 'com.google.guava:guava:31.1-jre'
 	implementation group: 'com.konghq', name: 'unirest-objectmapper-jackson', version: '3.13.11'
 	implementation files('libs/icu4j-71.1.jar')
 	implementation group: 'javax.mail', name: 'mail', version: '1.4.7'

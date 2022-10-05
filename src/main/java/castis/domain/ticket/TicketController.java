@@ -8,6 +8,7 @@ import castis.domain.vacation.VacationHistoryDao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +35,7 @@ import java.util.*;
  * Handles requests for the application home page.
  */
 @Controller
+@Slf4j
 @RequiredArgsConstructor
 public class TicketController {
 
@@ -43,8 +45,6 @@ public class TicketController {
     private UserDao userDao;
     private PointHistoryDao pointHistoryDao;
     private VacationHistoryDao vacationHistoryDao;
-
-    private static final Logger logger = LoggerFactory.getLogger(TicketController.class);
 
     String calendarTimeFormat = "yyyy-MM-dd";
     DateFormat format = new SimpleDateFormat(calendarTimeFormat);
@@ -149,7 +149,7 @@ public class TicketController {
             String username = req.getParameter("username");
             String dateTimeFormat = "yyyy-MM-dd";
             Date peroid = new SimpleDateFormat(dateTimeFormat).parse(period);
-            logger.info("get user info {} {}", username, period);
+            log.info("get user info {} {}", username, period);
             ticketList = ticketDao.get(username, peroid);
         }
 
@@ -281,7 +281,7 @@ public class TicketController {
                 }
             }
         } catch (Exception e) {
-            logger.error("vacation delete error:{}", e);
+            log.error("vacation delete error:{}", e);
         }
     }
 
@@ -375,7 +375,7 @@ public class TicketController {
     @RequestMapping(value = "sendDailyReportEmail.json", method = RequestMethod.POST)
     @ResponseBody
     public Map<String, Object> sendDailyReportEmail(HttpServletRequest req) throws Exception {
-        logger.info("send mail sendDailyReportEmail");
+        log.info("send mail sendDailyReportEmail");
 
         String sendUserName = req.getParameter("username");
         String title = "[업무보고] " + req.getParameter("title");
@@ -383,7 +383,7 @@ public class TicketController {
 
         Users user = userDao.get(sendUserName);
         if (user == null) {
-            logger.error("get user info fail");
+            log.error("get user info fail");
             response.put("isSuccess", false);
             return response;
         }
@@ -438,13 +438,13 @@ public class TicketController {
                 String filename = req.getSession().getServletContext().getRealPath("/") + "upload/" + name;
                 File remainFile = new File(filename);
                 if (remainFile.delete() == true) {
-                    logger.info("file {} is deleted", name);
+                    log.info("file {} is deleted", name);
                 }
             }
             response.put("isSuccess", true);
-            logger.info("send mail {} to {} success", sendUserName, user.getEmail());
+            log.info("send mail {} to {} success", sendUserName, user.getEmail());
         } catch (MessagingException mex) {
-            logger.error("{}", mex.getMessage());
+            log.error("{}", mex.getMessage());
             response.put("isSuccess", false);
             response.put("errorString", mex.getMessage());
             mex.printStackTrace();
@@ -462,7 +462,7 @@ public class TicketController {
             String filename = req.getSession().getServletContext().getRealPath("/") + "upload/" + name;
             File remainFile = new File(filename);
             if (remainFile.delete() == true) {
-                logger.info("file {} is deleted", name);
+                log.info("file {} is deleted", name);
             }
         }
     }
@@ -476,7 +476,7 @@ public class TicketController {
 
         String newFileName = ""; // 업로드 되는 파일명
         MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
-        logger.info("this is 'file upload' page.");
+        log.info("this is 'file upload' page.");
 
         File dir = new File(path);
         if (!dir.isDirectory()) {
@@ -491,7 +491,7 @@ public class TicketController {
             String fileName = mFile.getOriginalFilename();
             if (fileName == "")
                 continue;
-            logger.info("파일 이름 : " + fileName);
+            log.info("파일 이름 : " + fileName);
             newFileName = fileName;
             try {
                 mFile.transferTo(new File(path + newFileName));
@@ -559,7 +559,7 @@ public class TicketController {
         model.addAttribute("username", name);
         model.addAttribute("userlevel", userLevel);
 
-        logger.info("this is 'monthlystat" + "/" + currentYear + "/" + currentMonth + "'");
+        log.info("this is 'monthlystat" + "/" + currentYear + "/" + currentMonth + "'");
 
         // [key]username, [value]userStatOnMonth object list
         Map<String, List<UserStatOnMonth>> userStatMap = new HashMap<String, List<UserStatOnMonth>>();
@@ -629,7 +629,7 @@ public class TicketController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String name = user.getUsername(); // get logged in username
 
-        logger.info("this is 'jobstats" + "/" + currentYear + "'");
+        log.info("this is 'jobstats" + "/" + currentYear + "'");
 
         // [key]username, [value]userStatOnMonth object list
         Map<Integer, List<Ticket>> jobStatMap = new HashMap<Integer, List<Ticket>>();
@@ -664,7 +664,7 @@ public class TicketController {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String name = user.getUsername(); // get logged in username
 
-        logger.info("this is 'jobstats" + "/" + currentYear + "/" + currentMonth + "'");
+        log.info("this is 'jobstats" + "/" + currentYear + "/" + currentMonth + "'");
 
         // [key]username, [value]userStatOnMonth object list
         Map<Integer, List<Ticket>> jobStatMap = new HashMap<Integer, List<Ticket>>();

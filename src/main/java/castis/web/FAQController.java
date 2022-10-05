@@ -1,8 +1,7 @@
 package castis.web;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
@@ -17,17 +16,16 @@ import java.text.SimpleDateFormat;
  * Handles requests for the application home page.
  */
 @Controller
+@Slf4j
 @RequiredArgsConstructor
 public class FAQController {
-
-    private static final Logger logger = LoggerFactory.getLogger(FAQController.class);
 
     String calendarTimeFormat = "yyyy-MM-dd";
     DateFormat format = new SimpleDateFormat(calendarTimeFormat);
 
     @RequestMapping(value = "faqmain", method = RequestMethod.GET)
     public String getPointHistory(Model model) {
-        logger.info("call FAQ Main");
+        log.info("call FAQ Main");
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String name = user.getUsername(); // get logged in username
         model.addAttribute("username", name);

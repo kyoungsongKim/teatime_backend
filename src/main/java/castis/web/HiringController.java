@@ -3,6 +3,7 @@ package castis.web;
 import castis.domain.board.*;
 import castis.domain.model.PointHistory;
 import castis.domain.point.PointHistoryDao;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,9 +17,8 @@ import java.util.Date;
 import java.util.List;
 
 @Controller
+@Slf4j
 public class HiringController {
-
-    private static final Logger logger = LoggerFactory.getLogger(HiringController.class);
 
     private BoardSvc boardSvc;
     private BoardGroupSvc boardGroupSvc;
@@ -61,7 +61,7 @@ public class HiringController {
         }
         int userLevel = (int) Math.sqrt((int) (totalPoint / 1000));
         String totalPointStr = String.format("%,d", totalPoint);
-        logger.info("username:{} point:{}", name, totalPointStr);
+        log.info("username:{} point:{}", name, totalPointStr);
         modelMap.addAttribute("userpoint", totalPointStr);
         modelMap.addAttribute("username", name);
         modelMap.addAttribute("userlevel", userLevel);
