@@ -1,12 +1,9 @@
 package castis.domain.ticket;
 
-import castis.domain.artist.Artist;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;

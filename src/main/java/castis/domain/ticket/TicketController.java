@@ -25,7 +25,7 @@ public class TicketController {
 
     private final TicketService ticketService;
 
-    @RequestMapping(value = "/getTicketDataUsingUserNameAndPeroid", method = RequestMethod.GET)
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseEntity getTicketDataUsingUserNameAndPeroid(
             HttpServletRequest httpServletRequest
             , @RequestParam(name = "periodYear") String periodYear

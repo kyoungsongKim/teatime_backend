@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Setter
@@ -11,16 +12,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class EventDto {
     private String title;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private LocalDate start;
+    private LocalDate end;
     private String description;
     private String className;
 
     public EventDto (Ticket ticket) {
         this.title = ticket.getTitle();
-        this.start = ticket.getStartTime();
-        this.end = ticket.getEndTime();
+        this.start = ticket.getStartTime().toLocalDate();
+        this.end = ticket.getEndTime().toLocalDate();
         this.description = ticket.getContent();
-        this.className = "Lorem ipsum dolor eiu idunt ut labore";
+        //this.className = "Lorem ipsum dolor eiu idunt ut labore";
+        this.className = "fc-event-danger fc-event-solid-warning";
+
     }
 }
