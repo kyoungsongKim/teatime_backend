@@ -1,4 +1,4 @@
-package castis.domain.dao;
+package castis.domain.user;
 
 import castis.domain.model.Users;
 import org.springframework.jdbc.core.JdbcTemplate;

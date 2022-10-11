@@ -1,13 +1,11 @@
 package castis.scheduler;
 
-import castis.domain.dao.UserDao;
 import castis.domain.model.Users;
 import castis.domain.model.VacationHistory;
+import castis.domain.user.UserDao;
 import castis.domain.vacation.VacationHistoryDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.mail.*;
@@ -32,7 +30,9 @@ public class VacationScheduler {
 
     private static final int SUMMARY_START_TIME = 9; // from 09:00 ~
 
-    public void scheduleFixedRateTaskAsync() throws InterruptedException {
+    //FIXME 라이브 db연동되어 불필요한 동작 발생하여 임시 주석 
+//    @Scheduled(fixedRateString = "${scheduler.vacation.fixedRate: 30000}")
+    public void scheduleFixedRateTaskAsync() {
         Calendar now = Calendar.getInstance();
         if (now.get(Calendar.HOUR_OF_DAY) == SUMMARY_START_TIME) {
             // this time is 09:00:00~09:59:00

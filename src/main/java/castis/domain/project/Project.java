@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class Project {
 
     @Id
-    private String project;
+    private String projectName;
 
     @Column
     private String site;

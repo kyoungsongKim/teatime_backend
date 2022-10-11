@@ -38,4 +38,18 @@ public class TicketController {
         return new ResponseEntity<>(ticketDtoList, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public ResponseEntity getTicketData(
+            HttpServletRequest httpServletRequest
+            , @RequestParam(name = "periodYear") String periodYear
+            , @RequestParam(name = "periodMonth") String periodMonth
+            , @RequestParam(name = "periodDay", required = false) String periodDay
+            , @RequestParam(name = "userName", required = false) String userName
+    ) {
+        log.info("request, uri[{}] periodYear[{}], periodMonth[{}], periodDay[{}], userName[{}]", httpServletRequest.getRequestURI(), periodYear, periodMonth, periodDay, userName);
+        List<EventDetailDto> ticketDtoList = ticketService.findAllByUserNameAndPeroid(userName, periodYear, periodMonth, periodDay);
+
+        return new ResponseEntity<>(ticketDtoList, HttpStatus.OK);
+    }
+
 }

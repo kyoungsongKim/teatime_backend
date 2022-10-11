@@ -1,15 +1,13 @@
 package castis.web;
 
 import castis.domain.authorities.AuthoritiesDao;
-import castis.domain.dao.*;
 import castis.domain.model.*;
 import castis.domain.point.PointHistoryDao;
 import castis.domain.project.ProjectDao;
 import castis.domain.team.TeamDao;
+import castis.domain.user.UserDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,8 +16,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.mail.*;
-import javax.mail.internet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -150,66 +146,6 @@ public class AdminController {
         model.addAttribute("userlevel", userLevel);
         model.addAttribute("username", name);
         return "service_list";
-    }
-
-    @RequestMapping(value = "sendServiceRequestEmail.json", method = RequestMethod.POST)
-    @ResponseBody
-    public Map<String, Object> sendServiceRequestEmail(HttpServletRequest req) throws Exception {
-
-        String sendUserName = req.getParameter("username");
-        String title = "[퇴근후티타임] " + req.getParameter("title");
-        String recvEmail = req.getParameter("recvemail");
-
-        log.info("send mail sendServiceRequestEmail, sendUserName:{} recvEmail:{} title:{}", sendUserName, recvEmail, title);
-        Map<String, Object> response = new HashMap<String, Object>();
-
-        Users user = userDao.get(sendUserName);
-        if (user == null) {
-            log.error("get user info fail");
-            response.put("isSuccess", false);
-            return response;
-        }
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("<font style=\"font-family: 맑은 고딕; font-size:10pt\">안녕하세요.<br>퇴근 후 티타임 서비스를 신청해 주셔서 감사합니다!<br><br>");
-        builder.append(req.getParameter("contents").replaceAll("\n", "<br>").replaceAll(" ", "&nbsp;"));
-        builder.append("<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>");
-
-        boolean sessionDebug = false;
-        Properties props = System.getProperties();
-        props.put("mail.host", "mail.castis.com");
-        props.put("mail.smtp.port", "25");
-        props.put("mail.transport.protocol", "smtp");
-        Session session = Session.getDefaultInstance(props, null);
-        session.setDebug(sessionDebug);
-        try {
-            // Multipart
-            Multipart multipart = new MimeMultipart();
-            BodyPart messageBodyPart = new MimeBodyPart();
-            // Now set the actual message
-            messageBodyPart.setContent(builder.toString(), "text/html; charset=utf-8");
-            multipart.addBodyPart(messageBodyPart);
-
-            Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(user.getEmail()));
-            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(recvEmail));
-            msg.setRecipient(Message.RecipientType.CC, new InternetAddress(user.getEmail()));
-            msg.setSubject(MimeUtility.encodeText(title, "EUC-KR", "B"));
-            msg.setSubject(MimeUtility.encodeText(title, "UTF-8", "B"));
-            msg.setSentDate(new Date());
-            msg.setContent(multipart);
-
-            Transport.send(msg);
-            response.put("isSuccess", true);
-            log.info("send mail {} to {} success", sendUserName, user.getEmail());
-        } catch (MessagingException mex) {
-            log.error("{}", mex.getMessage());
-            response.put("isSuccess", false);
-            response.put("errorString", mex.getMessage());
-            mex.printStackTrace();
-        }
-
-        return response;
     }
 
     @RequestMapping(value = "/configuration", method = RequestMethod.GET)

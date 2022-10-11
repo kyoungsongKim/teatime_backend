@@ -1,12 +1,10 @@
 package castis.domain.point;
 
-import castis.domain.dao.UserDao;
+import castis.domain.user.UserDao;
 import castis.domain.model.PointHistory;
 import castis.domain.model.Users;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
