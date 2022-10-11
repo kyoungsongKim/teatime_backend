@@ -4,6 +4,8 @@ import castis.domain.project.Project;
 import castis.domain.project.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.Predicate;
@@ -88,5 +90,10 @@ public class TicketService {
         });
 
         return result;
+    }
+
+    public ResponseEntity saveTicketInfo(TicketDto ticketDto) {
+        ticketRepository.save(new Ticket(ticketDto));
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }
