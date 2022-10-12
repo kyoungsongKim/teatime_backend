@@ -1,9 +1,13 @@
 package castis.domain.ticket;
 
+import castis.domain.project.Project;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Setter
 @Getter
@@ -23,4 +27,20 @@ public class TicketDto {
     private String eventEndDate;
     private String eventEndTime;
     private String content;
+
+    public TicketDto(Ticket ticket, Project project) {
+        this.id = ticket.getNo();
+        this.teamName = ticket.getTeamName();
+        this.userName = ticket.getUserName();
+        this.title = ticket.getTitle();
+        this.site = project.getSite();
+        this.project = project.getProjectName();
+        this.md = String.valueOf(ticket.getEmd().intValue());
+        this.allDay = true;
+        this.eventStartDate = ticket.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        this.eventEndDate = ticket.getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        this.eventStartTime = ticket.getStartTime().format(DateTimeFormatter.ofPattern("HH:mm"));
+        this.eventEndTime = ticket.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm"));
+        this.content = ticket.getContent();
+    }
 }

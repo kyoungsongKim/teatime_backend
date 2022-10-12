@@ -96,4 +96,11 @@ public class TicketService {
         ticketRepository.save(new Ticket(ticketDto));
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
+
+    public TicketDto getTicketInfoByNo(Long no) {
+        Ticket ticket = ticketRepository.findById(no).orElse(null);
+        Project project = projectRepository.findById(ticket.getProjectName()).orElse(null);
+        TicketDto dto = new TicketDto(ticket, project);
+        return dto;
+    }
 }

@@ -5,12 +5,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @NoArgsConstructor
 public class EventDto {
+    private Long no;
     private String title;
     private LocalDate start;
     private LocalDate end;
@@ -18,6 +18,7 @@ public class EventDto {
     private String className;
 
     public EventDto (Ticket ticket) {
+        this.no = ticket.getNo();
         this.title = ticket.getTitle();
         this.start = ticket.getStartTime().toLocalDate();
         this.end = ticket.getEndTime().toLocalDate();
