@@ -55,6 +55,9 @@ public class Ticket {
 	private LocalDateTime endTime;
 
 	public Ticket(TicketDto dto) {
+		if(dto.getId() != null && dto.getId() != 0) {
+			this.no = dto.getId();
+		}
 		this.teamName = dto.getTeamName();
 		this.userName = dto.getUserName();
 		this.projectName = dto.getProject();

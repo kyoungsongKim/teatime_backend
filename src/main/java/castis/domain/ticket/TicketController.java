@@ -49,7 +49,7 @@ public class TicketController {
         return new ResponseEntity<>(ticketDtoList, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.POST)
+    @PostMapping(value = "/")
     public ResponseEntity saveTicketData(HttpServletRequest httpServletRequest, @RequestBody TicketDto ticketDto) {
         log.info("request, uri[{}] ticketDto[{}]", httpServletRequest.getRequestURI(), ticketDto.toString());
         return ticketService.saveTicketInfo(ticketDto);
