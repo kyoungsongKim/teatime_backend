@@ -1,0 +1,14 @@
+package castis.domain.user;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+public interface UserRepository extends JpaRepository<User, String> {
+
+    @Query(value =
+            "select count(*) " +
+                    "from users " +
+                    "where userId = :userId ", nativeQuery = true)
+    Integer countById(@Param("userId") String userId);
+}

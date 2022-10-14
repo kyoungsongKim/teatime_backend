@@ -47,6 +47,10 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     generate-ddl: true
 
+jwt:
+  secret:
+    signature: "aafsdzxcvasdfzxbbbasdfzxcvasdfzxcv"
+
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor

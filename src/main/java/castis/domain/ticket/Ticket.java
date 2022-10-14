@@ -2,14 +2,10 @@ package castis.domain.ticket;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.security.core.parameters.P;
 
 import javax.persistence.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -75,5 +71,8 @@ public class Ticket {
 			this.endTime = LocalDateTime.parse(dto.getEventEndDate() + " " + dto.getEventEndTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 		}
 	}
-	
+
+	public Ticket() {
+
+	}
 }
