@@ -1,6 +1,7 @@
 package castis.domain.ticket;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -11,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 @Setter
 @Table(name = "ticket")
 @Entity
+@NoArgsConstructor
 public class Ticket {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,16 +65,10 @@ public class Ticket {
 		this.emd = Float.parseFloat(dto.getMd());
 		this.nmd = Float.parseFloat(dto.getMd());
 
-		if(dto.isAllDay()) {
-			this.startTime = LocalDateTime.parse(dto.getEventStartDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-			this.endTime = LocalDateTime.parse(dto.getEventEndDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-		} else {
-			this.startTime = LocalDateTime.parse(dto.getEventStartDate() + " " + dto.getEventStartTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-			this.endTime = LocalDateTime.parse(dto.getEventEndDate() + " " + dto.getEventEndTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-		}
+		this.startTime = LocalDateTime.parse(dto.getEventStartDate() + " " + dto.getEventStartTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+		this.endTime = LocalDateTime.parse(dto.getEventEndDate() + " " + dto.getEventEndTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+
+		this.attachedfile = "";
 	}
 
-	public Ticket() {
-
-	}
 }

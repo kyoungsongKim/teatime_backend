@@ -55,4 +55,11 @@ public class TicketController {
         return ticketService.saveTicketInfo(ticketDto);
     }
 
+    @RequestMapping(value = "/{no}", method = RequestMethod.GET)
+    public ResponseEntity getTicketDataByNo(HttpServletRequest httpServletRequest, @PathVariable(value = "no")Long no){
+        log.info("request, uri[{}] No[{}]", httpServletRequest.getRequestURI(), no);
+        TicketDto dto = ticketService.getTicketInfoByNo(no);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
 }
