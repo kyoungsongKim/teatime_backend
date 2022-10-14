@@ -45,11 +45,11 @@ public class JoinDto {
                 .realName(name)
                 .password(password)
                 .teamName(team)
-                .position(position)
-                .cellphone(phone)
+                .position(position == null ? "" : position)
+                .cellphone(phone == null ? "" : position)
                 .email(email)
-                .dailyReportList(reportEmail)
-                .vacationReportList(reportEmail)
+                .dailyReportList(reportEmail == null ? "" : reportEmail)
+                .vacationReportList(reportEmail == null ? "" : reportEmail)
                 .build();
 
         return build;
