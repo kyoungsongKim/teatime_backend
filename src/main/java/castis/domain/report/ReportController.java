@@ -1,21 +1,41 @@
 package castis.domain.report;
 
+import castis.domain.user.User;
+import castis.domain.user.UserService;
+import castis.exception.custom.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.*;
 import javax.mail.internet.*;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/report")
 public class ReportController {
+
+    private final UserService userService;
+
+    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity<ReportUserResponseDto> getUserInfo(@RequestBody ReportUserRequestDto req) throws Exception {
+
+        Optional<User> userInfo = userService.findById(req.getUserId());
+        if (userInfo.get() != null) {
+            ReportUserResponseDto reportUserResponseDto = new ReportUserResponseDto();
+            reportUserResponseDto.setSendUserName(userInfo.get().getRealName());
+            reportUserResponseDto.setReceiveEmail(userInfo.get().getDailyReportList());
+            reportUserResponseDto.setSenderEmail(userInfo.get().getEmail());
+
+            return ResponseEntity.ok().body(reportUserResponseDto);
+        } else {
+            throw new UserNotFoundException("User Not Found");
+        }
+    }
 
     @RequestMapping(value = "/email", method = RequestMethod.POST)
     @ResponseBody

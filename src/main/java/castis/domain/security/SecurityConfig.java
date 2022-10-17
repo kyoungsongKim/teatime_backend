@@ -75,6 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/signup").permitAll()          // 회원가입
                 .antMatchers("/login/**").permitAll()        // 로그인
+                .antMatchers("/verifyToken/**").permitAll()  // 토큰
                 .antMatchers("/exception/**").permitAll()    // 예외처리 포인트
                 .anyRequest().hasRole("USER")                // 이외 나머지는 USER 권한필요
                 .and()

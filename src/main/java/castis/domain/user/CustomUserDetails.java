@@ -16,26 +16,44 @@ import java.util.stream.Collectors;
 @Setter
 public class CustomUserDetails implements UserDetails {
 
-    private String id;
+    private String userId;
 
-    private String username;
+    private String realName;
 
     private String password;
 
     private List<String> roles = new ArrayList<>();
 
+    private String apiToken;
+
     public CustomUserDetails(
             String id,
-            String email,
+            String username,
             String role) {
 
-        this.id = id;
-        this.username = email;
+        this.userId = id;
+        this.realName = username;
 
         List<String> roleList = new ArrayList<String>();
         roleList.add("ROLE_" + role);
 
         this.roles = roleList;
+    }
+
+    public CustomUserDetails(
+            String id,
+            String username,
+            String role,
+            String token) {
+
+        this.userId = id;
+        this.realName = username;
+
+        List<String> roleList = new ArrayList<String>();
+        roleList.add("ROLE_" + role);
+
+        this.roles = roleList;
+        this.apiToken = token;
     }
 
     @Override
@@ -47,6 +65,11 @@ public class CustomUserDetails implements UserDetails {
 
         return roles;
 
+    }
+
+    @Override
+    public String getUsername() {
+        return realName;
     }
 
     // 계정 만료여부

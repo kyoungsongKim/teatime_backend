@@ -69,13 +69,13 @@ public class AuthProvider {
     public Authentication getAuthentication(String token) {
 
         // 토큰 기반으로 유저의 정보 파싱
-        Claims claims = Jwts.parser().setSigningKey(signatureKey).parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parser().setSigningKey(signatureKey).parseClaimsJws(token.replace(BEARER_TYPE, "")).getBody();
 
         String username = claims.getSubject();
         String id = claims.get(ACCESS_USER_ID, String.class);
         String role = claims.get(AUTHORITIES_KEY, String.class);
 
-        CustomUserDetails userDetails = new CustomUserDetails(id, username, role);
+        CustomUserDetails userDetails = new CustomUserDetails(id, username, role, token);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
