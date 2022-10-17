@@ -38,50 +38,6 @@ public class AdminController {
     private AuthoritiesDao authoritiesDao;
     private ProjectDao projectDao;
 
-    /**
-     * Simply selects the home view to render by returning its name.
-     */
-    @RequestMapping(value = {"/login_page", "/"}, method = RequestMethod.GET)
-    public String home(Locale locale, Model model) {
-        log.info("this is 'login' page. {}.", locale);
-        return "login_page";
-    }
-
-    @RequestMapping(value = "/register_member", method = RequestMethod.GET)
-    public ModelAndView showRegistrationForm(@ModelAttribute Users user) {
-        log.info("Here is /register_member");
-        List<Team> teamList = teamDao.getAll();
-        List<String> teamNameList = new ArrayList<String>();
-        for (Team t : teamList) {
-            teamNameList.add(t.getTeamname());
-        }
-        teamNameList.add("직접입력");
-        Map<String, List<String>> teammap = new HashMap<String, List<String>>();
-        teammap.put("teamlist", teamNameList);
-        return new ModelAndView("register_member", "teammap", teammap);
-    }
-
-    @RequestMapping(value = "/join_member", method = RequestMethod.POST)
-    public String joinMember(@ModelAttribute Users user, HttpServletRequest req) throws UnsupportedEncodingException {
-        req.setCharacterEncoding("UTF-8");
-
-        List<Team> teamList = teamDao.getAll();
-        List<String> teamNameList = new ArrayList<String>();
-        for (Team t : teamList) {
-            teamNameList.add(t.getTeamname());
-        }
-        if (teamNameList.indexOf(user.getTeamname()) == -1) {
-            Team team = new Team(user.getTeamname(), "temp");
-            teamDao.add(team);
-        }
-        user.setEnabled(true);
-        user.setUserid(user.getUsername());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userDao.add(user);
-        Authorities newAuthority = new Authorities(user.getUsername(), "ROLE_USER");
-        authoritiesDao.add(newAuthority);
-        return "login_page";
-    }
 
     @RequestMapping(value = "/my_info", method = RequestMethod.GET)
     public String myInfo(Locale locale, Model model) {

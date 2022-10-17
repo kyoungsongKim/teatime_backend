@@ -3,6 +3,7 @@ package castis.domain.security;
 import castis.domain.security.filter.CustomFilter;
 import castis.domain.security.jwt.AuthProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Value("${useJwt}")
+    private static boolean useJwt;
+
     private final AuthProvider authProvider;
 
     @Bean
@@ -66,25 +71,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .httpBasic().disable()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                .antMatchers("/signup").permitAll()          // 회원가입
-                .antMatchers("/login/**").permitAll()        // 로그인
-                .antMatchers("/verifyToken/**").permitAll()  // 토큰
-                .antMatchers("/exception/**").permitAll()    // 예외처리 포인트
-                .anyRequest().hasRole("USER")                // 이외 나머지는 USER 권한필요
-                .and()
-                .cors()
-                .and()
-                .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedPoint())
-                .and()
-                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                .and()
-                .addFilterBefore(new CustomFilter(authProvider), UsernamePasswordAuthenticationFilter.class);
+        if (useJwt) {
+            http
+                    .httpBasic().disable()
+                    .csrf().disable()
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                    .authorizeRequests()
+                    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                    .antMatchers("/signup").permitAll()          // 회원가입
+                    .antMatchers("/login/**").permitAll()        // 로그인
+                    .antMatchers("/verifyToken/**").permitAll()  // 토큰
+                    .antMatchers("/exception/**").permitAll()    // 예외처리 포인트
+                    .anyRequest().hasRole("USER")                // 이외 나머지는 USER 권한필요
+                    .and()
+                    .cors()
+                    .and()
+                    .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedPoint())
+                    .and()
+                    .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                    .and()
+                    .addFilterBefore(new CustomFilter(authProvider), UsernamePasswordAuthenticationFilter.class);
+        } else {
+            http
+                    .authorizeRequests()
+                    .anyRequest().permitAll()
+                    .and()
+                    .exceptionHandling().accessDeniedPage("/")
+                    .and()
+                    .csrf().disable();
+        }
     }
 }

@@ -25,7 +25,7 @@ public class ReportController {
     public ResponseEntity<ReportUserResponseDto> getUserInfo(@RequestBody ReportUserRequestDto req) throws Exception {
 
         Optional<User> userInfo = userService.findById(req.getUserId());
-        if (userInfo.get() != null) {
+        if (userInfo.isPresent()) {
             ReportUserResponseDto reportUserResponseDto = new ReportUserResponseDto();
             reportUserResponseDto.setSendUserName(userInfo.get().getRealName());
             reportUserResponseDto.setReceiveEmail(userInfo.get().getDailyReportList());
