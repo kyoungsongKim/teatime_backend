@@ -3,13 +3,17 @@ package castis.domain.board;
 import castis.domain.model.PointHistory;
 import castis.domain.point.PointHistoryDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,20 +25,59 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Controller
+@RestController
 @Slf4j
 @RequiredArgsConstructor
+@RequestMapping(value = "/api")
 public class BoardController {
 
     private BoardSvc boardSvc;
     private BoardGroupSvc boardGroupSvc;
     private PointHistoryDao pointHistoryDao;
 
+    private final BoardRepository boardRepository;
+    private final BoardreplyRepository boardreplyRepository;
     /**
      * 리스트.
      */
-    @RequestMapping(value = "/boardList")
-    public String boardList(SearchVO searchVO, ModelMap modelMap) {
+    @GetMapping("/boardList")
+    public BoardListDto boardList(@RequestParam(value="board", defaultValue="1")long board, @RequestParam(value="page" , defaultValue = "1") int page, @RequestParam(value="page_size", defaultValue = "10") int size){
+        long count = boardRepository.countBoardByBoardGroupAndBrddeleteflag(board, 'N');
+        List<Board> boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
+        BoardListDto boardDto = new BoardListDto(count/size);
+        boardDto.setBoardDataList(boards);
+        return boardDto;
+    }
+
+    @GetMapping("/boardData")
+    public BoardDataDto boardData(@RequestParam(value="boardNum", defaultValue = "1") long bdNum){
+        Board boardData = boardRepository.findByBoardNumAndBrddeleteflag(bdNum, 'N').orElse(null);
+        BoardDataDto boardDataDto = new BoardDataDto(boardData);
+        return boardDataDto;
+    }
+
+    @GetMapping("/boardReplies")
+    public BoardReplyDto boardReplies(@RequestParam(value="boardNum", defaultValue = "1")int bdNum){
+        List<Boardreply> replies = boardreplyRepository.findByBrdnoOrderByReorder(bdNum).orElse(null);
+        BoardReplyDto boardReplyDto = new BoardReplyDto(replies);
+        return boardReplyDto;
+    }
+
+    @PostMapping("/writeDoc")
+    public String writeDocument(@RequestBody WriteDataDto data){
+        Board boardData = new Board(data);
+        Board result = boardRepository.save(boardData);
+        return result.getBoardNum().toString();
+    }
+
+    @PostMapping("/writeReply")
+    public String writeReply(@RequestBody WriteReplyDto reply) {
+        Boardreply boardreply;
+        return "1";
+    }
+
+
+    public String boardList1(SearchVO searchVO, ModelMap modelMap) {
         if (searchVO.getBgno() == null) {
             searchVO.setBgno("1");
         }
