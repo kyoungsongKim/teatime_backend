@@ -1,4 +1,4 @@
-package castis.domain.user;
+package castis.domain.user.entity;
 
 import lombok.Builder;
 import lombok.Getter;

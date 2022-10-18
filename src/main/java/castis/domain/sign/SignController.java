@@ -59,6 +59,6 @@ public class SignController {
     @PostMapping(value = {"/verifyToken"})
     public ResponseEntity<CustomUserDetails> verifyToken(@RequestBody TokenDto tokenDto) throws Exception {
         Authentication authentication = authProvider.getAuthentication(tokenDto.getApiToken());
-        return ResponseEntity.ok().body((CustomUserDetails)authentication.getPrincipal());
+        return ResponseEntity.ok().body((CustomUserDetails) authentication.getPrincipal());
     }
 }

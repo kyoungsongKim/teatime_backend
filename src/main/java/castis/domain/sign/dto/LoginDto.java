@@ -1,6 +1,6 @@
 package castis.domain.sign.dto;
 
-import castis.domain.user.User;
+import castis.domain.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

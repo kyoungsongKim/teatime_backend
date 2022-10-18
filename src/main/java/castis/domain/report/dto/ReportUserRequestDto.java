@@ -1,4 +1,4 @@
-package castis.domain.report;
+package castis.domain.report.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

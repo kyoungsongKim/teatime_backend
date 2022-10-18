@@ -1,5 +1,8 @@
-package castis.domain.user;
+package castis.domain.user.service;
 
+import castis.domain.user.CustomUserDetails;
+import castis.domain.user.entity.User;
+import castis.domain.user.repository.UserRepository;
 import castis.exception.custom.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,7 +1,10 @@
-package castis.domain.report;
+package castis.domain.report.controller;
 
-import castis.domain.user.User;
-import castis.domain.user.UserService;
+import castis.domain.report.dto.ReportRequestDto;
+import castis.domain.report.dto.ReportUserRequestDto;
+import castis.domain.report.dto.ReportUserResponseDto;
+import castis.domain.user.entity.User;
+import castis.domain.user.service.UserService;
 import castis.exception.custom.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

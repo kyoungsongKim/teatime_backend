@@ -1,4 +1,4 @@
-package castis.domain.report;
+package castis.domain.report.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +9,10 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor
 @ToString
-public class ReportUserResponseDto {
+public class ReportRequestDto {
     private String sendUserName;
+    private String title;
     private String senderEmail;
     private String receiveEmail;
+    private String contents;
 }

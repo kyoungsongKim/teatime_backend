@@ -1,9 +1,9 @@
-package castis.domain.sign.dto;
+package castis.domain.user.dto;
 
-import castis.domain.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -11,16 +11,14 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @Getter
 @NoArgsConstructor
-public class JoinDto {
+@ToString
+public class UserUpdateDto {
 
     @NotBlank(message = "'id' is a required input value")
     private String id;
 
     @NotBlank(message = "'name' is a required input value")
     private String name;
-
-    @NotBlank(message = "'password' is a required input value")
-    private String password;
 
     @NotBlank(message = "'team' is a required input value")
     private String team;
@@ -37,22 +35,4 @@ public class JoinDto {
     private String reportEmail;
 
     private String vacationReportList;
-
-    public User toEntity() {
-        User build = User.builder()
-                .id(id)
-                .userName(id)
-                .realName(name)
-                .password(password)
-                .teamName(team)
-                .position(position == null ? "" : position)
-                .cellphone(phone == null ? "" : position)
-                .email(email)
-                .dailyReportList(reportEmail == null ? "" : reportEmail)
-                .vacationReportList(reportEmail == null ? "" : reportEmail)
-                .build();
-
-        return build;
-    }
-
 }

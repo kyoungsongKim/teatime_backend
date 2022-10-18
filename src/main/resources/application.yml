@@ -59,4 +59,4 @@ scheduler:
   vacation:
     fixedRate: 30000
 
-useJwt: false
+useJwt: true
