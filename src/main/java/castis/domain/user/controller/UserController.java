@@ -8,8 +8,11 @@ import castis.domain.user.service.UserService;
 import castis.exception.custom.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -43,5 +46,27 @@ public class UserController {
     public ResponseEntity changePassword(@RequestBody PasswordDto passwordDto) throws Exception {
         userService.updatePassword(passwordDto);
         return ResponseEntity.ok().body("password changed!");
+    }
+
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity<UserDto> getUserInfoById(@PathVariable(value = "id")String id) throws Exception {
+        UserDto userInfo = userService.getUserDtoById(id);
+        if (userInfo != null) {
+            return new ResponseEntity<>(userInfo, HttpStatus.OK);
+        } else {
+            throw new UserNotFoundException("User Not Found");
+        }
+    }
+
+    @RequestMapping(value = "/user/except", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity getUserInfoExceptId(@RequestParam(value = "userId")String userId) throws Exception {
+        List<UserDto> userDtoList  = userService.findAllUserDtoExceptId(userId);
+        if (userDtoList != null) {
+            return new ResponseEntity<>(userDtoList, HttpStatus.OK);
+        } else {
+            throw new UserNotFoundException("User List Not Found");
+        }
     }
 }

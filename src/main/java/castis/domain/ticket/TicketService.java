@@ -1,5 +1,7 @@
 package castis.domain.ticket;
 
+import castis.domain.point.PointHistory;
+import castis.domain.point.PointHistoryRepository;
 import castis.domain.project.Project;
 import castis.domain.project.ProjectRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final ProjectRepository projectRepository;
+    private final PointHistoryRepository pointHistoryRepository;
 
     public List<EventDto> findAllByUserNameAndPeroid(String userName, String year, String month) {
 
@@ -94,6 +97,9 @@ public class TicketService {
 
     public ResponseEntity saveTicketInfo(TicketDto ticketDto) {
         ticketRepository.save(new Ticket(ticketDto));
+        PointHistory pointHistory = new PointHistory(ticketDto.getUserName(), ticketDto.getUserName(), 5, "TICKET_POINT", "AUTO");
+        pointHistory.setUseDate(LocalDateTime.now());
+        pointHistoryRepository.save(pointHistory);
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 

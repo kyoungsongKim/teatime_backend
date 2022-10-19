@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -72,5 +74,16 @@ public class UserService {
         userRepository.save(user);
 
         return true;
+    }
+
+    public List<UserDto> findAllUserDtoExceptId(String id) {
+        List<User> userList = userRepository.findAllExceptId(id);
+        List<UserDto> result = new ArrayList<>();
+
+        userList.forEach(i -> {
+            result.add(new UserDto(i));
+        });
+
+        return result;
     }
 }
