@@ -29,4 +29,17 @@ public class ProjectDto implements Serializable {
         this.endDate = project.getEndDate();
         this.bgColor = project.getBgColor();
     }
+
+    public Project toEntity() {
+        Project build = Project.builder()
+                .projectName(projectName)
+                .site(site)
+                .description(description)
+                .startDate(startDate)
+                .endDate(endDate)
+                .bgColor(bgColor)
+                .build();
+
+        return build;
+    }
 }

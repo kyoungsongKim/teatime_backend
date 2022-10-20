@@ -1,6 +1,8 @@
 package castis.domain.project;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @Table(name = "project")
 @Entity
+@NoArgsConstructor
 public class Project {
 
     @Id
@@ -32,4 +35,14 @@ public class Project {
 
     @Column
     private String bgColor;
+
+    @Builder
+    public Project(String projectName, String site, String description, LocalDateTime startDate, LocalDateTime endDate, String bgColor) {
+        this.projectName = projectName;
+        this.site = site;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.bgColor = bgColor;
+    }
 }

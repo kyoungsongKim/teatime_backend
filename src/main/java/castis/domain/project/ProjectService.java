@@ -27,4 +27,25 @@ public class ProjectService {
 
         return projectDtoList;
     }
+
+    public List<ProjectDto> getAllProjectInfoList() {
+        List<Project> projectList = projectRepository.findAll();
+
+        List<ProjectDto> projectDtoList = new ArrayList<>();
+        projectList.forEach(i -> {
+            projectDtoList.add(new ProjectDto(i));
+        });
+
+        return projectDtoList;
+    }
+
+    public boolean addProject(ProjectDto projectDto) {
+        projectRepository.save(projectDto.toEntity());
+        return true;
+    }
+
+    public boolean deleteProject(String projectName) {
+        projectRepository.deleteById(projectName);
+        return true;
+    }
 }
