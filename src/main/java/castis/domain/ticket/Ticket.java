@@ -1,5 +1,6 @@
 package castis.domain.ticket;
 
+import castis.domain.project.Project;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -53,6 +54,10 @@ public class Ticket {
 
 	@Column
 	private LocalDateTime endTime;
+
+	@ManyToOne
+	@JoinColumn(name = "projectname")
+	private Project project;
 
 	public Ticket(TicketDto dto) {
 		if(dto.getId() != null && dto.getId() != 0) {

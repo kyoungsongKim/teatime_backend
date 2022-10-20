@@ -16,6 +16,7 @@ public class EventDto {
     private LocalDate end;
     private String description;
     private String className;
+    private String color;
 
     public EventDto (Ticket ticket) {
         this.no = ticket.getNo();
@@ -25,6 +26,7 @@ public class EventDto {
         this.description = ticket.getContent();
         //this.className = "Lorem ipsum dolor eiu idunt ut labore";
         this.className = "fc-event-danger fc-event-solid-warning";
+        this.color = ticket.getProject().getBgColor();
 
     }
 }
