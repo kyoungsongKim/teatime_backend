@@ -31,8 +31,10 @@ class BoardReplyData {
     public String date;
     public Object avatar;
     public int depth;
+    public int id;
 
     public BoardReplyData(Boardreply reply){
+        this.id = reply.getId();
         this.message = reply.getRememo();
         this.author = reply.getRewriter();
         this.date = String.valueOf(reply.getRedate());

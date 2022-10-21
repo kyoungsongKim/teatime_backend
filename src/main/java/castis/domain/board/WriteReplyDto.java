@@ -8,6 +8,8 @@ import lombok.Setter;
 @Setter
 @RequiredArgsConstructor
 public class WriteReplyDto {
+    private int boardNum;
+    private int parentId;
     private String memo;
     private String writer;
 }

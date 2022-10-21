@@ -12,4 +12,5 @@ public class WriteDataDto {
     private String summary;
     private String writer;
     private long boardGroup;
+    private long boardNum;
 }

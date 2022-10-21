@@ -50,6 +50,20 @@ public class Board {
         this.brddeleteflag = 'N';
     }
 
+    public Board updateData(WriteDataDto data){
+        this.brdtitle = data.getTitle();
+        this.brdmemo = data.getSummary();
+        this.brdwriter = data.getWriter();
+        return this;
+    }
+    public Board deleteData(){
+            this.brddeleteflag = 'Y';
+            return this;
+    }
+
+    public void hitUp(){
+        this.brdhit++;
+    }
     public void setBrddeleteflag(Character brddeleteflag) {
         this.brddeleteflag = brddeleteflag;
     }

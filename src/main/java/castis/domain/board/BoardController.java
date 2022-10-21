@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.ui.ModelMap;
@@ -50,30 +52,103 @@ public class BoardController {
     }
 
     @GetMapping("/boardData")
-    public BoardDataDto boardData(@RequestParam(value="boardNum", defaultValue = "1") long bdNum){
+    public BoardDataDto boardData(@RequestParam(value="boardNum", defaultValue = "1") long bdNum, @RequestParam(value="hit", defaultValue = "false") boolean hit){
         Board boardData = boardRepository.findByBoardNumAndBrddeleteflag(bdNum, 'N').orElse(null);
+        if(hit) {
+            boardData.hitUp();
+            boardRepository.save(boardData);
+        }
         BoardDataDto boardDataDto = new BoardDataDto(boardData);
         return boardDataDto;
     }
 
     @GetMapping("/boardReplies")
     public BoardReplyDto boardReplies(@RequestParam(value="boardNum", defaultValue = "1")int bdNum){
-        List<Boardreply> replies = boardreplyRepository.findByBrdnoOrderByReorder(bdNum).orElse(null);
+        List<Boardreply> replies = boardreplyRepository.findByBrdnoAndRedeleteflagOrderByReorder(bdNum, 'N').orElse(null);
         BoardReplyDto boardReplyDto = new BoardReplyDto(replies);
         return boardReplyDto;
     }
 
     @PostMapping("/writeDoc")
     public String writeDocument(@RequestBody WriteDataDto data){
-        Board boardData = new Board(data);
+        Board boardData = boardRepository.findByBoardNum(data.getBoardNum())
+                .map(board -> board.updateData(data))
+                .orElse(new Board(data));
+
         Board result = boardRepository.save(boardData);
         return result.getBoardNum().toString();
     }
 
+    @DeleteMapping("/deleteDoc/{boardNum}")
+    public ResponseEntity deleteDocument(@PathVariable long boardNum ) {
+        Board boardData = boardRepository.findByBoardNum(boardNum)
+                .map(Board::deleteData)
+                .orElse(null);
+
+        if(boardData == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }else {
+            boardRepository.save(boardData);
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        }
+    }
+
     @PostMapping("/writeReply")
-    public String writeReply(@RequestBody WriteReplyDto reply) {
-        Boardreply boardreply;
-        return "1";
+    public ResponseEntity writeReply(@RequestBody WriteReplyDto reply) {
+        Boardreply boardreply = new Boardreply(reply);
+        Boardreply parentReply = null;
+        int order = 0;
+        if(reply.getParentId() > 0) {
+            parentReply = boardreplyRepository.findByBrdnoAndIdOrderByReorderDesc(reply.getBoardNum(), reply.getParentId()).orElse(null);
+            if(parentReply != null) {
+                boardreply.setRedepth(parentReply.getRedepth()+1);
+                boardreply.setReparent(parentReply.getId());
+
+                Boardreply nextReply =  boardreplyRepository.findTop1ByBrdnoAndRedepthAndReorderGreaterThanOrderByReorder(reply.getBoardNum(), parentReply.getRedepth(), parentReply.getReorder()).orElse(null);
+
+                if(nextReply != null) {
+                    order = nextReply.getReorder();
+                }
+            }
+        }else {
+            parentReply = boardreplyRepository.findTop1ByBrdnoOrderByReorderDesc(reply.getBoardNum()).orElse(null);
+        }
+        List<Boardreply> nextReply = new ArrayList<>();
+        if(parentReply == null) {
+            order = 1;
+        }else {
+            if(order == 0){
+                order = parentReply.getReorder()+1;
+            }
+            nextReply = boardreplyRepository.findByBrdnoAndReorderGreaterThanEqual(reply.getBoardNum(), order).orElse(new ArrayList<>());
+        }
+
+        boardreply.setReorder(order);
+
+        boardreplyRepository.save(boardreply);
+        //전체 증가해주는 거 하나 필요.
+        //저장하는거 ㅏ나필요.
+        if(nextReply != null ) {
+            for (Boardreply value : nextReply) {
+                value.setReorder(value.getReorder() + 1);
+            }
+            boardreplyRepository.saveAll(nextReply);
+        }
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteReply/{replyId}")
+    public ResponseEntity deleteReply(@PathVariable int replyId ) {
+        Boardreply deleteReplyData = boardreplyRepository.findById(replyId)
+                .map(Boardreply::deleteData)
+                .orElse(null);
+
+        if(deleteReplyData == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }else {
+            boardreplyRepository.save(deleteReplyData);
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        }
     }
 
 

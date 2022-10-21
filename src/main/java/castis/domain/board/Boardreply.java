@@ -1,13 +1,18 @@
 package castis.domain.board;
 
+import lombok.RequiredArgsConstructor;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 @Entity
 @Table(name = "boardreply")
+@RequiredArgsConstructor
 public class Boardreply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +43,26 @@ public class Boardreply {
 
     @Column(name = "REORDER")
     private Integer reorder;
+
+    @Column(name = "REDELETEFLAG")
+    private Character redeleteflag;
+
+
+    public Boardreply(WriteReplyDto writeReplyDto){
+        this.brdno = writeReplyDto.getBoardNum();
+        this.rewriter = writeReplyDto.getWriter();
+        this.rememo = writeReplyDto.getMemo();
+        this.redate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+        this.redepth = 0;
+        this.reparent = -1;
+        this.reorder = 0;
+        this.redeleteflag = 'N';
+    }
+
+    public Boardreply deleteData(){
+        this.redeleteflag = 'Y';
+        return this;
+    }
 
     public Integer getId() {
         return id;
