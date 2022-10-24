@@ -1,9 +1,11 @@
 package castis.domain.project;
 
-import castis.domain.ticket.EventDto;
+import castis.domain.project.dto.ProjectDto;
+import castis.exception.custom.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +48,13 @@ public class ProjectService {
 
     public boolean deleteProject(String projectName) {
         projectRepository.deleteById(projectName);
+        return true;
+    }
+
+    public boolean updateEndDateProject(String projectName) {
+        Project project = projectRepository.findById(projectName).orElseThrow(() -> new NotFoundException("Project Not Found"));
+        project.setEndDate(LocalDateTime.now().minusDays(1));
+        projectRepository.save(project);
         return true;
     }
 }

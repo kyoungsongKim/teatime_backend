@@ -1,5 +1,7 @@
 package castis.domain.project;
 
+import castis.domain.project.dto.ProjectDto;
+import castis.domain.project.dto.SiteAndProjectDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -7,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.ZoneId;
 import java.util.*;
 
 @RestController
@@ -34,7 +35,7 @@ public class ProjectController {
     }
 
     @RequestMapping(value = "/project/all", method = RequestMethod.GET)
-    public ResponseEntity getAllProjectInfo(HttpServletRequest httpServletRequest) {
+    public ResponseEntity<SiteAndProjectDto> getAllProjectInfo(HttpServletRequest httpServletRequest) {
         log.info("request, uri[{}]", httpServletRequest.getRequestURI());
         List<ProjectDto> projectList = projectService.getAllProjectInfoList();
         Set<String> siteList = new HashSet<>();
@@ -53,35 +54,32 @@ public class ProjectController {
             }
         }
 
-        return new ResponseEntity<>(projectMap, HttpStatus.OK);
+        SiteAndProjectDto siteAndProjectDto = new SiteAndProjectDto();
+        siteAndProjectDto.setSiteList(siteList);
+        siteAndProjectDto.setProjectMap(projectMap);
+
+        return new ResponseEntity<>(siteAndProjectDto, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/project", method = RequestMethod.POST)
     public ResponseEntity addProjectInfo(@RequestBody ProjectDto projectDto, HttpServletRequest httpServletRequest) {
         log.info("request, uri[{}]", httpServletRequest.getRequestURI());
 
-        Date now = new Date();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(now);
-        cal.add(Calendar.YEAR, 1);
-        Date oneYearAfter = cal.getTime();
-        projectDto.setStartDate(now.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-        projectDto.setEndDate(oneYearAfter.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-
         List<ProjectDto> projectDtoList = projectService.getProjectInfoListBySiteName(projectDto.getSite());
         if (projectDtoList != null && projectDtoList.isEmpty() == false) {
             projectDto.setBgColor(projectDtoList.get(0).getBgColor());
         }
+        projectDto.setDescription(projectDto.getProjectName());
 
         projectService.addProject(projectDto);
 
         return new ResponseEntity<>(projectDtoList, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/project/{projectName}", method = RequestMethod.DELETE)
-    public ResponseEntity deleteProjectInfo(@PathVariable(value = "projectName") String projectName, HttpServletRequest httpServletRequest) {
+    @RequestMapping(value = "/project/{projectName}", method = RequestMethod.POST)
+    public ResponseEntity updateEndDateProject(@PathVariable(value = "projectName") String projectName, HttpServletRequest httpServletRequest) {
         log.info("request, uri[{}]", httpServletRequest.getRequestURI());
-        projectService.deleteProject(projectName);
-        return new ResponseEntity<>(projectName + "deleted success", HttpStatus.OK);
+        projectService.updateEndDateProject(projectName);
+        return new ResponseEntity<>(projectName + "end date update success", HttpStatus.OK);
     }
 }
