@@ -52,7 +52,7 @@ public class Boardreply {
         this.brdno = writeReplyDto.getBoardNum();
         this.rewriter = writeReplyDto.getWriter();
         this.rememo = writeReplyDto.getMemo();
-        this.redate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+        this.redate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         this.redepth = 0;
         this.reparent = -1;
         this.reorder = 0;

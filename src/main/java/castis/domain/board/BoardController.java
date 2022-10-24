@@ -1,5 +1,7 @@
 package castis.domain.board;
 
+import castis.Boardfile;
+import castis.BoardfileRepository;
 import castis.domain.model.PointHistory;
 import castis.domain.point.PointHistoryDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,19 +9,30 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +52,7 @@ public class BoardController {
 
     private final BoardRepository boardRepository;
     private final BoardreplyRepository boardreplyRepository;
+    private final BoardfileRepository boardfileRepository;
     /**
      * 리스트.
      */
@@ -59,6 +73,13 @@ public class BoardController {
             boardRepository.save(boardData);
         }
         BoardDataDto boardDataDto = new BoardDataDto(boardData);
+        Boardfile file = boardfileRepository.findByBrdno(Long.valueOf(bdNum).intValue()).orElse(null);
+        if(file != null) {
+            boardDataDto.setFileName(file.getFilename());
+            boardDataDto.setSaveName(file.getRealname());
+            boardDataDto.setFileSize(file.getFilesize());
+        }
+
         return boardDataDto;
     }
 
@@ -79,11 +100,48 @@ public class BoardController {
         return result.getBoardNum().toString();
     }
 
+    @PostMapping("/uploadFile")
+    public ResponseEntity uploadFile(@RequestParam("uploadFile") MultipartFile file, @RequestParam("boardNum") int num) throws IOException {
+        FileUtil fs = new FileUtil();
+
+        Boardfile boardfile = new Boardfile(num, file);
+        fs.saveFile(file, boardfile.getRealname());
+        boardfileRepository.save(boardfile);
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+
+    @GetMapping("/downloadFile")
+    public ResponseEntity downloadFile(@RequestParam("fileName") String file, @RequestParam("saveName") String save) throws IOException {
+        log.info(file);
+        log.info(save);
+        FileUtil fs = new FileUtil();
+        Path path = Paths.get(fs.getUploadFolder()+save);
+        String contentType = Files.probeContentType(path);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(ContentDisposition.builder("attachment")
+                .filename(file, StandardCharsets.UTF_8).build());
+        headers.add(HttpHeaders.CONTENT_TYPE, contentType);
+
+        Resource resource = new InputStreamResource(Files.newInputStream(path));
+
+        return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+    }
+
     @DeleteMapping("/deleteDoc/{boardNum}")
     public ResponseEntity deleteDocument(@PathVariable long boardNum ) {
         Board boardData = boardRepository.findByBoardNum(boardNum)
                 .map(Board::deleteData)
                 .orElse(null);
+
+        List<Boardreply> boardreplies = boardreplyRepository.findByBrdno(Long.valueOf(boardNum).intValue()).orElse(null);
+
+        if(boardreplies != null) {
+            for (Boardreply reply : boardreplies){
+                reply.deleteData();
+            }
+            boardreplyRepository.saveAll(boardreplies);
+        }
 
         if(boardData == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
@@ -126,8 +184,6 @@ public class BoardController {
         boardreply.setReorder(order);
 
         boardreplyRepository.save(boardreply);
-        //전체 증가해주는 거 하나 필요.
-        //저장하는거 ㅏ나필요.
         if(nextReply != null ) {
             for (Boardreply value : nextReply) {
                 value.setReorder(value.getReorder() + 1);
@@ -150,8 +206,6 @@ public class BoardController {
             return new ResponseEntity<>(null, HttpStatus.OK);
         }
     }
-
-
     public String boardList1(SearchVO searchVO, ModelMap modelMap) {
         if (searchVO.getBgno() == null) {
             searchVO.setBgno("1");

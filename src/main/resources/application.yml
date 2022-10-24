@@ -25,6 +25,7 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 10MB
+      location: d:\\spring\\temp
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://172.16.48.45/ims
@@ -60,3 +61,6 @@ scheduler:
     fixedRate: 30000
 
 useJwt: true
+
+uploadLocation:
+  path: d:\\spring\\upload\\

@@ -1,5 +1,12 @@
 package castis.domain.board;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -8,7 +15,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
+@Configuration
+@Getter
 public class FileUtil {
+    @Value("${uploadLocation.path}")
+    private String uploadPath;
+    String uploadFolder = "/usr/local/imsfileupload/";
+
     /**
      * 파일 업로드.
      */
@@ -42,6 +56,20 @@ public class FileUtil {
         if (!dir.exists()) {
             dir.mkdirs();
         }
+    }
+
+    public String saveFile(MultipartFile file, String newName) throws IOException {
+        if (file == null || file.getName().equals("") || file.getSize() < 1) {
+            return null;
+        }
+
+        makeBasePath(uploadFolder);
+        String uploadFileFullPath = uploadFolder + newName;
+
+        File uploadFile = new File(uploadFileFullPath);
+        file.transferTo(uploadFile);
+
+        return uploadFileFullPath;
     }
 
     /**

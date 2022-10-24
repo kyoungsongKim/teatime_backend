@@ -18,10 +18,15 @@ public class BoardDataDto implements Serializable {
     public String answers;
     public String upvotes;
 
+    public String fileName;
+    public String saveName;
+    public int fileSize;
+
     public BoardDataDto(Board board){
         this.bdNum = board.getBoardNum();
         this.title = board.getBrdtitle();
         this.author = board.getBrdwriter();
+        this.date = board.getBrddate();
         this.avatar = false;
         this.upvotes = board.getBrdhit().toString();
         this.summary = board.getBrdmemo();

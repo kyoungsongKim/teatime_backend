@@ -13,5 +13,6 @@ public interface BoardreplyRepository extends JpaRepository<Boardreply, Integer>
     Optional<Boardreply> findTop1ByBrdnoAndRedepthAndReorderGreaterThanOrderByReorder(int brdno, int depth, int order);
     Optional<List<Boardreply>> findByBrdnoAndReorderGreaterThanEqual(int brdno, int order);
 
+    Optional<List<Boardreply>> findByBrdno(int brdno);
     Optional<Boardreply> findById(int id);
 }

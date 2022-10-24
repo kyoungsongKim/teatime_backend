@@ -44,7 +44,7 @@ public class Board {
         this.brdtitle = data.getTitle();
         this.brdmemo = data.getSummary();
         this.brdwriter = data.getWriter();
-        this.brddate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+        this.brddate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         this.boardGroup = data.getBoardGroup();
         this.brdhit = 0;
         this.brddeleteflag = 'N';
