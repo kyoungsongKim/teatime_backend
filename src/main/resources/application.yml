@@ -46,7 +46,7 @@ spring:
       jdbc.batch_size: 100
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    generate-ddl: true
+    generate-ddl: false
 
 jwt:
   secret:
