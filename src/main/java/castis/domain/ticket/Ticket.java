@@ -56,7 +56,7 @@ public class Ticket {
 	private LocalDateTime endTime;
 
 	@ManyToOne
-	@JoinColumn(name = "projectname")
+	@JoinColumn(name = "projectname", insertable = false, updatable = false)
 	private Project project;
 
 	public Ticket(TicketDto dto) {
@@ -70,11 +70,19 @@ public class Ticket {
 		this.subtitle = dto.getTitle();
 		this.content = dto.getContent();
 
-		this.emd = Float.parseFloat(dto.getMd());
-		this.nmd = Float.parseFloat(dto.getMd());
+		double md = 0;
+		if(dto.getMd() != null && !"".equals(dto.getMd())) {
+			String[] mds = dto.getMd().split(":");
+			md = Float.parseFloat(mds[0]) / 8;
+			if(mds[1].equals("30")) {
+				md += 0.0625;
+			}
+			this.emd = (float) md;
+			this.nmd = (float) md;
+		}
 
-		this.startTime = LocalDateTime.parse(dto.getEventStartDate() + " " + dto.getEventStartTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-		this.endTime = LocalDateTime.parse(dto.getEventEndDate() + " " + dto.getEventEndTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+		this.startTime = LocalDateTime.parse(dto.getEventStartDate() + " 00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+		this.endTime = LocalDateTime.parse(dto.getEventEndDate() + " 00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
 
 		this.attachedfile = "";
 	}

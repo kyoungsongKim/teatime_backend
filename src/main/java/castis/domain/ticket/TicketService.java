@@ -97,9 +97,11 @@ public class TicketService {
 
     public ResponseEntity saveTicketInfo(TicketDto ticketDto) {
         ticketRepository.save(new Ticket(ticketDto));
-        PointHistory pointHistory = new PointHistory(ticketDto.getUserName(), ticketDto.getUserName(), 5, "TICKET_POINT", "AUTO");
-        pointHistory.setUseDate(LocalDateTime.now());
-        pointHistoryRepository.save(pointHistory);
+        if(ticketDto.getId() == null || ticketDto.getId() == 0) {
+            PointHistory pointHistory = new PointHistory(ticketDto.getUserName(), ticketDto.getUserName(), 5, "TICKET_POINT", "AUTO");
+            pointHistory.setUseDate(LocalDateTime.now());
+            pointHistoryRepository.save(pointHistory);
+        }
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
