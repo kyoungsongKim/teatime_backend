@@ -1,10 +1,12 @@
 package castis.domain.ticket;
 
+import castis.util.holiday.HolidayDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Setter
 @Getter
@@ -29,4 +31,14 @@ public class EventDto {
         this.color = ticket.getProject().getBgColor();
 
     }
+
+    public EventDto (HolidayDto dto) {
+        this.no = 0L;
+        this.title = dto.getName();
+        this.start = LocalDate.parse(dto.getDate(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+        this.end = LocalDate.parse(dto.getDate(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+        this.className = "fc-event-danger fc-event-solid-warning";
+        this.color = "#FF1100";
+    }
+
 }

@@ -1,5 +1,7 @@
 package castis.domain.ticket;
 
+import castis.domain.model.Holiday;
+import castis.util.holiday.HolidayService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -7,9 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -21,6 +25,7 @@ public class TicketController {
     DateFormat format = new SimpleDateFormat(calendarTimeFormat);
 
     private final TicketService ticketService;
+    private final HolidayService holidayService;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseEntity getTicketDataUsingUserNameAndPeroid(
@@ -28,7 +33,7 @@ public class TicketController {
             , @RequestParam(name = "periodYear") String periodYear
             , @RequestParam(name = "periodMonth") String periodMonth
             , @RequestParam(name = "userName", required = false) String userName
-    ){
+    ) throws IOException {
         log.info("request, uri[{}]", httpServletRequest.getRequestURI());
         List<EventDto> ticketDtoList = ticketService.findAllByUserNameAndPeroid(userName, periodYear, periodMonth);
 
@@ -61,5 +66,4 @@ public class TicketController {
         TicketDto dto = ticketService.getTicketInfoByNo(no);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
-
 }

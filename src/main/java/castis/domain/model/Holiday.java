@@ -2,6 +2,7 @@ package castis.domain.model;
 
 import com.ibm.icu.util.ChineseCalendar;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
+@Component
 public class Holiday {
     private Map<String, String> holidayMap;
 

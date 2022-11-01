@@ -1,9 +1,12 @@
 package castis.domain.ticket;
 
+import castis.domain.model.Holiday;
 import castis.domain.point.PointHistory;
 import castis.domain.point.PointHistoryRepository;
 import castis.domain.project.Project;
 import castis.domain.project.ProjectRepository;
+import castis.util.holiday.HolidayDto;
+import castis.util.holiday.HolidayService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -11,10 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.Predicate;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,8 +29,9 @@ public class TicketService {
     private final TicketRepository ticketRepository;
     private final ProjectRepository projectRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final HolidayService holidayService;
 
-    public List<EventDto> findAllByUserNameAndPeroid(String userName, String year, String month) {
+    public List<EventDto> findAllByUserNameAndPeroid(String userName, String year, String month) throws IOException {
 
         List<EventDto> result = new ArrayList<>();
 
@@ -50,6 +56,10 @@ public class TicketService {
         List<Ticket> list = ticketRepository.findAll(spec).stream().collect(Collectors.toList());
         list.forEach(i -> {
             result.add(new EventDto(i));
+        });
+
+        holidayService.getHolidayInfo(year, month).forEach(h -> {
+            result.add(new EventDto(h));
         });
 
         return result;

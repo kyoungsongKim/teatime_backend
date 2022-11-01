@@ -64,3 +64,7 @@ useJwt: true
 
 uploadLocation:
   path: d:\\spring\\upload\\
+
+holiday:
+  openApi:
+    serviceKey: jwV6WKPafup8qqgOZ%2BtRbkR3lsuAsYJ4bbUyg8QfP9yh3CbEBOkb7n%2BB91U11TK0v2KjGdZ3CIkx0hwhg2vnTQ%3D%3D
