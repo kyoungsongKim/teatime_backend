@@ -19,10 +19,6 @@ public class Boardreply {
     @Column(name = "RENO", nullable = false)
     private Integer id;
 
-    @NotNull
-    @Column(name = "BRDNO", nullable = false)
-    private Integer brdno;
-
     @Size(max = 10)
     @NotNull
     @Column(name = "REWRITER", nullable = false, length = 10)
@@ -47,9 +43,22 @@ public class Boardreply {
     @Column(name = "REDELETEFLAG")
     private Character redeleteflag;
 
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "BRDNO", nullable = false)
+    private Board brdno;
 
-    public Boardreply(WriteReplyDto writeReplyDto){
-        this.brdno = writeReplyDto.getBoardNum();
+    public Board getBrdno() {
+        return brdno;
+    }
+
+    public void setBrdno(Board brdno) {
+        this.brdno = brdno;
+    }
+
+
+    public Boardreply(WriteReplyDto writeReplyDto, Board board){
+        this.brdno = board;
         this.rewriter = writeReplyDto.getWriter();
         this.rememo = writeReplyDto.getMemo();
         this.redate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -72,13 +81,6 @@ public class Boardreply {
         this.id = id;
     }
 
-    public Integer getBrdno() {
-        return brdno;
-    }
-
-    public void setBrdno(Integer brdno) {
-        this.brdno = brdno;
-    }
 
     public String getRewriter() {
         return rewriter;

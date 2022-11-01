@@ -22,6 +22,8 @@ public class BoardDataDto implements Serializable {
     public String saveName;
     public int fileSize;
 
+    public int repliesCount;
+
     public BoardDataDto(Board board){
         this.bdNum = board.getBoardNum();
         this.title = board.getBrdtitle();
@@ -30,5 +32,6 @@ public class BoardDataDto implements Serializable {
         this.avatar = false;
         this.upvotes = board.getBrdhit().toString();
         this.summary = board.getBrdmemo();
+        this.repliesCount = board.getBoardreplies().size();
     }
 }

@@ -18,6 +18,7 @@ import java.util.List;
 public class BoardListDto implements Serializable {
     private long size;
     private List<BoardDataDto> boardDataList;
+
     @Builder
     public BoardListDto(long size){
         this.size = size;

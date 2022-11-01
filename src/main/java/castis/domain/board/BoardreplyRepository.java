@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BoardreplyRepository extends JpaRepository<Boardreply, Integer> {
-    Optional<List<Boardreply>> findByBrdnoAndRedeleteflagOrderByReorder(int brdno, char flag);
-    Optional<Boardreply> findTop1ByBrdnoOrderByReorderDesc(int brdno);
-    Optional<Boardreply> findByBrdnoAndIdOrderByReorderDesc(int brdno, int id);
+    Optional<List<Boardreply>> findByBrdnoAndRedeleteflagOrderByReorder(Board brdno, char flag);
+    Optional<Boardreply> findTop1ByBrdnoOrderByReorderDesc(Board brdno);
+    Optional<Boardreply> findByBrdnoAndIdOrderByReorderDesc(Board brdno, int id);
 
-    Optional<Boardreply> findTop1ByBrdnoAndRedepthAndReorderGreaterThanOrderByReorder(int brdno, int depth, int order);
-    Optional<List<Boardreply>> findByBrdnoAndReorderGreaterThanEqual(int brdno, int order);
+    Optional<Boardreply> findTop1ByBrdnoAndRedepthAndReorderGreaterThanOrderByReorder(Board brdno, int depth, int order);
+    Optional<List<Boardreply>> findByBrdnoAndReorderGreaterThanEqual(Board brdno, int order);
 
-    Optional<List<Boardreply>> findByBrdno(int brdno);
+    Optional<List<Boardreply>> findByBrdno(Board brdno);
     Optional<Boardreply> findById(int id);
+
 }

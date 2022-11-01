@@ -8,6 +8,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Getter
 @Table(name = "board")
@@ -39,6 +41,13 @@ public class Board {
 
     @Column(name = "BRDDELETEFLAG")
     private Character brddeleteflag;
+
+    @OneToMany(mappedBy = "brdno")
+    private Set<Boardreply> boardreplies = new LinkedHashSet<>();
+
+    public void setBoardreplies(Set<Boardreply> boardreplies) {
+        this.boardreplies = boardreplies;
+    }
 
     public Board(WriteDataDto data){
         this.brdtitle = data.getTitle();

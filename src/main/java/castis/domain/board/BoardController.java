@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -33,10 +34,6 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api")
 public class BoardController {
-
-    private BoardSvc boardSvc;
-    private BoardGroupSvc boardGroupSvc;
-
     private final BoardRepository boardRepository;
     private final BoardreplyRepository boardreplyRepository;
     private final BoardfileRepository boardfileRepository;
@@ -45,7 +42,8 @@ public class BoardController {
      * 리스트.
      */
     @GetMapping("/boardList")
-    public BoardListDto boardList(@RequestParam(value = "board", defaultValue = "1") long board, @RequestParam(value = "page", defaultValue = "1") int page, @RequestParam(value = "page_size", defaultValue = "10") int size) {
+    @Transactional
+    public BoardListDto boardList(@RequestParam(value="board", defaultValue="1")long board, @RequestParam(value="page" , defaultValue = "1") int page, @RequestParam(value="page_size", defaultValue = "10") int size){
         long count = boardRepository.countBoardByBoardGroupAndBrddeleteflag(board, 'N');
         List<Board> boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
         BoardListDto boardDto = new BoardListDto(count / size);
@@ -54,7 +52,8 @@ public class BoardController {
     }
 
     @GetMapping("/boardData")
-    public BoardDataDto boardData(@RequestParam(value = "boardNum", defaultValue = "1") long bdNum, @RequestParam(value = "hit", defaultValue = "false") boolean hit) {
+    @Transactional
+    public BoardDataDto boardData(@RequestParam(value="boardNum", defaultValue = "1") long bdNum, @RequestParam(value="hit", defaultValue = "false") boolean hit){
         Board boardData = boardRepository.findByBoardNumAndBrddeleteflag(bdNum, 'N').orElse(null);
         if (hit) {
             boardData.hitUp();
@@ -72,8 +71,14 @@ public class BoardController {
     }
 
     @GetMapping("/boardReplies")
-    public BoardReplyDto boardReplies(@RequestParam(value = "boardNum", defaultValue = "1") int bdNum) {
-        List<Boardreply> replies = boardreplyRepository.findByBrdnoAndRedeleteflagOrderByReorder(bdNum, 'N').orElse(null);
+    public BoardReplyDto boardReplies(@RequestParam(value="boardNum", defaultValue = "1")int bdNum){
+        Board board = boardRepository.findByBoardNum(bdNum).orElse(null);
+        List<Boardreply> replies = null;
+        if(board!=null) {
+            replies = boardreplyRepository.findByBrdnoAndRedeleteflagOrderByReorder(board, 'N').orElse(null);
+
+
+        }
         BoardReplyDto boardReplyDto = new BoardReplyDto(replies);
         return boardReplyDto;
     }
@@ -100,8 +105,7 @@ public class BoardController {
 
     @GetMapping("/downloadFile")
     public ResponseEntity downloadFile(@RequestParam("fileName") String file, @RequestParam("saveName") String save) throws IOException {
-        log.info(file);
-        log.info(save);
+
         FileUtil fs = new FileUtil();
         Path path = Paths.get(fs.getUploadFolder() + save);
         String contentType = Files.probeContentType(path);
@@ -122,18 +126,18 @@ public class BoardController {
                 .map(Board::deleteData)
                 .orElse(null);
 
-        List<Boardreply> boardreplies = boardreplyRepository.findByBrdno(Long.valueOf(boardNum).intValue()).orElse(null);
+        List<Boardreply> boardreplies = boardreplyRepository.findByBrdno(boardData).orElse(null);
 
-        if (boardreplies != null) {
-            for (Boardreply reply : boardreplies) {
+        if(boardreplies != null) {
+            for (Boardreply reply : boardreplies){
                 reply.deleteData();
             }
             boardreplyRepository.saveAll(boardreplies);
         }
 
-        if (boardData == null) {
+        if(boardData == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } else {
+        }else {
             boardRepository.save(boardData);
             return new ResponseEntity<>(null, HttpStatus.OK);
         }
@@ -141,218 +145,61 @@ public class BoardController {
 
     @PostMapping("/writeReply")
     public ResponseEntity writeReply(@RequestBody WriteReplyDto reply) {
-        Boardreply boardreply = new Boardreply(reply);
-        Boardreply parentReply = null;
-        int order = 0;
-        if (reply.getParentId() > 0) {
-            parentReply = boardreplyRepository.findByBrdnoAndIdOrderByReorderDesc(reply.getBoardNum(), reply.getParentId()).orElse(null);
-            if (parentReply != null) {
-                boardreply.setRedepth(parentReply.getRedepth() + 1);
-                boardreply.setReparent(parentReply.getId());
+        Board board = boardRepository.findByBoardNum(reply.getBoardNum()).orElse(null);
+        if(board != null) {
+            Boardreply boardreply = new Boardreply(reply, board);
+            Boardreply parentReply = null;
+            int order = 0;
+            if (reply.getParentId() > 0) {
+                parentReply = boardreplyRepository.findByBrdnoAndIdOrderByReorderDesc(board, reply.getParentId()).orElse(null);
+                if (parentReply != null) {
+                    boardreply.setRedepth(parentReply.getRedepth() + 1);
+                    boardreply.setReparent(parentReply.getId());
 
-                Boardreply nextReply = boardreplyRepository.findTop1ByBrdnoAndRedepthAndReorderGreaterThanOrderByReorder(reply.getBoardNum(), parentReply.getRedepth(), parentReply.getReorder()).orElse(null);
+                    Boardreply nextReply = boardreplyRepository.findTop1ByBrdnoAndRedepthAndReorderGreaterThanOrderByReorder(board, parentReply.getRedepth(), parentReply.getReorder()).orElse(null);
 
-                if (nextReply != null) {
-                    order = nextReply.getReorder();
+                    if (nextReply != null) {
+                        order = nextReply.getReorder();
+                    }
                 }
+            } else {
+                parentReply = boardreplyRepository.findTop1ByBrdnoOrderByReorderDesc(board).orElse(null);
             }
-        } else {
-            parentReply = boardreplyRepository.findTop1ByBrdnoOrderByReorderDesc(reply.getBoardNum()).orElse(null);
-        }
-        List<Boardreply> nextReply = new ArrayList<>();
-        if (parentReply == null) {
-            order = 1;
-        } else {
-            if (order == 0) {
-                order = parentReply.getReorder() + 1;
+            List<Boardreply> nextReply = new ArrayList<>();
+            if (parentReply == null) {
+                order = 1;
+            } else {
+                if (order == 0) {
+                    order = parentReply.getReorder() + 1;
+                }
+                nextReply = boardreplyRepository.findByBrdnoAndReorderGreaterThanEqual(board, order).orElse(new ArrayList<>());
             }
-            nextReply = boardreplyRepository.findByBrdnoAndReorderGreaterThanEqual(reply.getBoardNum(), order).orElse(new ArrayList<>());
-        }
 
-        boardreply.setReorder(order);
+            boardreply.setReorder(order);
 
-        boardreplyRepository.save(boardreply);
-        if (nextReply != null) {
-            for (Boardreply value : nextReply) {
-                value.setReorder(value.getReorder() + 1);
+            boardreplyRepository.save(boardreply);
+
+            if (nextReply != null) {
+                for (Boardreply value : nextReply) {
+                    value.setReorder(value.getReorder() + 1);
+                }
+                boardreplyRepository.saveAll(nextReply);
             }
-            boardreplyRepository.saveAll(nextReply);
         }
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteReply/{replyId}")
-    public ResponseEntity deleteReply(@PathVariable int replyId) {
+    public ResponseEntity deleteReply(@PathVariable int replyId ) {
         Boardreply deleteReplyData = boardreplyRepository.findById(replyId)
                 .map(Boardreply::deleteData)
                 .orElse(null);
 
-        if (deleteReplyData == null) {
+        if(deleteReplyData == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } else {
+        }else {
             boardreplyRepository.save(deleteReplyData);
             return new ResponseEntity<>(null, HttpStatus.OK);
-        }
-    }
-
-    /**
-     * 글 쓰기.
-     */
-    @RequestMapping(value = "/boardForm")
-    public String boardForm(HttpServletRequest request, ModelMap modelMap) {
-        String bgno = request.getParameter("bgno");
-        String brdno = request.getParameter("brdno");
-
-        if (brdno != null) {
-            BoardVO boardInfo = boardSvc.selectBoardOne(brdno);
-            List<?> listview = boardSvc.selectBoardFileList(brdno);
-
-            modelMap.addAttribute("boardInfo", boardInfo);
-            modelMap.addAttribute("listview", listview);
-            bgno = boardInfo.getBgno();
-        }
-        BoardGroupVO bgInfo = boardGroupSvc.selectBoardGroupOne4Used(bgno);
-        if (bgInfo == null) {
-            return "castis/domain/BoardGroupFail";
-        }
-
-        modelMap.addAttribute("bgno", bgno);
-        modelMap.addAttribute("bgInfo", bgInfo);
-
-        return "castis/domain/BoardForm";
-    }
-
-    /**
-     * 글 저장.
-     */
-    @RequestMapping(value = "/boardSave")
-    public String boardSave(HttpServletRequest request, BoardVO boardInfo) {
-        String[] fileno = request.getParameterValues("fileno");
-
-        FileUtil fs = new FileUtil();
-        List<FileVO> filelist = fs.saveAllFiles(boardInfo.getUploadfile());
-
-        boardSvc.insertBoard(boardInfo, filelist, fileno);
-
-        if (boardInfo.getBgno().equalsIgnoreCase("2")) {
-            return "redirect:/hiring";
-        }
-        return "redirect:/boardList?bgno=" + boardInfo.getBgno();
-    }
-
-    /**
-     * 글 읽기.
-     */
-    @RequestMapping(value = "/boardRead")
-    public String BoardRead(HttpServletRequest request, ModelMap modelMap) {
-        String brdno = request.getParameter("brdno");
-
-        boardSvc.updateBoardRead(brdno);
-        BoardVO boardInfo = boardSvc.selectBoardOne(brdno);
-        List<?> listview = boardSvc.selectBoardFileList(brdno);
-        List<?> replylist = boardSvc.selectBoardReplyList(brdno);
-
-        BoardGroupVO bgInfo = boardGroupSvc.selectBoardGroupOne4Used(boardInfo.getBgno());
-        if (bgInfo == null) {
-            return "castis/domain/BoardGroupFail";
-        }
-
-        String[] memoArray = boardInfo.getBrdmemo().split("\r\n");
-        String youtubeRegexPattern = "^(?:http(?:s?):\\/\\/)?(?:[0-9A-Z-]+\\.)?(?:youtu\\.be\\/|youtube\\.com\\S*[^\\w\\-\\s])([\\w\\-]{11})(?=[^\\w\\-]|$)(?![?=&+%\\w]*(?:['\"][^<>]*>|<\\/a>))[?=&+%\\w]*";
-        String httpRegex = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
-        String newMemo = "";
-        List<String> validYoutubeVideoIdList = new ArrayList<String>();
-        for (String token : memoArray) {
-            boolean isFindYoutubeURL = false;
-            Pattern youtubeRegexCompiled = Pattern.compile(youtubeRegexPattern, Pattern.CASE_INSENSITIVE);
-            Matcher youtubeRegexMatcher = youtubeRegexCompiled.matcher(token);
-            if (youtubeRegexMatcher.find()) {
-                try {
-                    String validYoutubeVideoId = youtubeRegexMatcher.group(1);
-                    validYoutubeVideoIdList.add(validYoutubeVideoId);
-                } catch (Exception ex) {
-                    log.error("some exception:", ex);
-                }
-                isFindYoutubeURL = true;
-            }
-            if (isFindYoutubeURL == false) {
-                Pattern httpRegexCompiled = Pattern.compile(httpRegex, Pattern.CASE_INSENSITIVE);
-                Matcher httpRegexMatcher = httpRegexCompiled.matcher(token);
-                if (httpRegexMatcher.find()) {
-                    try {
-                        token = "<a href='" + token + "' target='_blank'>" + token + "</a>";
-                    } catch (Exception ex) {
-                        log.error("some exception:", ex);
-                    }
-                }
-                newMemo += (token + "<br>");
-            }
-        }
-        boardInfo.setBrdmemo(newMemo);
-        if (validYoutubeVideoIdList.size() > 0) {
-            modelMap.addAttribute("youtubeDataIdList", validYoutubeVideoIdList);
-        }
-        if (listview != null && listview.size() > 0) {
-            FileUtil fs = new FileUtil();
-            FileVO originalFile = (FileVO) listview.get(0);
-            fs.copyFile(originalFile.getRealname());
-        }
-        modelMap.addAttribute("boardInfo", boardInfo);
-        modelMap.addAttribute("listview", listview);
-        modelMap.addAttribute("replylist", replylist);
-        modelMap.addAttribute("bgInfo", bgInfo);
-
-        if (boardInfo.getBgno().equalsIgnoreCase("2")) {
-            return "castis/domain/HiringRead";
-        }
-        return "castis/domain/BoardRead";
-    }
-
-    /**
-     * 글 삭제.
-     */
-    @RequestMapping(value = "/boardDelete")
-    public String boardDelete(HttpServletRequest request) {
-        String brdno = request.getParameter("brdno");
-        String bgno = request.getParameter("bgno");
-
-        boardSvc.deleteBoardOne(brdno);
-
-        return "redirect:/boardList?bgno=" + bgno;
-    }
-
-    /* ===================================================================== */
-
-    /**
-     * 댓글 저장.
-     */
-    @RequestMapping(value = "/boardReplySave")
-    public String BoardReplySave(HttpServletRequest request, BoardReplyVO boardReplyInfo, ModelMap modelMap) {
-
-        boardSvc.insertBoardReply(boardReplyInfo);
-
-        modelMap.addAttribute("replyInfo", boardReplyInfo);
-
-        return "castis/domain/BoardReadAjax4Reply";
-    }
-
-    /**
-     * 댓글 삭제.
-     */
-    @RequestMapping(value = "/boardReplyDelete")
-    public void BoardReplyDelete(HttpServletResponse response, BoardReplyVO boardReplyInfo) {
-
-        ObjectMapper mapper = new ObjectMapper();
-        response.setContentType("application/json;charset=UTF-8");
-
-        try {
-            if (!boardSvc.deleteBoardReply(boardReplyInfo.getReno())) {
-                response.getWriter().print(mapper.writeValueAsString("Fail"));
-            } else {
-                response.getWriter().print(mapper.writeValueAsString("OK"));
-            }
-        } catch (IOException ex) {
-            System.out.println("오류: 댓글 삭제에 문제가 발생했습니다.");
         }
     }
 }
