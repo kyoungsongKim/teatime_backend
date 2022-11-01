@@ -2,40 +2,28 @@ package castis.domain.board;
 
 import castis.Boardfile;
 import castis.BoardfileRepository;
-import castis.domain.model.PointHistory;
-import castis.domain.point.PointHistoryDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,33 +36,33 @@ public class BoardController {
 
     private BoardSvc boardSvc;
     private BoardGroupSvc boardGroupSvc;
-    private PointHistoryDao pointHistoryDao;
 
     private final BoardRepository boardRepository;
     private final BoardreplyRepository boardreplyRepository;
     private final BoardfileRepository boardfileRepository;
+
     /**
      * 리스트.
      */
     @GetMapping("/boardList")
-    public BoardListDto boardList(@RequestParam(value="board", defaultValue="1")long board, @RequestParam(value="page" , defaultValue = "1") int page, @RequestParam(value="page_size", defaultValue = "10") int size){
+    public BoardListDto boardList(@RequestParam(value = "board", defaultValue = "1") long board, @RequestParam(value = "page", defaultValue = "1") int page, @RequestParam(value = "page_size", defaultValue = "10") int size) {
         long count = boardRepository.countBoardByBoardGroupAndBrddeleteflag(board, 'N');
         List<Board> boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
-        BoardListDto boardDto = new BoardListDto(count/size);
+        BoardListDto boardDto = new BoardListDto(count / size);
         boardDto.setBoardDataList(boards);
         return boardDto;
     }
 
     @GetMapping("/boardData")
-    public BoardDataDto boardData(@RequestParam(value="boardNum", defaultValue = "1") long bdNum, @RequestParam(value="hit", defaultValue = "false") boolean hit){
+    public BoardDataDto boardData(@RequestParam(value = "boardNum", defaultValue = "1") long bdNum, @RequestParam(value = "hit", defaultValue = "false") boolean hit) {
         Board boardData = boardRepository.findByBoardNumAndBrddeleteflag(bdNum, 'N').orElse(null);
-        if(hit) {
+        if (hit) {
             boardData.hitUp();
             boardRepository.save(boardData);
         }
         BoardDataDto boardDataDto = new BoardDataDto(boardData);
         Boardfile file = boardfileRepository.findByBrdno(Long.valueOf(bdNum).intValue()).orElse(null);
-        if(file != null) {
+        if (file != null) {
             boardDataDto.setFileName(file.getFilename());
             boardDataDto.setSaveName(file.getRealname());
             boardDataDto.setFileSize(file.getFilesize());
@@ -84,14 +72,14 @@ public class BoardController {
     }
 
     @GetMapping("/boardReplies")
-    public BoardReplyDto boardReplies(@RequestParam(value="boardNum", defaultValue = "1")int bdNum){
+    public BoardReplyDto boardReplies(@RequestParam(value = "boardNum", defaultValue = "1") int bdNum) {
         List<Boardreply> replies = boardreplyRepository.findByBrdnoAndRedeleteflagOrderByReorder(bdNum, 'N').orElse(null);
         BoardReplyDto boardReplyDto = new BoardReplyDto(replies);
         return boardReplyDto;
     }
 
     @PostMapping("/writeDoc")
-    public String writeDocument(@RequestBody WriteDataDto data){
+    public String writeDocument(@RequestBody WriteDataDto data) {
         Board boardData = boardRepository.findByBoardNum(data.getBoardNum())
                 .map(board -> board.updateData(data))
                 .orElse(new Board(data));
@@ -115,7 +103,7 @@ public class BoardController {
         log.info(file);
         log.info(save);
         FileUtil fs = new FileUtil();
-        Path path = Paths.get(fs.getUploadFolder()+save);
+        Path path = Paths.get(fs.getUploadFolder() + save);
         String contentType = Files.probeContentType(path);
 
         HttpHeaders headers = new HttpHeaders();
@@ -129,23 +117,23 @@ public class BoardController {
     }
 
     @DeleteMapping("/deleteDoc/{boardNum}")
-    public ResponseEntity deleteDocument(@PathVariable long boardNum ) {
+    public ResponseEntity deleteDocument(@PathVariable long boardNum) {
         Board boardData = boardRepository.findByBoardNum(boardNum)
                 .map(Board::deleteData)
                 .orElse(null);
 
         List<Boardreply> boardreplies = boardreplyRepository.findByBrdno(Long.valueOf(boardNum).intValue()).orElse(null);
 
-        if(boardreplies != null) {
-            for (Boardreply reply : boardreplies){
+        if (boardreplies != null) {
+            for (Boardreply reply : boardreplies) {
                 reply.deleteData();
             }
             boardreplyRepository.saveAll(boardreplies);
         }
 
-        if(boardData == null) {
+        if (boardData == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }else {
+        } else {
             boardRepository.save(boardData);
             return new ResponseEntity<>(null, HttpStatus.OK);
         }
@@ -156,27 +144,27 @@ public class BoardController {
         Boardreply boardreply = new Boardreply(reply);
         Boardreply parentReply = null;
         int order = 0;
-        if(reply.getParentId() > 0) {
+        if (reply.getParentId() > 0) {
             parentReply = boardreplyRepository.findByBrdnoAndIdOrderByReorderDesc(reply.getBoardNum(), reply.getParentId()).orElse(null);
-            if(parentReply != null) {
-                boardreply.setRedepth(parentReply.getRedepth()+1);
+            if (parentReply != null) {
+                boardreply.setRedepth(parentReply.getRedepth() + 1);
                 boardreply.setReparent(parentReply.getId());
 
-                Boardreply nextReply =  boardreplyRepository.findTop1ByBrdnoAndRedepthAndReorderGreaterThanOrderByReorder(reply.getBoardNum(), parentReply.getRedepth(), parentReply.getReorder()).orElse(null);
+                Boardreply nextReply = boardreplyRepository.findTop1ByBrdnoAndRedepthAndReorderGreaterThanOrderByReorder(reply.getBoardNum(), parentReply.getRedepth(), parentReply.getReorder()).orElse(null);
 
-                if(nextReply != null) {
+                if (nextReply != null) {
                     order = nextReply.getReorder();
                 }
             }
-        }else {
+        } else {
             parentReply = boardreplyRepository.findTop1ByBrdnoOrderByReorderDesc(reply.getBoardNum()).orElse(null);
         }
         List<Boardreply> nextReply = new ArrayList<>();
-        if(parentReply == null) {
+        if (parentReply == null) {
             order = 1;
-        }else {
-            if(order == 0){
-                order = parentReply.getReorder()+1;
+        } else {
+            if (order == 0) {
+                order = parentReply.getReorder() + 1;
             }
             nextReply = boardreplyRepository.findByBrdnoAndReorderGreaterThanEqual(reply.getBoardNum(), order).orElse(new ArrayList<>());
         }
@@ -184,7 +172,7 @@ public class BoardController {
         boardreply.setReorder(order);
 
         boardreplyRepository.save(boardreply);
-        if(nextReply != null ) {
+        if (nextReply != null) {
             for (Boardreply value : nextReply) {
                 value.setReorder(value.getReorder() + 1);
             }
@@ -194,64 +182,17 @@ public class BoardController {
     }
 
     @DeleteMapping("/deleteReply/{replyId}")
-    public ResponseEntity deleteReply(@PathVariable int replyId ) {
+    public ResponseEntity deleteReply(@PathVariable int replyId) {
         Boardreply deleteReplyData = boardreplyRepository.findById(replyId)
                 .map(Boardreply::deleteData)
                 .orElse(null);
 
-        if(deleteReplyData == null) {
+        if (deleteReplyData == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }else {
+        } else {
             boardreplyRepository.save(deleteReplyData);
             return new ResponseEntity<>(null, HttpStatus.OK);
         }
-    }
-    public String boardList1(SearchVO searchVO, ModelMap modelMap) {
-        if (searchVO.getBgno() == null) {
-            searchVO.setBgno("1");
-        }
-
-        BoardGroupVO bgInfo = boardGroupSvc.selectBoardGroupOne4Used(searchVO.getBgno());
-        if (bgInfo == null) {
-            return "castis/domain/BoardGroupFail";
-        }
-        searchVO.pageCalculate(boardSvc.selectBoardCount(searchVO)); // startRow,
-        // endRow
-
-        List<BoardVO> listview = boardSvc.selectBoardList(searchVO);
-
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        String formattedToday = df.format(new Date());
-        int substringCount = "YYYY-mm-ddT".length();
-        for (BoardVO bvd : listview) {
-            if (bvd.getBrddate().contains(formattedToday) == true) {
-                // this article was written today (YYYY-mm-ddT 11char)
-                bvd.setBrddate(bvd.getBrddate().substring(substringCount));
-            } else {
-                // this article was written yesterday or ago
-                bvd.setBrddate(bvd.getBrddate().substring(0, substringCount - 1));
-            }
-        }
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String name = user.getUsername(); // get logged in username
-        List<PointHistory> pointHistoryList = pointHistoryDao.getPointHistoryByUser(name);
-        int totalPoint = 0;
-        for (PointHistory pHistory : pointHistoryList) {
-            if (pHistory.getUsedate() != null) {
-                //add only used code
-                totalPoint += pHistory.getPoint();
-            }
-        }
-        int userLevel = (int) Math.sqrt((int) (totalPoint / 1000));
-        String totalPointStr = String.format("%,d", totalPoint);
-        modelMap.addAttribute("userpoint", totalPointStr);
-        modelMap.addAttribute("username", name);
-        modelMap.addAttribute("userlevel", userLevel);
-        modelMap.addAttribute("listview", listview);
-        modelMap.addAttribute("searchVO", searchVO);
-        modelMap.addAttribute("bgInfo", bgInfo);
-
-        return "castis/domain/BoardList";
     }
 
     /**
