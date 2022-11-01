@@ -5,6 +5,8 @@ import castis.domain.point.PointHistory;
 import castis.domain.point.PointHistoryRepository;
 import castis.domain.project.Project;
 import castis.domain.project.ProjectRepository;
+import castis.domain.vacation.VacationHistory;
+import castis.domain.vacation.VacationHistoryService;
 import castis.util.holiday.HolidayDto;
 import castis.util.holiday.HolidayService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class TicketService {
     private final ProjectRepository projectRepository;
     private final PointHistoryRepository pointHistoryRepository;
     private final HolidayService holidayService;
+    private final VacationHistoryService vacationHistoryService;
 
     public List<EventDto> findAllByUserNameAndPeroid(String userName, String year, String month) throws IOException {
 
@@ -106,11 +109,14 @@ public class TicketService {
     }
 
     public ResponseEntity saveTicketInfo(TicketDto ticketDto) {
-        ticketRepository.save(new Ticket(ticketDto));
+        Ticket ticket = ticketRepository.save(new Ticket(ticketDto));
         if(ticketDto.getId() == null || ticketDto.getId() == 0) {
             PointHistory pointHistory = new PointHistory(ticketDto.getUserName(), ticketDto.getUserName(), 5, "TICKET_POINT", "AUTO");
             pointHistory.setUseDate(LocalDateTime.now());
             pointHistoryRepository.save(pointHistory);
+        }
+        if(ticketDto.getProject().equals("휴가")) {
+            vacationHistoryService.saveVacationHistory(new VacationHistory(ticket));
         }
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
