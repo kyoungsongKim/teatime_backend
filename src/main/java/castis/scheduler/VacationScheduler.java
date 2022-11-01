@@ -26,8 +26,8 @@ import java.util.Properties;
 @RequiredArgsConstructor
 public class VacationScheduler {
 
-    private final VacationHistoryDao vacationHistoryDao;
-    private final UserDao userDao;
+    private VacationHistoryDao vacationHistoryDao;
+    private UserDao userDao;
 
     private static final int SUMMARY_START_TIME = 9; // from 09:00 ~
 
