@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.Predicate;
 import java.io.IOException;
@@ -126,5 +127,12 @@ public class TicketService {
         Project project = projectRepository.findById(ticket.getProjectName()).orElse(null);
         TicketDto dto = new TicketDto(ticket, project);
         return dto;
+    }
+
+    @Transactional
+    public ResponseEntity deleteTicketInfoByNo(Long no) {
+        ticketRepository.deleteById(no);
+        vacationHistoryService.deleteVacationHistory(no);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }

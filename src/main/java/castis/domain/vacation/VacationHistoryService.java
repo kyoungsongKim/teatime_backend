@@ -16,4 +16,9 @@ public class VacationHistoryService {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
+    public ResponseEntity deleteVacationHistory(Long no) {
+        vacationHistoryRepository.deleteByTicketNo(no, VacationHistory.STATUS_READY);
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+
 }

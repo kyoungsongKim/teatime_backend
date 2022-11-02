@@ -66,4 +66,11 @@ public class TicketController {
         TicketDto dto = ticketService.getTicketInfoByNo(no);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
+
+    @DeleteMapping(value = "/{no}")
+    public ResponseEntity deleteTicketData(HttpServletRequest httpServletRequest, @PathVariable(value = "no")Long no) {
+        log.info("request, uri[{}] No[{}]", httpServletRequest.getRequestURI(), no);
+        ticketService.deleteTicketInfoByNo(no);
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
 }
