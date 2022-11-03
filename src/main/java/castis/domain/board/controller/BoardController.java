@@ -37,6 +37,7 @@ public class BoardController {
     private final BoardRepository boardRepository;
     private final BoardreplyRepository boardreplyRepository;
     private final BoardfileRepository boardfileRepository;
+    private final FileUtil fs;
 
     /**
      * 리스트.
@@ -95,8 +96,6 @@ public class BoardController {
 
     @PostMapping("/uploadFile")
     public ResponseEntity uploadFile(@RequestParam("uploadFile") MultipartFile file, @RequestParam("boardNum") int num) throws IOException {
-        FileUtil fs = new FileUtil();
-
         Boardfile boardfile = new Boardfile(num, file);
         fs.saveFile(file, boardfile.getRealname());
         boardfileRepository.save(boardfile);
@@ -105,8 +104,6 @@ public class BoardController {
 
     @GetMapping("/downloadFile")
     public ResponseEntity downloadFile(@RequestParam("fileName") String file, @RequestParam("saveName") String save) throws IOException {
-
-        FileUtil fs = new FileUtil();
         Path path = Paths.get(fs.getUploadFolder() + save);
         String contentType = Files.probeContentType(path);
 
