@@ -26,27 +26,6 @@ public class FileUtil {
     /**
      * 파일 업로드.
      */
-    public List<FileVO> saveAllFiles(List<MultipartFile> upfiles) {
-        String filePath = "/usr/local/imsfileupload/"; 
-        List<FileVO> filelist = new ArrayList<FileVO>();
-
-        for (MultipartFile uploadfile : upfiles ) {
-            if (uploadfile.getSize() == 0) {
-                continue;
-            }
-            
-            String newName = getNewName();
-            
-            saveFile(uploadfile, filePath + "/" + newName.substring(0,4) + "/", newName);
-            
-            FileVO filedo = new FileVO();
-            filedo.setFilename(uploadfile.getOriginalFilename());
-            filedo.setRealname(newName);
-            filedo.setFilesize(uploadfile.getSize());
-            filelist.add(filedo);
-        }
-        return filelist;
-    }    
     
     /**
      * 파일 저장 경로 생성.
@@ -58,6 +37,9 @@ public class FileUtil {
         }
     }
 
+    /**
+     * 실제 파일 저장.
+     */
     public String saveFile(MultipartFile file, String newName) throws IOException {
         if (file == null || file.getName().equals("") || file.getSize() < 1) {
             return null;
@@ -72,9 +54,7 @@ public class FileUtil {
         return uploadFileFullPath;
     }
 
-    /**
-     * 실제 파일 저장.
-     */
+
     public String saveFile(MultipartFile file, String basePath, String fileName){
         if (file == null || file.getName().equals("") || file.getSize() < 1) {
             return null;
