@@ -1,5 +1,7 @@
 package castis.domain.sign.service;
 
+import castis.domain.authorities.entity.Authorities;
+import castis.domain.authorities.repository.AuthoritiesRepository;
 import castis.domain.sign.dto.AuthenticationDto;
 import castis.domain.sign.dto.JoinDto;
 import castis.domain.sign.dto.LoginDto;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class SignService {
 
     private final UserRepository userRepository;
+    private final AuthoritiesRepository authoritiesRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -32,6 +35,7 @@ public class SignService {
 
         // 데이터 등록(저장)
         userRepository.save(joinDto.toEntity());
+        authoritiesRepository.save(new Authorities(joinDto.getId(), "ROLE_USER"));
 
         return true;
     }

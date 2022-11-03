@@ -4,13 +4,6 @@ server:
   servlet:
     context-path: /
 
-tomcat:
-  ajp:
-    protocol: 'AJP/1.3'
-    address: 0.0.0.0
-    port: 18082
-    enabled: false
-
 logging:
   file:
     path: logs/teatime
@@ -51,10 +44,6 @@ spring:
 jwt:
   secret:
     signature: "aafsdzxcvasdfzxbbbasdfzxcvasdfzxcv"
-
-jasypt:
-  encryptor:
-    bean: jasyptStringEncryptor
 
 scheduler:
   vacation:

@@ -1,6 +1,6 @@
 package castis.domain.project.dto;
 
-import castis.domain.project.Project;
+import castis.domain.project.entity.Project;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
