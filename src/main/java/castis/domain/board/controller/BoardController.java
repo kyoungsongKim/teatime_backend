@@ -47,7 +47,7 @@ public class BoardController {
     public BoardListDto boardList(@RequestParam(value="board", defaultValue="1")long board, @RequestParam(value="page" , defaultValue = "1") int page, @RequestParam(value="page_size", defaultValue = "10") int size){
         long count = boardRepository.countBoardByBoardGroupAndBrddeleteflag(board, 'N');
         List<Board> boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
-        BoardListDto boardDto = new BoardListDto(count / size);
+        BoardListDto boardDto = new BoardListDto(count , size);
         boardDto.setBoardDataList(boards);
         return boardDto;
     }

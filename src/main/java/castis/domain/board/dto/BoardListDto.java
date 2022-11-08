@@ -21,8 +21,11 @@ public class BoardListDto implements Serializable {
     private List<BoardDataDto> boardDataList;
 
     @Builder
-    public BoardListDto(long size){
-        this.size = size;
+    public BoardListDto(long count, int size){
+        this.size = count / size;
+        if(count % size != 0) {
+            this.size++;
+        }
     }
 
     public void setBoardDataList(List<Board> boards){
