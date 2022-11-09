@@ -55,7 +55,7 @@ public class PointController {
     }
 
     @RequestMapping(value = "/pointCode", method = RequestMethod.POST)
-    public ResponseEntity getPointCodeData(
+    public ResponseEntity updatePointCodeData(
             HttpServletRequest httpServletRequest
             , @RequestBody PointHistoryDto pointHistoryDto
     ) {
