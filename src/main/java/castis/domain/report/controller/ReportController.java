@@ -73,7 +73,7 @@ public class ReportController {
 
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress(senderEmail));
-            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(recvEmail));
+            msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(recvEmail));
             msg.setRecipient(Message.RecipientType.CC, new InternetAddress(senderEmail));
             msg.setSubject(MimeUtility.encodeText(title, "EUC-KR", "B"));
             msg.setSubject(MimeUtility.encodeText(title, "UTF-8", "B"));
