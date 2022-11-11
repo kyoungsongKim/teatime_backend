@@ -28,6 +28,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @Slf4j
@@ -61,6 +63,39 @@ public class BoardController {
             boardRepository.save(boardData);
         }
         BoardDataDto boardDataDto = new BoardDataDto(boardData);
+        String[] memoArray = boardDataDto.getSummary().split("\r\n");
+        String youtubeRegexPattern = "^(?:http(?:s?):\\/\\/)?(?:[0-9A-Z-]+\\.)?(?:youtu\\.be\\/|youtube\\.com\\S*[^\\w\\-\\s])([\\w\\-]{11})(?=[^\\w\\-]|$)(?![?=&+%\\w]*(?:['\"][^<>]*>|<\\/a>))[?=&+%\\w]*";
+        String httpRegex = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+        for (String line : memoArray) {
+            Pattern youtubeRegexCompiled = Pattern.compile(youtubeRegexPattern, Pattern.CASE_INSENSITIVE);
+            Matcher youtubeRegexMatcher = youtubeRegexCompiled.matcher(line);
+            String type = "";
+            String summary_line = "";
+            if(youtubeRegexMatcher.find()) {
+                try{
+                    String validYoutubeVideoID = youtubeRegexMatcher.group(1);
+                    summary_line = validYoutubeVideoID;
+                    type = "youtube";
+                }catch (Exception ex){
+                    log.error("some exception : {}" , ex);
+                }
+            } else {
+                Pattern httpRegexCompiled = Pattern.compile(httpRegex, Pattern.CASE_INSENSITIVE);
+                Matcher httpRegexMatcher = httpRegexCompiled.matcher(line);
+                if(httpRegexMatcher.find()) {
+                    try {
+                        summary_line = "<a href='" + line + "' target='_blank'>" + line + "</a>";
+                        type = "html";
+                    } catch (Exception ex) {
+                        log.error("some exception : {}" , ex);
+                    }
+                }else {
+                    type = "default";
+                    summary_line = line;
+                }
+            }
+            boardDataDto.addSummary(type, summary_line);
+        }
         Boardfile file = boardfileRepository.findByBrdno(Long.valueOf(bdNum).intValue()).orElse(null);
         if (file != null) {
             boardDataDto.setFileName(file.getFilename());
@@ -77,8 +112,6 @@ public class BoardController {
         List<Boardreply> replies = null;
         if(board!=null) {
             replies = boardreplyRepository.findByBrdnoAndRedeleteflagOrderByReorder(board, 'N').orElse(null);
-
-
         }
         BoardReplyDto boardReplyDto = new BoardReplyDto(replies);
         return boardReplyDto;
