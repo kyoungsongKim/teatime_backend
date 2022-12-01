@@ -58,7 +58,7 @@ public class PointController {
     public ResponseEntity updatePointCodeData(
             HttpServletRequest httpServletRequest
             , @RequestBody PointHistoryDto pointHistoryDto
-    ) {
+    ) throws Exception {
         log.info("request, uri[{}]", httpServletRequest.getRequestURI());
         return pointService.updatePointHistoryComplete(pointHistoryDto.getCode());
     }

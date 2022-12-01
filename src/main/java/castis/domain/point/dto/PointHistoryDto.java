@@ -22,7 +22,9 @@ public class PointHistoryDto {
     public PointHistoryDto (PointHistory pointHistory) {
         this.id = pointHistory.getId();
         this.createdDate = pointHistory.getCreateDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        this.useDate = pointHistory.getUseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        if(pointHistory.getUseDate() != null) {
+            this.useDate = pointHistory.getUseDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }
         this.memo = pointHistory.getMemo();
         this.point = pointHistory.getPoint();
         this.sender = pointHistory.getSender();

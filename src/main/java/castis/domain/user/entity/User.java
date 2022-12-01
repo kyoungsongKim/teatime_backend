@@ -50,6 +50,12 @@ public class User {
     @Column(name = "vacationreportlist", nullable = false, length = 1024)
     private String vacationReportList;
 
+    @Column(name = "cbank_id", length = 50)
+    private String cbankId;
+
+    @Column(name = "cbank_account", length = 50)
+    private String cbankAccount;
+
     @Builder
     public User(String id, String userName, String realName, String password,
                 String teamName, String position,

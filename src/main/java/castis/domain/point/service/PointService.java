@@ -1,13 +1,21 @@
 package castis.domain.point.service;
 
-import castis.domain.point.repository.PointHistoryRepository;
 import castis.domain.point.dto.PointHistoryDto;
 import castis.domain.point.entity.PointHistory;
+import castis.domain.point.repository.PointHistoryRepository;
+import castis.domain.project.dto.OtpDTO;
+import castis.domain.project.dto.TransferDTO;
+import castis.domain.user.entity.User;
+import castis.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import net.minidev.json.JSONObject;
+import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
@@ -23,6 +31,8 @@ import java.util.stream.Collectors;
 public class PointService {
 
     private final PointHistoryRepository pointHistoryRepository;
+    private final UserRepository userRepository;
+    private final Environment environment;
 
     public List<PointHistoryDto> findAllPointHistoryByRecver(String recver, String periodYear){
         List<PointHistoryDto> result = new ArrayList<>();
@@ -66,12 +76,42 @@ public class PointService {
         return code;
     }
 
-    public ResponseEntity updatePointHistoryComplete(String code) {
+    @Transactional
+    public ResponseEntity updatePointHistoryComplete(String code) throws Exception {
         PointHistory pointHistory = pointHistoryRepository.findByCode(code).orElse(null);
         if(pointHistory != null) {
             pointHistory.setCode(code + "_COMPLETE");
             pointHistory.setUseDate(LocalDateTime.now());
             pointHistoryRepository.save(pointHistory);
+
+            //cbank 기준 sender
+            User sender = userRepository.findById(pointHistory.getRecver()).orElse(null);
+            if(sender != null) {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("userId", sender.getCbankId());
+                jsonObject.put("companyId", environment.getProperty("cbank.companyId"));
+                ResponseEntity<OtpDTO> res = new RestTemplate().postForEntity(environment.getProperty("cbank.openApi.otp.url")
+                        , jsonObject, OtpDTO.class);
+                //cbank 기준 receiver
+                User receiver = userRepository.findById(pointHistory.getSender()).orElse(null);
+                if(receiver != null) {
+                    jsonObject = new JSONObject();
+                    jsonObject.put("userId", sender.getCbankId());
+                    jsonObject.put("sendAccountId", sender.getCbankAccount());
+                    jsonObject.put("recvAccountId", receiver.getCbankAccount());
+                    jsonObject.put("amount", pointHistory.getPoint());
+                    jsonObject.put("transferHistory", "기부 포인트");
+                    jsonObject.put("otp", res.getBody().getOtp());
+                    jsonObject.put("memo", pointHistory.getMemo());
+
+                    ResponseEntity<TransferDTO> result = new RestTemplate().postForEntity(environment.getProperty("cbank.openApi.transfer.url")
+                            , jsonObject, TransferDTO.class);
+
+                    if(!result.getBody().getResultCode().equals("200")) {
+                        throw new Exception();
+                    }
+                }
+            }
             return new ResponseEntity(HttpStatus.OK);
         }else{
             return new ResponseEntity(HttpStatus.NOT_FOUND);
