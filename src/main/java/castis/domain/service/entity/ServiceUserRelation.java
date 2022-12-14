@@ -17,7 +17,7 @@ public class ServiceUserRelation {
     private ServiceUserRelationPK id;
 
     @Column(name = "service_charge")
-    private Integer serviceCharge;
+    private String serviceCharge;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("serviceId")

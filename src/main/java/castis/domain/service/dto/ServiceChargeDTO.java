@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ServiceChargeDTO {
     private String serviceName;
-    private Integer charge;
+    private String charge;
 
     public ServiceChargeDTO (ServiceUserRelation serviceUserRelation) {
         this.serviceName = serviceUserRelation.getService().getName();
