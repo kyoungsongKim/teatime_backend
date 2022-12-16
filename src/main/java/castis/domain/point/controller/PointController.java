@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Iterator;
 import java.util.List;
 
 @RestController
@@ -28,8 +29,20 @@ public class PointController {
     ) {
         log.info("request, uri[{}], receiver[{}] periodYear[{}]", httpServletRequest.getRequestURI(), receiver, periodYear);
         List<PointHistoryDto> pointHistoryDtoList = pointService.findAllPointHistoryByRecver(receiver, periodYear);
-
         if (pointHistoryDtoList != null) {
+            Iterator<PointHistoryDto> phIterrator = pointHistoryDtoList.iterator();
+            while(phIterrator.hasNext()){
+                PointHistoryDto curDto = phIterrator.next();
+                if(curDto!=null){
+                    if (curDto.getUseDate() == null ) {
+                        phIterrator.remove();
+                    } else if (curDto.getCode().contains("OLD")) {
+                        phIterrator.remove();
+                    } else if (curDto.getCode().contains("_COMPLETE")) {
+                        curDto.setCode(curDto.getCode().substring(0,4));
+                    }
+                }
+            }
             return new ResponseEntity<>(pointHistoryDtoList, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(null, HttpStatus.OK);

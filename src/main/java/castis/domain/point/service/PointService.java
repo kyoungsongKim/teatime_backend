@@ -67,19 +67,23 @@ public class PointService {
     public String savePointHistoryAndCodeReturn(String sender, String receiver, Integer point, String memo) {
         UUID uuid = UUID.randomUUID();
         long l = ByteBuffer.wrap(uuid.toString().getBytes()).getLong();
-        String code = Long.toString(l, Character.MAX_RADIX);
-        code = code.toUpperCase().substring(0,4);
-
+        List<PointHistory> pointHistoryList = null;
+        String code = "";
+        do {
+            code = Long.toString(l, Character.MAX_RADIX);
+            code = code.toUpperCase().substring(0,4);
+            pointHistoryList = pointHistoryRepository.findByCodeEquals(code.toUpperCase()).orElse(null);
+        } while (pointHistoryList == null);
         PointHistory pointHistory = new PointHistory(sender, receiver, point, memo, code);
         pointHistoryRepository.save(pointHistory);
-
         return code;
     }
 
     @Transactional
     public ResponseEntity updatePointHistoryComplete(String code) throws Exception {
-        PointHistory pointHistory = pointHistoryRepository.findByCode(code).orElse(null);
-        if(pointHistory != null) {
+        List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeEquals(code.toUpperCase()).orElse(null);
+        if(pointHistoryList != null) {
+            PointHistory pointHistory = pointHistoryList.get(0);
             pointHistory.setCode(code + "_COMPLETE");
             pointHistory.setUseDate(LocalDateTime.now());
             pointHistoryRepository.save(pointHistory);
@@ -98,7 +102,7 @@ public class PointService {
                     jsonObject = new JSONObject();
                     jsonObject.put("userId", sender.getCbankId());
                     jsonObject.put("sendAccountId", sender.getCbankAccount());
-                    jsonObject.put("recvAccountId", receiver.getCbankAccount());
+                    jsonObject.put("recvAccountId", "0379-0201");
                     jsonObject.put("amount", pointHistory.getPoint());
                     jsonObject.put("transferHistory", "기부 포인트");
                     jsonObject.put("otp", res.getBody().getOtp());
@@ -108,7 +112,7 @@ public class PointService {
                             , jsonObject, TransferDTO.class);
 
                     if(!result.getBody().getResultCode().equals("200")) {
-                        throw new Exception();
+                        new ResponseEntity(result.getBody().getResultMsg(), HttpStatus.BAD_REQUEST);
                     }
                 }
             }

@@ -13,5 +13,5 @@ public interface PointHistoryRepository extends JpaRepository<PointHistory, Long
 
     Optional<List<PointHistory>> findAllByRecver(String recver);
 
-    Optional<PointHistory> findByCode(String code);
+    Optional<List<PointHistory>> findByCodeEquals(String code);
 }

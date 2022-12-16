@@ -24,9 +24,9 @@ spring:
     #url: jdbc:mariadb://172.16.48.45/ims
     #username: root
     #password: Castis365*
-    url: jdbc:mariadb://172.16.161.136/ims_dump
+    url: jdbc:mariadb://172.16.48.45/ims
     username: root
-    password: castis
+    password: Castis365*
 #    hikari:
 #      jdbc-url: jdbc:mariadb://172.16.48.45/ims
 #      username: root
@@ -65,6 +65,6 @@ cbank:
   companyId: teatime
   openApi:
     otp:
-      url: http://172.16.48.201/cbank/api/v1/otp
+      url: http://bank.castis.net/cbank/api/v1/otp
     transfer:
-      url: http://172.16.48.201/cbank/api/v1/transfer
+      url: http://bank.castis.net/cbank/api/v1/transfer
