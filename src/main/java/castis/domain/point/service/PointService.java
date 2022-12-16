@@ -64,6 +64,15 @@ public class PointService {
         return result;
     }
 
+    public PointHistory getPointHistoryByCode(String code) {
+        List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeEquals(code.toUpperCase()).orElse(null);
+        if(pointHistoryList != null && pointHistoryList.size() > 0) {
+            PointHistory pointHistory = pointHistoryList.get(0);
+            return pointHistory;
+        }
+        return null;
+    }
+
     public String savePointHistoryAndCodeReturn(String sender, String receiver, Integer point, String memo) {
         UUID uuid = UUID.randomUUID();
         long l = ByteBuffer.wrap(uuid.toString().getBytes()).getLong();
@@ -81,8 +90,9 @@ public class PointService {
 
     @Transactional
     public ResponseEntity updatePointHistoryComplete(String code) throws Exception {
+        code = code.toUpperCase();
         List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeEquals(code.toUpperCase()).orElse(null);
-        if(pointHistoryList != null) {
+        if(pointHistoryList != null && pointHistoryList.size() > 0) {
             PointHistory pointHistory = pointHistoryList.get(0);
             pointHistory.setCode(code + "_COMPLETE");
             pointHistory.setUseDate(LocalDateTime.now());
@@ -104,9 +114,9 @@ public class PointService {
                     jsonObject.put("sendAccountId", sender.getCbankAccount());
                     jsonObject.put("recvAccountId", "0379-0201");
                     jsonObject.put("amount", pointHistory.getPoint());
-                    jsonObject.put("transferHistory", "기부 포인트");
+                    jsonObject.put("transferHistory", "기부금(" + pointHistory.getMemo() +")");
                     jsonObject.put("otp", res.getBody().getOtp());
-                    jsonObject.put("memo", pointHistory.getMemo());
+                    jsonObject.put("memo", "");
 
                     ResponseEntity<TransferDTO> result = new RestTemplate().postForEntity(environment.getProperty("cbank.openApi.transfer.url")
                             , jsonObject, TransferDTO.class);
@@ -122,6 +132,4 @@ public class PointService {
         }
 
     }
-
-
 }

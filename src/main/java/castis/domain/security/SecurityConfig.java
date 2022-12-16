@@ -60,13 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(
-                "/static/css/**",
-                "/static/js/**",
-                "/static/img/**",
-                "/static/**"
-        );
+    public void configure(WebSecurity web) {
     }
 
     @Override
@@ -79,6 +73,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                     .authorizeRequests()
                     .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                    .antMatchers("/static/css/**").permitAll()          // css
+                    .antMatchers("/static/js/**").permitAll()           // js
+                    .antMatchers("/static/img/**").permitAll()          // ims
+                    .antMatchers("/static/**").permitAll()              // statics
                     .antMatchers("/signup").permitAll()          // 회원가입
                     .antMatchers("/login/**").permitAll()        // 로그인
                     .antMatchers("/verifyToken/**").permitAll()  // 토큰
