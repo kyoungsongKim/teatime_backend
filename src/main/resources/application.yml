@@ -1,6 +1,6 @@
 server:
   #ip: 127.0.0.1 # 설정없이 디폴트 ip 설정.
-  port: 9090
+  port: 9091
   servlet:
     context-path: /
 
