@@ -20,6 +20,7 @@ public class MoneyCheckDto {
     private String realName;
     private String teamName;
     private String email;
+    private String cbankId;
     private String cbankAccount;
     //default rate
     private String defaultRSrate;
@@ -55,6 +56,7 @@ public class MoneyCheckDto {
         this.teamName = user.getTeamName();
         this.email = user.getEmail();
         this.cbankAccount = user.getCbankAccount();
+        this.cbankId = user.getCbankId();
         this.defaultRSrate="";
         this.selfDecidedMoney="";
         this.emergencyPersonService="X";
