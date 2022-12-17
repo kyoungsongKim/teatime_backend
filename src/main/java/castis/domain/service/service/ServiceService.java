@@ -28,6 +28,14 @@ public class ServiceService {
         return result;
     }
 
+    public List<ServiceChargeDTO> getAllServiceListWithCharge() {
+        List<ServiceUserRelation> serviceUserRelationList = serviceUserRelationRepository.findAll();
+        List<ServiceChargeDTO> result = new ArrayList<>();
+        for(ServiceUserRelation serviceUserRelation : serviceUserRelationList) {
+            result.add(new ServiceChargeDTO(serviceUserRelation));
+        }
+        return result;
+    }
     public List<ServiceChargeDTO> getServiceListWithCharge(String userId) {
         List<ServiceUserRelation> serviceUserRelationList = serviceUserRelationRepository.findAllByUserId(userId);
         List<ServiceChargeDTO> result = new ArrayList<>();
@@ -36,5 +44,4 @@ public class ServiceService {
         }
         return result;
     }
-
 }

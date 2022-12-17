@@ -68,3 +68,5 @@ cbank:
       url: http://bank.castis.net/cbank/api/v1/otp
     transfer:
       url: http://bank.castis.net/cbank/api/v1/transfer
+    viewAccount:
+      url: http://bank.castis.net/cbank/api/v1/account/info/
