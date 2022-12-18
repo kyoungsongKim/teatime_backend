@@ -64,6 +64,17 @@ public class PointService {
         return result;
     }
 
+    public List<PointHistoryDto> findAllPointHistory(){
+        List<PointHistoryDto> result = new ArrayList<>();
+
+        List<PointHistory> list = pointHistoryRepository.findAll();
+        list.forEach(i -> {
+            result.add(new PointHistoryDto(i));
+        });
+
+        return result;
+    }
+
     public PointHistory getPointHistoryByCode(String code) {
         List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeEquals(code.toUpperCase()).orElse(null);
         if(pointHistoryList != null && pointHistoryList.size() > 0) {
@@ -83,9 +94,19 @@ public class PointService {
             code = code.toUpperCase().substring(0,4);
             pointHistoryList = pointHistoryRepository.findByCodeEquals(code.toUpperCase()).orElse(null);
         } while (pointHistoryList == null);
-        PointHistory pointHistory = new PointHistory(sender, receiver, point, memo, code);
+        PointHistory pointHistory = new PointHistory(sender, receiver, point, 0, memo, code);
+        if ( point < 0 ) {
+            pointHistory.setUseDate(LocalDateTime.now());
+        }
         pointHistoryRepository.save(pointHistory);
         return code;
+    }
+
+    public void changePointToExp(String sender, String receiver, Integer point, String memo) {
+        int minusPoint = point * -1;
+        PointHistory pointHistory = new PointHistory(sender, receiver, minusPoint, point, memo, "LEVEL_UP");
+        pointHistory.setUseDate(LocalDateTime.now());
+        pointHistoryRepository.save(pointHistory);
     }
 
     @Transactional
@@ -94,9 +115,6 @@ public class PointService {
         List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeEquals(code.toUpperCase()).orElse(null);
         if(pointHistoryList != null && pointHistoryList.size() > 0) {
             PointHistory pointHistory = pointHistoryList.get(0);
-            pointHistory.setCode(code + "_COMPLETE");
-            pointHistory.setUseDate(LocalDateTime.now());
-            pointHistoryRepository.save(pointHistory);
 
             //cbank 기준 sender
             User sender = userRepository.findById(pointHistory.getRecver()).orElse(null);
@@ -124,9 +142,14 @@ public class PointService {
                     if(!result.getBody().getResultCode().equals("200")) {
                         new ResponseEntity(result.getBody().getResultMsg(), HttpStatus.BAD_REQUEST);
                     }
+                    pointHistory.setCode(code + "_COMPLETE");
+                    pointHistory.setPoint(pointHistory.getPoint() * 100);
+                    pointHistory.setUseDate(LocalDateTime.now());
+                    pointHistoryRepository.save(pointHistory);
+                    return new ResponseEntity(HttpStatus.OK);
                 }
             }
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }else{
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }

@@ -114,7 +114,7 @@ public class TicketService {
     public ResponseEntity saveTicketInfo(TicketDto ticketDto) {
         Ticket ticket = ticketRepository.save(new Ticket(ticketDto));
         if(ticketDto.getId() == null || ticketDto.getId() == 0) {
-            PointHistory pointHistory = new PointHistory(ticketDto.getUserName(), ticketDto.getUserName(), 5, "TICKET_POINT", "AUTO");
+            PointHistory pointHistory = new PointHistory(ticketDto.getUserName(), ticketDto.getUserName(), 500, 0, "TICKET_POINT", "AUTO");
             pointHistory.setUseDate(LocalDateTime.now());
             pointHistoryRepository.save(pointHistory);
         }

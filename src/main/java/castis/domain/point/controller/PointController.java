@@ -2,7 +2,10 @@ package castis.domain.point.controller;
 
 import castis.domain.point.dto.PointAndLevelDto;
 import castis.domain.point.dto.PointHistoryDto;
+import castis.domain.point.dto.PointSummaryDto;
 import castis.domain.point.service.PointService;
+import castis.domain.user.entity.User;
+import castis.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -10,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,6 +24,7 @@ import java.util.List;
 public class PointController {
 
     private final PointService pointService;
+    private final UserRepository userRepository;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseEntity getPointListDataByReceiver(
@@ -46,6 +51,41 @@ public class PointController {
             return new ResponseEntity<>(pointHistoryDtoList, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(null, HttpStatus.OK);
+        }
+    }
+
+    @RequestMapping(value = "/summary", method = RequestMethod.GET)
+    public ResponseEntity getPointListDataByReceiver(HttpServletRequest httpServletRequest) {
+        log.info("request, uri[{}]", httpServletRequest.getRequestURI());
+        List<PointSummaryDto> pointSummaryDtoList = new ArrayList<>();
+        List<PointHistoryDto> pointHistoryDtoList = pointService.findAllPointHistory();
+        List<User> userList = userRepository.findAll();
+        if (pointHistoryDtoList != null) {
+            for (User curUser : userList) {
+                PointSummaryDto curSummary = new PointSummaryDto();
+                curSummary.setUserId(curUser.getId());
+                curSummary.setRealName(curUser.getRealName());
+                int totalPoint = 0;
+                int totalExp = 0;
+                Iterator<PointHistoryDto> phIterrator = pointHistoryDtoList.iterator();
+                while(phIterrator.hasNext()){
+                    PointHistoryDto curDto = phIterrator.next();
+                    if(curDto!=null){
+                        if (curDto.getRecver().equalsIgnoreCase(curUser.getId()) && curDto.getUseDate() != null ) {
+                            totalPoint += curDto.getPoint();
+                            totalExp += curDto.getExpValue();
+                        }
+                    }
+                }
+                curSummary.setTotalPoint(totalPoint);
+                curSummary.setTotalExp(totalExp);
+                int level = (int) Math.sqrt(totalExp / 10000);
+                curSummary.setLevel(level);
+                pointSummaryDtoList.add(curSummary);
+            }
+            return new ResponseEntity<>(pointSummaryDtoList, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -85,15 +125,17 @@ public class PointController {
 
         List<PointHistoryDto> pointHistoryList = pointService.findAllPointHistoryByRecver(receiver, null);
         int totalPoint = 0;
+        int totalExp = 0;
         for (PointHistoryDto pHistory : pointHistoryList) {
             if (pHistory.getUseDate() != null) {
                 //add only used code
                 totalPoint += pHistory.getPoint();
             }
+            totalExp += pHistory.getExpValue();
         }
-        int userLevel = (int) Math.sqrt((int) (totalPoint / 1000));
+        int userLevel = (int) Math.sqrt((int) (totalExp / 10000));
 
-        PointAndLevelDto pointAndLevelDto = new PointAndLevelDto(totalPoint, userLevel);
+        PointAndLevelDto pointAndLevelDto = new PointAndLevelDto(totalPoint, userLevel, totalExp);
 
         return new ResponseEntity<>(pointAndLevelDto, HttpStatus.OK);
     }

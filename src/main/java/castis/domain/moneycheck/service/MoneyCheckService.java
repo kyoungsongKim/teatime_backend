@@ -1,34 +1,16 @@
 package castis.domain.moneycheck.service;
 
 import castis.domain.moneycheck.dto.MoneyCheckDto;
-import castis.domain.point.dto.PointHistoryDto;
-import castis.domain.point.entity.PointHistory;
-import castis.domain.project.dto.OtpDTO;
-import castis.domain.project.dto.TransferDTO;
 import castis.domain.service.dto.ServiceChargeDTO;
-import castis.domain.service.dto.ServiceDTO;
 import castis.domain.service.service.ServiceService;
 import castis.domain.user.entity.User;
 import castis.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONObject;
-import org.springframework.core.env.Environment;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Predicate;
-import java.nio.ByteBuffer;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -37,7 +19,6 @@ public class MoneyCheckService {
 
     private final ServiceService serviceService;
     private final UserRepository userRepository;
-    private final Environment environment;
 
     public List<MoneyCheckDto> findAll(){
         List<MoneyCheckDto> result = new ArrayList<>();
@@ -55,9 +36,12 @@ public class MoneyCheckService {
                             mcd.setDefaultRSrate(curService.getCharge());
                             break;
                         case 2:
-                            mcd.setAgreeEndDate(curService.getCharge());
+                            mcd.setAgreeStartDate(curService.getCharge());
                             break;
                         case 3:
+                            mcd.setAgreeEndDate(curService.getCharge());
+                            break;
+                        case 5:
                             mcd.setSelfDecidedMoney(curService.getCharge());
                             needMoney += parseHangulToLongCost(curService.getCharge());
                             break;

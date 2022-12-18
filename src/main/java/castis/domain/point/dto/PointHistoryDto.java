@@ -16,7 +16,9 @@ public class PointHistoryDto {
     private String useDate;
     private String memo;
     private Integer point;
+    private Integer expValue;
     private String sender;
+    private String recver;
     private String code;
 
     public PointHistoryDto (PointHistory pointHistory) {
@@ -28,6 +30,8 @@ public class PointHistoryDto {
         this.memo = pointHistory.getMemo();
         this.point = pointHistory.getPoint();
         this.sender = pointHistory.getSender();
+        this.recver = pointHistory.getRecver();
         this.code = pointHistory.getCode();
+        this.expValue = pointHistory.getExpvalue();
     }
 }

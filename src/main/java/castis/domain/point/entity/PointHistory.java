@@ -19,6 +19,8 @@ public class PointHistory {
 
     @Column
     private Integer point;
+    @Column
+    private Integer expvalue;
 
     @Column
     private String code;
@@ -38,12 +40,13 @@ public class PointHistory {
     @Column
     private LocalDateTime useDate;
 
-    public PointHistory (String sender, String receiver, Integer point, String memo, String code) {
+    public PointHistory (String sender, String receiver, Integer point, Integer expvalue, String memo, String code) {
         this.sender = sender;
         this.recver = receiver;
         this.point = point;
         this.memo = memo;
         this.code = code;
+        this.expvalue = expvalue;
         this.createDate = LocalDateTime.now();
     }
 }

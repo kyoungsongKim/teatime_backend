@@ -10,9 +10,11 @@ import lombok.Setter;
 public class PointAndLevelDto {
     private int point;
     private int level;
+    private int expvalue;
 
-    public PointAndLevelDto(int point, int level) {
+    public PointAndLevelDto(int point, int level, int expvalue) {
         this.point = point;
         this.level = level;
+        this.expvalue = expvalue;
     }
 }

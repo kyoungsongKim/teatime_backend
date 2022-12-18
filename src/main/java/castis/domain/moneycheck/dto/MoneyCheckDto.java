@@ -24,6 +24,8 @@ public class MoneyCheckDto {
     private String cbankAccount;
     //default rate
     private String defaultRSrate;
+    //start date of agreement
+    private String agreeStartDate;
     //last date of agreement
     private String agreeEndDate;
     //self decided money
