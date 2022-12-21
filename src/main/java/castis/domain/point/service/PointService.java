@@ -112,6 +112,9 @@ public class PointService {
     @Transactional
     public ResponseEntity updatePointHistoryComplete(String code) throws Exception {
         code = code.toUpperCase();
+        if (code.contains("LEVEL_UP") || code.contains("AUTO")) {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
         List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeEquals(code.toUpperCase()).orElse(null);
         if(pointHistoryList != null && pointHistoryList.size() > 0) {
             PointHistory pointHistory = pointHistoryList.get(0);

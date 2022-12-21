@@ -21,10 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.Predicate;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -113,10 +116,15 @@ public class TicketService {
 
     public ResponseEntity saveTicketInfo(TicketDto ticketDto) {
         Ticket ticket = ticketRepository.save(new Ticket(ticketDto));
+        LocalDate date = LocalDate.parse(ticketDto.getEventStartDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDateTime createDate = LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), 0, 0, 0);
         if(ticketDto.getId() == null || ticketDto.getId() == 0) {
-            PointHistory pointHistory = new PointHistory(ticketDto.getUserName(), ticketDto.getUserName(), 500, 0, "TICKET_POINT", "AUTO");
-            pointHistory.setUseDate(LocalDateTime.now());
-            pointHistoryRepository.save(pointHistory);
+            List<PointHistory> pointHistoryList = pointHistoryRepository.findAllByRecverAndCreateDateAndCode(ticketDto.getUserName(), createDate, "AUTO").orElse(null);;
+            if ( pointHistoryList == null || pointHistoryList.size() == 0) {
+                PointHistory pointHistory = new PointHistory(ticketDto.getUserName(), ticketDto.getUserName(), 500, 0, "TICKET_POINT", "AUTO");
+                pointHistory.setUseDate(LocalDateTime.now());
+                pointHistoryRepository.save(pointHistory);
+            }
         }
         if(ticketDto.getProject().equals("휴가")) {
             vacationHistoryService.saveVacationHistory(new VacationHistory(ticket));

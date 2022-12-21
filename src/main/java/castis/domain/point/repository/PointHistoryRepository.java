@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,5 +14,6 @@ public interface PointHistoryRepository extends JpaRepository<PointHistory, Long
 
     Optional<List<PointHistory>> findAllByRecver(String recver);
 
+    Optional<List<PointHistory>> findAllByRecverAndCreateDateAndCode(String recver, LocalDateTime date, String code);
     Optional<List<PointHistory>> findByCodeEquals(String code);
 }
