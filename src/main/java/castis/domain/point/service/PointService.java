@@ -97,6 +97,7 @@ public class PointService {
         PointHistory pointHistory = new PointHistory(sender, receiver, point, 0, memo, code);
         if ( point < 0 ) {
             pointHistory.setUseDate(LocalDateTime.now());
+            pointHistory.setCode(code + "_COMPLETE");
         }
         pointHistoryRepository.save(pointHistory);
         return code;
