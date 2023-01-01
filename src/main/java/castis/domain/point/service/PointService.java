@@ -1,6 +1,7 @@
 package castis.domain.point.service;
 
 import castis.domain.point.dto.PointHistoryDto;
+import castis.domain.point.dto.PointSummaryDto;
 import castis.domain.point.entity.PointHistory;
 import castis.domain.point.repository.PointHistoryRepository;
 import castis.domain.project.dto.OtpDTO;
@@ -22,6 +23,7 @@ import javax.persistence.criteria.Predicate;
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -105,9 +107,31 @@ public class PointService {
 
     public void changePointToExp(String sender, String receiver, Integer point, String memo) {
         int minusPoint = point * -1;
-        PointHistory pointHistory = new PointHistory(sender, receiver, minusPoint, point, memo, "LEVEL_UP");
+        int plusPoint = point.intValue();
+        int currentPoint = getPointByUserId(receiver);
+        if ( plusPoint < currentPoint ) {
+            plusPoint = currentPoint - plusPoint;
+        }
+        PointHistory pointHistory = new PointHistory(sender, receiver, minusPoint, plusPoint, memo, "LEVEL_UP");
         pointHistory.setUseDate(LocalDateTime.now());
         pointHistoryRepository.save(pointHistory);
+    }
+
+    private int getPointByUserId(String userId) {
+        int totalPoint = 0;
+        List<PointHistoryDto> pointHistoryDtoList = findAllPointHistory();
+        if (pointHistoryDtoList != null) {
+            Iterator<PointHistoryDto> phIterrator = pointHistoryDtoList.iterator();
+            while (phIterrator.hasNext()) {
+                PointHistoryDto curDto = phIterrator.next();
+                if (curDto != null) {
+                    if (curDto.getRecver().equalsIgnoreCase(userId) && curDto.getUseDate() != null) {
+                        totalPoint += curDto.getPoint();
+                    }
+                }
+            }
+        }
+        return totalPoint;
     }
 
     @Transactional
