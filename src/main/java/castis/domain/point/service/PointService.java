@@ -109,8 +109,13 @@ public class PointService {
         int minusPoint = point * -1;
         int plusPoint = point.intValue();
         int currentPoint = getPointByUserId(receiver);
-        if ( plusPoint < currentPoint ) {
-            plusPoint = currentPoint - plusPoint;
+        if ( plusPoint > currentPoint ) {
+            if ( currentPoint > 0) {
+                plusPoint = currentPoint;
+                minusPoint = plusPoint * -1;
+            } else {
+                plusPoint = 0;
+            }
         }
         PointHistory pointHistory = new PointHistory(sender, receiver, minusPoint, plusPoint, memo, "LEVEL_UP");
         pointHistory.setUseDate(LocalDateTime.now());
