@@ -38,7 +38,7 @@ public class MoneyCheckController {
             while(mcIterator.hasNext()){
                 MoneyCheckDto curDto = mcIterator.next();
                 if(curDto!=null){
-                    if (curDto.getTeamName().contains("티타임") == false ) {
+                    if (curDto.getTeamName().contains("Teatime") == false ) {
                         mcIterator.remove();
                     } else {
                         String accountId = curDto.getCbankAccount();
