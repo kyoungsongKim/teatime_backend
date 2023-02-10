@@ -28,6 +28,7 @@ public class UserDto implements Serializable {
     public UserDto(User user) {
         this.id = user.getId();
         this.userName = user.getUserName();
+        this.realName = user.getRealName();
         this.enabled = user.getEnabled();
         this.teamName = user.getTeamName();
         this.position = user.getPosition();
