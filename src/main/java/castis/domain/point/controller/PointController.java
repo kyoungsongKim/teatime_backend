@@ -3,6 +3,7 @@ package castis.domain.point.controller;
 import castis.domain.point.dto.PointAndLevelDto;
 import castis.domain.point.dto.PointHistoryDto;
 import castis.domain.point.dto.PointSummaryDto;
+import castis.domain.point.entity.PointHistory;
 import castis.domain.point.service.PointService;
 import castis.domain.user.entity.User;
 import castis.domain.user.repository.UserRepository;
@@ -138,5 +139,61 @@ public class PointController {
         PointAndLevelDto pointAndLevelDto = new PointAndLevelDto(totalPoint, userLevel, totalExp);
 
         return new ResponseEntity<>(pointAndLevelDto, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/month", method = RequestMethod.GET)
+    public ResponseEntity getMonthSummary(HttpServletRequest httpServletRequest
+            , @RequestParam(name = "year") String year
+            , @RequestParam(name = "month") String month) {
+        log.info("request, uri[{}] year[{}] month[{}]", httpServletRequest.getRequestURI(), year, month);
+
+        List<PointSummaryDto> pointSummaryDtoList = new ArrayList<>();
+        Integer yearInt = Integer.valueOf(year);
+        Integer monthInt = Integer.valueOf(month);
+        List<PointHistoryDto> pointHistoryDtoList = pointService.getPointHistoryByYearAndMonth(yearInt, monthInt);
+        List<User> userList = userRepository.findAll();
+        if (pointHistoryDtoList != null) {
+            for (User curUser : userList) {
+                PointSummaryDto curSummary = new PointSummaryDto();
+                curSummary.setUserId(curUser.getId());
+                curSummary.setRealName(curUser.getRealName());
+                int totalPoint = 0;
+                int totalDonateCount = 0;
+                int totalNotDonateCount = 0;
+                Iterator<PointHistoryDto> phIterrator = pointHistoryDtoList.iterator();
+                while(phIterrator.hasNext()){
+                    PointHistoryDto curDto = phIterrator.next();
+                    if(curDto!=null){
+                        if (curDto.getRecver().equalsIgnoreCase(curUser.getId())) {
+                            if ( curDto.getCode().equalsIgnoreCase("AUTO")) {
+                                continue;
+                            }
+                            if ( curDto.getCode().equalsIgnoreCase("LEVEL_UP")) {
+                                continue;
+                            }
+                            if ( curDto.getPoint() > 0) {
+                                if ( curDto.getUseDate() != null ) {
+                                    totalPoint += curDto.getPoint();
+                                    // donate completed
+                                    totalDonateCount += 1;
+                                } else {
+                                    // not donate
+                                    totalNotDonateCount += 1;
+                                }
+                            }
+                        }
+                    }
+                }
+                curSummary.setTotalPoint(totalPoint);
+                // count of ticket
+                curSummary.setTotalExp(totalDonateCount);
+                // not meaning
+                curSummary.setLevel(totalNotDonateCount);
+                pointSummaryDtoList.add(curSummary);
+            }
+            return new ResponseEntity<>(pointSummaryDtoList, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

@@ -30,7 +30,7 @@ public class ReportController {
         Optional<User> userInfo = userService.findById(req.getUserId());
         if (userInfo.isPresent()) {
             ReportUserResponseDto reportUserResponseDto = new ReportUserResponseDto();
-            reportUserResponseDto.setSendUserName(userInfo.get().getRealName());
+            reportUserResponseDto.setSendUserName(userInfo.get().getUserName());
             reportUserResponseDto.setReceiveEmail(userInfo.get().getDailyReportList());
             reportUserResponseDto.setSenderEmail(userInfo.get().getEmail());
 

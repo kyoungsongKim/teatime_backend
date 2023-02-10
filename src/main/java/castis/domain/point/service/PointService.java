@@ -86,6 +86,15 @@ public class PointService {
         return null;
     }
 
+    public List<PointHistoryDto> getPointHistoryByYearAndMonth(Integer year, Integer month) {
+        List<PointHistoryDto> result = new ArrayList<>();
+        List<PointHistory> pointHistoryList = pointHistoryRepository.findAllByYearAndMonth(year, month);
+        pointHistoryList.forEach(i -> {
+            result.add(new PointHistoryDto(i));
+        });
+        return result;
+    }
+
     public String savePointHistoryAndCodeReturn(String sender, String receiver, Integer point, String memo) {
         UUID uuid = UUID.randomUUID();
         long l = ByteBuffer.wrap(uuid.toString().getBytes()).getLong();

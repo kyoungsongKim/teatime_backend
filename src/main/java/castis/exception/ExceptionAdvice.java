@@ -3,7 +3,6 @@ package castis.exception;
 import castis.exception.custom.*;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
-import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
