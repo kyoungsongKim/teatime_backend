@@ -27,7 +27,7 @@ public class VacationScheduler {
 
     private static final int SUMMARY_START_TIME = 9; // from 09:00 ~
 
-    @Scheduled(fixedRateString = "${scheduler.vacation.fixedRate: 30000}")
+    @Scheduled(fixedRateString = "${scheduler.vacation.fixedRate: 300000}")
     public void scheduleFixedRateTaskAsync() {
         Calendar now = Calendar.getInstance();
         if (now.get(Calendar.HOUR_OF_DAY) == SUMMARY_START_TIME) {
