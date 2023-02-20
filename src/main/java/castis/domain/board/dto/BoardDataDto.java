@@ -28,6 +28,8 @@ public class BoardDataDto implements Serializable {
 
     public int repliesCount;
 
+    public String agreementUserId;
+
     public BoardDataDto(Board board){
         this.bdNum = board.getBoardNum();
         this.title = board.getBrdtitle();
@@ -38,6 +40,7 @@ public class BoardDataDto implements Serializable {
         this.summary = board.getBrdmemo();
         this.repliesCount = board.getBoardreplies().size();
         this.summaryLists = new ArrayList<>();
+        this.agreementUserId = board.getAgreementUserId();
     }
 
     public void addSummary(String type, String summary) {

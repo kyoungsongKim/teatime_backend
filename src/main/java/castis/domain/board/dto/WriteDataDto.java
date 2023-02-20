@@ -14,4 +14,5 @@ public class WriteDataDto {
     private String writer;
     private long boardGroup;
     private long boardNum;
+    private String agreementUserId;
 }

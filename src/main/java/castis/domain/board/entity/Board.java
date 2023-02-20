@@ -44,6 +44,9 @@ public class Board {
     @OneToMany(mappedBy = "brdno")
     private Set<Boardreply> boardreplies = new LinkedHashSet<>();
 
+    @Column(name = "AGREEMENTUSERID")
+    private String agreementUserId;
+
     public void setBoardreplies(Set<Boardreply> boardreplies) {
         this.boardreplies = boardreplies;
     }
@@ -56,12 +59,14 @@ public class Board {
         this.boardGroup = data.getBoardGroup();
         this.brdhit = 0;
         this.brddeleteflag = 'N';
+        this.agreementUserId = data.getAgreementUserId();
     }
 
     public Board updateData(WriteDataDto data){
         this.brdtitle = data.getTitle();
         this.brdmemo = data.getSummary();
         this.brdwriter = data.getWriter();
+        this.agreementUserId = data.getAgreementUserId();
         return this;
     }
     public Board deleteData(){
