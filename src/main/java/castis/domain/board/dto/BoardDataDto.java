@@ -1,6 +1,7 @@
 package castis.domain.board.dto;
 
 import castis.domain.board.entity.Board;
+import castis.domain.board.entity.Boardfile;
 import lombok.*;
 
 import java.io.Serializable;
@@ -22,13 +23,11 @@ public class BoardDataDto implements Serializable {
     public String answers;
     public String upvotes;
 
-    public String fileName;
-    public String saveName;
-    public int fileSize;
-
     public int repliesCount;
 
     public String agreementUserId;
+
+    public List<BoardfileDto> boardFiles = new ArrayList<>();
 
     public BoardDataDto(Board board){
         this.bdNum = board.getBoardNum();
@@ -41,6 +40,14 @@ public class BoardDataDto implements Serializable {
         this.repliesCount = board.getBoardreplies().size();
         this.summaryLists = new ArrayList<>();
         this.agreementUserId = board.getAgreementUserId();
+    }
+
+    public void setBoardfiles(List<Boardfile> files) {
+        for (Boardfile file :
+                files) {
+            BoardfileDto boardfileDto = new BoardfileDto(file);
+            boardFiles.add(boardfileDto);
+        }
     }
 
     public void addSummary(String type, String summary) {

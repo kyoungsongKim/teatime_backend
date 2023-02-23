@@ -96,12 +96,7 @@ public class BoardController {
             }
             boardDataDto.addSummary(type, summary_line);
         }
-        Boardfile file = boardfileRepository.findByBrdno(Long.valueOf(bdNum).intValue()).orElse(null);
-        if (file != null) {
-            boardDataDto.setFileName(file.getFilename());
-            boardDataDto.setSaveName(file.getRealname());
-            boardDataDto.setFileSize(file.getFilesize());
-        }
+        boardfileRepository.findByBrdno(Long.valueOf(bdNum).intValue()).ifPresent(boardDataDto::setBoardfiles);
 
         return boardDataDto;
     }
