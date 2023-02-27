@@ -27,8 +27,12 @@ import java.util.Map;
 public class HolidayService {
 
     private final Environment environment;
-
+    private Map<String, ArrayList<HolidayDto>> holidayMap = new HashMap<String, ArrayList<HolidayDto>>();
     public List<HolidayDto> getHolidayInfo(String year, String month) throws IOException {
+        String mapKey = year+"_"+month;
+        if ( holidayMap.containsKey(mapKey)) {
+            return holidayMap.get(mapKey);
+        }
         StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("serviceKey","UTF-8") + "=" + environment.getProperty("holiday.openApi.serviceKey")); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("100", "UTF-8")); /*한 페이지 결과 수*/
@@ -55,10 +59,11 @@ public class HolidayService {
         conn.disconnect();
 
         List<HolidayJsonDto> list = string2Map(sb.toString());
-        List<HolidayDto> result = new ArrayList<>();
+        ArrayList<HolidayDto> result = new ArrayList<>();
         list.forEach(i -> {
             result.add(new HolidayDto(i));
         });
+        holidayMap.put(mapKey, result);
         return result;
 
     }

@@ -45,12 +45,6 @@ public class TicketService {
         List<EventDto> result = new ArrayList<>();
 
         Specification<Ticket> spec = (con, query, cb) -> {
-            /*// ordering
-            List<Order> orders = new ArrayList<>();
-            //orders.add(cb.asc(con.get("seq")));
-            orders.add(cb.asc(con.get("order")));
-            query.orderBy(orders);*/
-
             List<Predicate> predicates = new ArrayList<>();
             if (userName != null && !"".equals(userName)) {
                 predicates.add(cb.equal(con.get("userName"), userName));
