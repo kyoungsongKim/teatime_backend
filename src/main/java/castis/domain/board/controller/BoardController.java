@@ -46,9 +46,20 @@ public class BoardController {
      */
     @GetMapping("/boardList")
     @Transactional
-    public BoardListDto boardList(@RequestParam(value="board", defaultValue="1")long board, @RequestParam(value="page" , defaultValue = "1") int page, @RequestParam(value="page_size", defaultValue = "10") int size){
-        long count = boardRepository.countBoardByBoardGroupAndBrddeleteflag(board, 'N');
-        List<Board> boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
+    public BoardListDto boardList(@RequestParam(value="board", defaultValue="1")long board,
+                                  @RequestParam(value="page" , defaultValue = "1") int page,
+                                  @RequestParam(value="page_size", defaultValue = "10") int size,
+                                  @RequestParam(value="agreementUserId", defaultValue="") String agreementUserId){
+        long count;
+        List<Board> boards;
+        if (agreementUserId.isEmpty()) {    // admin
+            count = boardRepository.countBoardByBoardGroupAndBrddeleteflag(board, 'N');
+            boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
+        }
+        else {  // user
+            count = boardRepository.countBoardByBoardGroupAndAgreementUserIdAndBrddeleteflag(board, agreementUserId, 'N');
+            boards = boardRepository.findByBoardGroupAndAgreementUserIdAndBrddeleteflagOrderByBoardNumDesc(board, agreementUserId, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
+        }
         BoardListDto boardDto = new BoardListDto(count , size);
         boardDto.setBoardDataList(boards);
         return boardDto;
