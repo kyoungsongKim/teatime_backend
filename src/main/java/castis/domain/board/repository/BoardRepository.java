@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface BoardRepository extends JpaRepository<Board, Long> {
     //Optional<List<Board>> findByBoardGroupOrderByBoardNumDescWithPagination(Long boardGroup, Pageable pageable);
     Optional<List<Board>> findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(long boardGroup, char flag, Pageable pageable);
+    Optional<List<Board>> findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(long boardGroup, char flag);
     Optional<List<Board>> findByBoardGroupAndAgreementUserIdAndBrddeleteflagOrderByBoardNumDesc(long boardGroup, String agreementUserId, char flag, Pageable pageable);
 
     Optional<Board> findByBoardNumAndBrddeleteflag(long boardNum, char flag);

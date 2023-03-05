@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,14 +50,27 @@ public class BoardController {
     public BoardListDto boardList(@RequestParam(value="board", defaultValue="1")long board,
                                   @RequestParam(value="page" , defaultValue = "1") int page,
                                   @RequestParam(value="page_size", defaultValue = "10") int size,
-                                  @RequestParam(value="agreementUserId", defaultValue="") String agreementUserId){
+                                  @RequestParam(value="agreementUserId", defaultValue="") String agreementUserId,
+                                  @RequestParam(value="searchKeyword", defaultValue="") String searchKeyword){
         long count;
         List<Board> boards;
-        if (agreementUserId.isEmpty()) {    // admin
+        if ( searchKeyword.isEmpty() == false ) {
+            boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N').orElse(null);
+            Iterator<Board> iter = boards.iterator();
+            while (iter.hasNext()) {
+                Board curBoard = iter.next();
+                String title = curBoard.getBrdtitle()==null?"":curBoard.getBrdtitle();
+                String agreeId = curBoard.getAgreementUserId()==null?"":curBoard.getAgreementUserId();
+                if ( title.contains(searchKeyword) || agreeId.contains(searchKeyword)) {
+                    continue;
+                }
+                iter.remove();
+            }
+            count=boards.size();
+        } else if (agreementUserId.isEmpty()) {
             count = boardRepository.countBoardByBoardGroupAndBrddeleteflag(board, 'N');
             boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
-        }
-        else {  // user
+        } else {  // user
             count = boardRepository.countBoardByBoardGroupAndAgreementUserIdAndBrddeleteflag(board, agreementUserId, 'N');
             boards = boardRepository.findByBoardGroupAndAgreementUserIdAndBrddeleteflagOrderByBoardNumDesc(board, agreementUserId, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
         }
