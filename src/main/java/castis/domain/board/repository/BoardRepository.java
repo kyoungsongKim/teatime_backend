@@ -17,6 +17,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Optional<Board> findByBoardNum(long boardNum);
     long countBoardByBoardGroupAndBrddeleteflag(long boardGroup, char flag);
     long countBoardByBoardGroupAndAgreementUserIdAndBrddeleteflag(long boardGroup, String agreementUserId, char flag);
-
-
+    Optional<List<Board>> findByBoardGroupAndAgreementUserIdOrderByBoardNumDesc(long boardGroup, String agreementUserId);
 }
