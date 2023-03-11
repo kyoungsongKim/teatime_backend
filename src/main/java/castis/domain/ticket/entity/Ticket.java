@@ -73,11 +73,7 @@ public class Ticket {
 
 		double md = 0;
 		if(dto.getMd() != null && !"".equals(dto.getMd())) {
-			String[] mds = dto.getMd().split(":");
-			md = Float.parseFloat(mds[0]) / 8;
-			if(mds[1].equals("30")) {
-				md += 0.0625;
-			}
+			md = Float.parseFloat(dto.getMd());
 			this.emd = (float) md;
 			this.nmd = (float) md;
 		}

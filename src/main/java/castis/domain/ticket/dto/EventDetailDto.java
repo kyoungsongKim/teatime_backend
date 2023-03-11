@@ -31,7 +31,7 @@ public class EventDetailDto implements Serializable {
         this.teamName = ticket.getTeamName();
         this.userName = ticket.getUserName();
         this.projectName = ticket.getProjectName();
-        this.title = ticket.getTitle();
+        this.title = ticket.getProjectName();
         this.content = ticket.getContent();
         this.content = ticket.getContent();
         this.emd = ticket.getEmd();

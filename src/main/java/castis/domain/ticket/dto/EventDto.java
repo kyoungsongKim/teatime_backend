@@ -23,7 +23,7 @@ public class EventDto {
 
     public EventDto (Ticket ticket) {
         this.no = ticket.getNo();
-        this.title = ticket.getTitle();
+        this.title = ticket.getProjectName();
         this.start = ticket.getStartTime().toLocalDate();
         this.end = ticket.getEndTime().toLocalDate();
         this.description = ticket.getContent();

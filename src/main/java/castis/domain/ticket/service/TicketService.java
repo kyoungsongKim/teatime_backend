@@ -108,6 +108,38 @@ public class TicketService {
         return result;
     }
 
+    public List<EventDetailDto> findAllByUserNameAndMonth(String userName, String year, String month) {
+
+        List<EventDetailDto> result = new ArrayList<>();
+
+        Specification<Ticket> spec = (con, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (userName != null && !"".equals(userName)) {
+                predicates.add(cb.equal(con.get("userName"), userName));
+            }
+            LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), 1, 0, 0);
+            YearMonth lastDay = YearMonth.from(startDate);
+            LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), lastDay.lengthOfMonth(), 0, 0);
+            predicates.add(cb.between(con.get("startTime"), startDate, endDate));
+
+            return predicates.size() > 0 ? cb.and(predicates.toArray(new Predicate[predicates.size()])) : null;
+        };
+        List<Project> projectList = projectRepository.findAll();
+        List<Ticket> list = ticketRepository.findAll(spec).stream().collect(Collectors.toList());
+        list.forEach(i -> {
+            EventDetailDto eventDetailDto = new EventDetailDto(i);
+            for (Project project : projectList) {
+                if (project.getProjectName().equalsIgnoreCase(eventDetailDto.getProjectName())) {
+                    eventDetailDto.setSite(project.getSite());
+                    eventDetailDto.setBgColor(project.getBgColor());
+                    break;
+                }
+            }
+            result.add(eventDetailDto);
+        });
+        return result;
+    }
+
     public ResponseEntity saveTicketInfo(TicketDto ticketDto) {
         Ticket ticket = ticketRepository.save(new Ticket(ticketDto));
         LocalDate date = LocalDate.parse(ticketDto.getEventStartDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));

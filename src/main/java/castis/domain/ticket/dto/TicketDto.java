@@ -29,28 +29,10 @@ public class TicketDto {
         this.id = ticket.getNo();
         this.teamName = ticket.getTeamName();
         this.userName = ticket.getUserName();
-        this.title = ticket.getTitle();
+        this.title = ticket.getProjectName();
         this.site = project.getSite();
         this.project = project.getProjectName();
-
-        String hour = "00";
-        String minute = "00";
-        double md = ticket.getEmd().doubleValue() * 8;
-        int h = (int) md;
-        double m = (double) (md - (int) md) * 60;
-        if((int)(Math.log10(m)+1) < 2) {
-            hour = "0" + String.valueOf(h);
-        }else{
-            hour = String.valueOf(h);
-        }
-        if((int)(Math.log10(m)+1) < 2) {
-            minute = "0" + String.valueOf((int)m);
-        } else {
-            minute = String.valueOf((int)m);
-        }
-
-
-        this.md = hour + ":" + minute;
+        this.md = String.valueOf(ticket.getEmd());
         this.eventStartDate = ticket.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.eventEndDate = ticket.getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.content = ticket.getContent();

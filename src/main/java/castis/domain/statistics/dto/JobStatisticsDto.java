@@ -25,7 +25,7 @@ public class JobStatisticsDto {
         this.startDate = ticket.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.endDate = ticket.getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.projectName = ticket.getProjectName();
-        this.title = ticket.getTitle();
+        this.title = ticket.getProjectName();
         this.content = ticket.getContent();
         this.nmd = ticket.getNmd();
     }
