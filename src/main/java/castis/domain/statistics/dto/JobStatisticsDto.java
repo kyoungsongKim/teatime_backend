@@ -18,7 +18,7 @@ public class JobStatisticsDto {
     private String projectName;
     private String title;
     private String content;
-    private Float nmd;
+    private Long nmd;
 
     public JobStatisticsDto(Ticket ticket) {
         this.id = ticket.getNo();
@@ -27,6 +27,6 @@ public class JobStatisticsDto {
         this.projectName = ticket.getProjectName();
         this.title = ticket.getProjectName();
         this.content = ticket.getContent();
-        this.nmd = ticket.getNmd();
+        this.nmd = ticket.getNmd().longValue();
     }
 }

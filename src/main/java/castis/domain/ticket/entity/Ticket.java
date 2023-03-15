@@ -5,8 +5,10 @@ import castis.domain.ticket.dto.TicketDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.parameters.P;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -39,10 +41,10 @@ public class Ticket {
 	private String content;
 
 	@Column
-	private Float nmd;
+	private BigDecimal nmd;
 
 	@Column
-	private Float emd;
+	private BigDecimal emd;
 
 	@Column
 	private String history;
@@ -73,9 +75,28 @@ public class Ticket {
 
 		double md = 0;
 		if(dto.getMd() != null && !"".equals(dto.getMd())) {
-			md = Float.parseFloat(dto.getMd());
-			this.emd = (float) md;
-			this.nmd = (float) md;
+			String jobValue = dto.getMd();
+			jobValue=jobValue.replaceAll(",", "");
+			jobValue=jobValue.trim();
+			if ( jobValue.indexOf("만") > 0 && jobValue.indexOf("천") >0 && jobValue.indexOf("백") >0) {
+				jobValue=jobValue.replaceAll("만", "");
+				jobValue=jobValue.replaceAll("천", "");
+				jobValue=jobValue.replaceAll("백", "00");
+			} else if ( jobValue.indexOf("만") > 0 && jobValue.indexOf("천") >0 ) {
+				jobValue=jobValue.replaceAll("만", "");
+				jobValue=jobValue.replaceAll("천", "000");
+			} else if ( jobValue.indexOf("만") > 0 ){
+				jobValue=jobValue.replaceAll("만", "0000");
+			} else if ( jobValue.indexOf("천") > 0 ){
+				jobValue=jobValue.replaceAll("천", "000");
+			}
+			try {
+				md = Long.parseLong(jobValue);
+			} catch ( Exception e ) {
+				md = 0;
+			}
+			this.emd = new BigDecimal(md);
+			this.nmd = new BigDecimal(md);
 		}
 
 		this.startTime = LocalDateTime.parse(dto.getEventStartDate() + " 00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));

@@ -20,7 +20,7 @@ public class EventDetailDto implements Serializable {
     private String projectName;
     private String title;
     private String content;
-    private Float emd;
+    private Long emd;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
@@ -34,7 +34,7 @@ public class EventDetailDto implements Serializable {
         this.title = ticket.getProjectName();
         this.content = ticket.getContent();
         this.content = ticket.getContent();
-        this.emd = ticket.getEmd();
+        this.emd = ticket.getEmd().longValue();
         this.startTime = ticket.getStartTime();
         this.endTime = ticket.getEndTime();
     }
