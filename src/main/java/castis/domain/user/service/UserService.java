@@ -39,6 +39,10 @@ public class UserService {
         }
     }
 
+    public List<User> getUserList() {
+        return userRepository.findAll();
+    }
+
     public Boolean updatePassword(PasswordDto passwordDto) {
         // 회원 엔티티 조회시작
         User user = userRepository.findById(passwordDto.getId())

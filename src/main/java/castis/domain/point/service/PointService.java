@@ -86,6 +86,18 @@ public class PointService {
         return null;
     }
 
+    public PointHistory getLastReceivePointHistory(String recver) {
+        List<PointHistory> pointHistoryList = pointHistoryRepository.findAllByRecverOrderByCreateDateDesc(recver).orElse(null);
+        if(pointHistoryList != null && pointHistoryList.size() > 0) {
+            for ( PointHistory ph : pointHistoryList ) {
+                if ( (ph.getCode().equalsIgnoreCase("LEVEL_UP") || ph.getCode().equalsIgnoreCase("AUTO")) == false) {
+                    return ph;
+                }
+            }
+        }
+        return null;
+    }
+
     public List<PointHistoryDto> getPointHistoryByYearAndMonth(Integer year, Integer month) {
         List<PointHistoryDto> result = new ArrayList<>();
         List<PointHistory> pointHistoryList = pointHistoryRepository.findAllByYearAndMonth(year, month);
