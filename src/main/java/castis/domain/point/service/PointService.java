@@ -183,6 +183,11 @@ public class PointService {
                 if(receiver != null) {
                     jsonObject = new JSONObject();
                     jsonObject.put("userId", sender.getCbankId());
+                    if(sender.getCbankId().equalsIgnoreCase("teatime.coffee")) {
+                        jsonObject.put("sendAccountPwd", "Q2FzdGlzMzY1Kg==");
+                    } else if (sender.getCbankId().equalsIgnoreCase("teatime.ginger")) {
+                        jsonObject.put("sendAccountPwd", "MTQ0Ng==");
+                    }
                     jsonObject.put("sendAccountId", sender.getCbankAccount());
                     jsonObject.put("recvAccountId", "0379-0201");
                     jsonObject.put("amount", pointHistory.getPoint());
