@@ -57,7 +57,7 @@ public class NoticeScheduler {
                                 }
                                 sb.append("마지막 서비스 이용일은 [").append(dateStr).append("]로 ");
                                 sb.append(intervalDateCount).append("일이 지났습니다!\n");
-                                sb.append("많이 바쁘시겠지만 에이전트 서비스 이용 홍보차 연락드렸습니다. 많은 이용 부탁드리겠습니다.\n 감사합니다!\n");
+                                sb.append("많이 바쁘시겠지만 에이전트 서비스 이용 홍보차 연락드렸습니다. 많은 이용 부탁드리겠습니다.\n감사합니다!\n");
                                 if (user.getCbankId().equalsIgnoreCase("teatime.coffee")) {
                                     sb.append("연락처:010-7164-9777\n");
                                     sb.append("서비스예약:https://coffee.castis.net\n");
