@@ -113,8 +113,8 @@ public class PointController {
             HttpServletRequest httpServletRequest
             , @RequestBody PointHistoryDto pointHistoryDto
     ) throws Exception {
-        log.info("request, uri[{}]", httpServletRequest.getRequestURI());
-        return pointService.updatePointHistoryComplete(pointHistoryDto.getCode());
+        log.info("request, uri[{}] code:[{}] recver[{}]", httpServletRequest.getRequestURI(), pointHistoryDto.getCode(), pointHistoryDto.getRecver());
+        return pointService.updatePointHistoryComplete(pointHistoryDto.getCode(), pointHistoryDto.getRecver());
     }
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)

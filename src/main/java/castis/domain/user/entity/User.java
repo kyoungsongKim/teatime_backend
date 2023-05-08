@@ -29,9 +29,6 @@ public class User {
     @Column(name = "password", nullable = false, length = 256)
     private String password;
 
-    @Column(name = "enabled", nullable = false)
-    private int enabled = 0;
-
     @Column(name = "teamname", nullable = false, length = 128)
     private String teamName;
 

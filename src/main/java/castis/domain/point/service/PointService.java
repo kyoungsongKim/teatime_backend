@@ -14,6 +14,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -78,10 +81,15 @@ public class PointService {
     }
 
     public PointHistory getPointHistoryByCode(String code) {
-        List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeEquals(code.toUpperCase()).orElse(null);
-        if(pointHistoryList != null && pointHistoryList.size() > 0) {
-            PointHistory pointHistory = pointHistoryList.get(0);
-            return pointHistory;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String username = userDetails.getUsername();
+            List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeAndRecver(code.toUpperCase(), username).orElse(null);
+            if(pointHistoryList != null && pointHistoryList.size() > 0) {
+                PointHistory pointHistory = pointHistoryList.get(0);
+                return pointHistory;
+            }
         }
         return null;
     }
@@ -115,7 +123,7 @@ public class PointService {
         do {
             code = Long.toString(l, Character.MAX_RADIX);
             code = code.toUpperCase().substring(0,4);
-            pointHistoryList = pointHistoryRepository.findByCodeEquals(code.toUpperCase()).orElse(null);
+            pointHistoryList = pointHistoryRepository.findByCodeAndRecver(code.toUpperCase(), receiver).orElse(null);
         } while (pointHistoryList == null);
         PointHistory pointHistory = new PointHistory(sender, receiver, point, 0, memo, code);
         if ( point < 0 ) {
@@ -161,12 +169,12 @@ public class PointService {
     }
 
     @Transactional
-    public ResponseEntity updatePointHistoryComplete(String code) throws Exception {
+    public ResponseEntity updatePointHistoryComplete(String code, String userName) throws Exception {
         code = code.toUpperCase();
         if (code.contains("LEVEL_UP") || code.contains("AUTO")) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeEquals(code.toUpperCase()).orElse(null);
+        List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeAndRecver(code.toUpperCase(), userName).orElse(null);
         if(pointHistoryList != null && pointHistoryList.size() > 0) {
             PointHistory pointHistory = pointHistoryList.get(0);
 
@@ -209,9 +217,7 @@ public class PointService {
                 }
             }
             return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }else{
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-
+        return new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 }

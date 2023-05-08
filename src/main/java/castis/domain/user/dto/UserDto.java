@@ -17,7 +17,6 @@ public class UserDto implements Serializable {
     private String id;
     private String userName;
     private String realName;
-    private int enabled;
     private String teamName;
     private String position;
     private String cellphone;
@@ -29,7 +28,6 @@ public class UserDto implements Serializable {
         this.id = user.getId();
         this.userName = user.getUserName();
         this.realName = user.getRealName();
-        this.enabled = user.getEnabled();
         this.teamName = user.getTeamName();
         this.position = user.getPosition();
         this.cellphone = user.getCellphone();

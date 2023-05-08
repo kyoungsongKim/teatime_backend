@@ -4,6 +4,8 @@ import castis.domain.point.entity.PointHistory;
 import castis.domain.point.service.PointService;
 import castis.domain.user.entity.User;
 import castis.domain.user.service.UserService;
+import castis.domain.usersmsinfo.entity.UserSMSInfoService;
+import castis.domain.usersmsinfo.entity.UserSmsInfo;
 import castis.scheduler.sms.SMSHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +31,10 @@ public class NoticeScheduler {
     private final UserService userService;
     private final PointService pointService;
     private final SMSHistoryService smsHistoryService;
+    private final UserSMSInfoService userSMSInfoService;
 
     // mon - fri, 13:00
-    @Scheduled(cron = "0 00 13 * * MON-FRI")
+    @Scheduled(cron = "0 00 13 * * MON,WED,FRI")
     public void findLastReflectMeetTime() {
         List<User> userList = userService.getUserList();
         for ( User user: userList) {
@@ -45,7 +48,8 @@ public class NoticeScheduler {
                     if ( user.getCellphone() != null && user.getCellphone().isEmpty() == false ) {
                         if(user.getCbankId().equalsIgnoreCase("teatime.coffee")) {
                             long intervalDateCount = DAYS.between(ph.getCreateDate(), LocalDateTime.now());
-                            if (intervalDateCount > user.getEnabled()) {
+                            UserSmsInfo usi = userSMSInfoService.getUSerSMSInfo(user.getId());
+                            if ( usi != null  && usi.isSendmsg() == true && usi.getSendday() > 0 && intervalDateCount > usi.getSendday()) {
                                 String dateStr = ph.getCreateDate().toString().substring(0, ph.getCreateDate().toString().indexOf("T"));
                                 if (dateStr.indexOf("T") > 0) {
                                     dateStr = dateStr.substring(0, ph.getCreateDate().toString().indexOf("T"));
