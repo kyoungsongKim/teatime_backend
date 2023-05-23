@@ -195,6 +195,8 @@ public class PointService {
                         jsonObject.put("sendAccountPwd", "Q2FzdGlzMzY1Kg==");
                     } else if (sender.getCbankId().equalsIgnoreCase("teatime.ginger")) {
                         jsonObject.put("sendAccountPwd", "MTQ0Ng==");
+                    } else if (sender.getCbankId().equalsIgnoreCase("besu2545")) {
+                        jsonObject.put("sendAccountPwd", "YXMxNjk1NDFeXg==");
                     }
                     jsonObject.put("sendAccountId", sender.getCbankAccount());
                     jsonObject.put("recvAccountId", "0379-0201");
