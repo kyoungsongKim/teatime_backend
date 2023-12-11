@@ -48,22 +48,41 @@ public class ReportController {
         String recvEmail = req.getReceiveEmail();
         String senderEmail = req.getSenderEmail();
 
-        log.info("send mail sendServiceReqquestEmail, sendUserName:{} recvEmail:{} title:{}", sendUserName, recvEmail, title);
+        log.info("send mail sendServiceReqquestEmail, sendUserName:{} recvEmail:{} title:{}", sendUserName, recvEmail,
+                title);
         Map<String, Object> response = new HashMap<String, Object>();
 
         StringBuilder builder = new StringBuilder();
-        builder.append("<font style=\"font-family: 맑은 고딕; font-size:10pt\">안녕하세요.<br>" + sendUserName + " " + req.getTitle() + "<br><br>");
+        builder.append("<font style=\"font-family: 맑은 고딕; font-size:10pt\">안녕하세요.<br>" + sendUserName + " "
+                + req.getTitle() + "<br><br>");
         builder.append(req.getContents().replaceAll("\n", "<br>").replaceAll(" ", "&nbsp;"));
-        builder.append("<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>");
+        builder.append(
+                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>");
 
         boolean sessionDebug = false;
         Properties props = System.getProperties();
-        props.put("mail.host", "mail.castis.com");
-        props.put("mail.smtp.port", "25");
+        props.put("mail.host", "gwsmtp.ktbizoffice.com");
+        props.put("mail.smtp.port", "587");
         props.put("mail.transport.protocol", "smtp");
-        Session session = Session.getDefaultInstance(props, null);
+        props.put("mail.smtp.auth",true);
+        props.put("mail.smtp.starttls.enable",true);
+        props.put("mail.smtp.ssl.trust", "gwsmtp.ktbizoffice.com");
+        props.put("mail.smtp.host", "gwsmtp.ktbizoffice.com");
+
+        // Java 1.8
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+
+        Authenticator auth = new Authenticator() {
+            // override the getPasswordAuthentication method
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("kskim@castis.com", "fjqjrnsk79!");
+            }
+        };
+
+        Session session = Session.getDefaultInstance(props, auth);
         session.setDebug(sessionDebug);
         try {
+            Message message = new MimeMessage(session);
             // Multipart
             Multipart multipart = new MimeMultipart();
             BodyPart messageBodyPart = new MimeBodyPart();
@@ -71,16 +90,19 @@ public class ReportController {
             messageBodyPart.setContent(builder.toString(), "text/html; charset=utf-8");
             multipart.addBodyPart(messageBodyPart);
 
-            Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(senderEmail));
-            msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(recvEmail));
-            msg.setRecipient(Message.RecipientType.CC, new InternetAddress(senderEmail));
-            msg.setSubject(MimeUtility.encodeText(title, "EUC-KR", "B"));
-            msg.setSubject(MimeUtility.encodeText(title, "UTF-8", "B"));
-            msg.setSentDate(new Date());
-            msg.setContent(multipart);
+            message.setHeader("X-Mailer","d-sdn");
+            message.setHeader("MIME-Version", "1.0");
+            message.setHeader("Content-Type", multipart.getContentType());
 
-            Transport.send(msg);
+            message.setFrom(new InternetAddress("kskim@castis.com", MimeUtility.encodeText("사람사업부 전산시스템", "UTF-8", "B")));
+
+            message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(recvEmail));
+            message.setRecipient(Message.RecipientType.CC, new InternetAddress(senderEmail));
+            message.setSubject(MimeUtility.encodeText(title, "UTF-8", "B"));
+            message.setSentDate(new Date());
+            message.setContent(multipart);
+
+            Transport.send(message);
             response.put("isSuccess", true);
             log.info("send mail {} to {} success", sendUserName, senderEmail);
         } catch (MessagingException mex) {

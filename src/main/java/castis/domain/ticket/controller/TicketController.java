@@ -1,9 +1,9 @@
 package castis.domain.ticket.controller;
 
-import castis.domain.ticket.service.TicketService;
 import castis.domain.ticket.dto.EventDetailDto;
 import castis.domain.ticket.dto.EventDto;
 import castis.domain.ticket.dto.TicketDto;
+import castis.domain.ticket.service.TicketService;
 import castis.util.holiday.HolidayService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,11 +31,9 @@ public class TicketController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseEntity getTicketDataUsingUserNameAndPeroid(
-            HttpServletRequest httpServletRequest
-            , @RequestParam(name = "periodYear") String periodYear
-            , @RequestParam(name = "periodMonth") String periodMonth
-            , @RequestParam(name = "userName", required = false) String userName
-    ) throws IOException {
+            HttpServletRequest httpServletRequest, @RequestParam(name = "periodYear") String periodYear,
+            @RequestParam(name = "periodMonth") String periodMonth,
+            @RequestParam(name = "userName", required = false) String userName) throws IOException {
         log.info("request, uri[{}]", httpServletRequest.getRequestURI());
         List<EventDto> ticketDtoList = ticketService.findAllByUserNameAndPeroid(userName, periodYear, periodMonth);
 
@@ -44,26 +42,28 @@ public class TicketController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ResponseEntity getTicketData(
-            HttpServletRequest httpServletRequest
-            , @RequestParam(name = "periodYear") String periodYear
-            , @RequestParam(name = "periodMonth") String periodMonth
-            , @RequestParam(name = "periodDay", required = false) String periodDay
-            , @RequestParam(name = "userName", required = false) String userName
-    ) {
-        log.info("request, uri[{}] periodYear[{}], periodMonth[{}], periodDay[{}], userName[{}]", httpServletRequest.getRequestURI(), periodYear, periodMonth, periodDay, userName);
-        List<EventDetailDto> ticketDtoList = ticketService.findAllByUserNameAndPeroid(userName, periodYear, periodMonth, periodDay);
+            HttpServletRequest httpServletRequest, @RequestParam(name = "periodYear") String periodYear,
+            @RequestParam(name = "periodMonth") String periodMonth,
+            @RequestParam(name = "periodDay", required = false) String periodDay,
+            @RequestParam(name = "userName", required = false) String userName) {
+        log.info("request, uri[{}] periodYear[{}], periodMonth[{}], periodDay[{}], userName[{}]",
+                httpServletRequest.getRequestURI(), periodYear, periodMonth, periodDay, userName);
+        List<EventDetailDto> ticketDtoList = ticketService.findAllByUserNameAndPeroid(userName, periodYear, periodMonth,
+                periodDay);
 
         return new ResponseEntity<>(ticketDtoList, HttpStatus.OK);
     }
 
     @PostMapping(value = "/")
-    public ResponseEntity saveTicketData(HttpServletRequest httpServletRequest, @RequestBody TicketDto ticketDto) {
+    public ResponseEntity saveTicketData(HttpServletRequest httpServletRequest,
+            @RequestBody TicketDto ticketDto) {
         log.info("request, uri[{}] ticketDto[{}]", httpServletRequest.getRequestURI(), ticketDto.toString());
         return ticketService.saveTicketInfo(ticketDto);
     }
 
     @RequestMapping(value = "/{no}", method = RequestMethod.GET)
-    public ResponseEntity getTicketDataByNo(HttpServletRequest httpServletRequest, @PathVariable(value = "no") Long no) {
+    public ResponseEntity getTicketDataByNo(HttpServletRequest httpServletRequest,
+            @PathVariable(value = "no") Long no) {
         log.info("request, uri[{}] No[{}]", httpServletRequest.getRequestURI(), no);
         TicketDto dto = ticketService.getTicketInfoByNo(no);
         return new ResponseEntity<>(dto, HttpStatus.OK);

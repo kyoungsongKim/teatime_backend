@@ -2,7 +2,10 @@ package castis.domain.board.dto;
 
 import castis.domain.board.entity.Board;
 import castis.domain.board.entity.Boardfile;
-import lombok.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.ArrayList;

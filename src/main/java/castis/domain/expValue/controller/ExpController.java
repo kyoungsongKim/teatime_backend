@@ -1,8 +1,5 @@
 package castis.domain.expValue.controller;
 
-import castis.domain.point.dto.PointAndLevelDto;
-import castis.domain.point.dto.PointHistoryDto;
-import castis.domain.point.dto.PointSummaryDto;
 import castis.domain.point.service.PointService;
 import castis.domain.user.entity.User;
 import castis.domain.user.repository.UserRepository;
@@ -10,11 +7,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @RestController

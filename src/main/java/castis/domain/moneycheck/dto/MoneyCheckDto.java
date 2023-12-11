@@ -1,14 +1,9 @@
 package castis.domain.moneycheck.dto;
 
-import castis.domain.point.entity.PointHistory;
-import castis.domain.service.entity.Service;
 import castis.domain.user.entity.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Setter
 @Getter

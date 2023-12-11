@@ -1,12 +1,12 @@
 package castis.domain.board.controller;
 
+import castis.domain.board.FileUtil;
 import castis.domain.board.dto.*;
-import castis.domain.board.entity.Boardfile;
-import castis.domain.board.repository.BoardfileRepository;
-import castis.domain.board.*;
 import castis.domain.board.entity.Board;
+import castis.domain.board.entity.Boardfile;
 import castis.domain.board.entity.Boardreply;
 import castis.domain.board.repository.BoardRepository;
+import castis.domain.board.repository.BoardfileRepository;
 import castis.domain.board.repository.BoardreplyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

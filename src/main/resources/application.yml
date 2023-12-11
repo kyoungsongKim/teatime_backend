@@ -1,6 +1,6 @@
 server:
   #ip: 127.0.0.1 # 설정없이 디폴트 ip 설정.
-  port: 9091
+  port: 9090
   servlet:
     context-path: /
 
@@ -70,3 +70,13 @@ cbank:
       url: http://bank.castis.net/cbank/api/v1/transfer
     viewAccount:
       url: http://bank.castis.net/cbank/api/v1/account/info/
+    history:
+      url: http://bank.castis.net/cbank/api/v1/account/history
+#    otp:
+#      url: http://172.16.48.201/cbank/api/v1/otp
+#    transfer:
+#      url: http://172.16.48.201/cbank/api/v1/transfer
+#    viewAccount:
+#      url: http://172.16.48.201/cbank/api/v1/account/info/
+#    history:
+#      url: http://172.16.48.201/cbank/api/v1/account/history

@@ -33,8 +33,8 @@ public class TicketDto {
         this.site = project.getSite();
         this.project = project.getProjectName();
         this.md = String.valueOf(ticket.getEmd());
-        this.eventStartDate = ticket.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        this.eventEndDate = ticket.getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        this.eventStartDate = ticket.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        this.eventEndDate = ticket.getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         this.content = ticket.getContent();
     }
 }

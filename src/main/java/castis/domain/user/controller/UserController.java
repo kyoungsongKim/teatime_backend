@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -50,7 +51,7 @@ public class UserController {
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<UserDto> getUserInfoById(@PathVariable(value = "id")String id) throws Exception {
+    public ResponseEntity<UserDto> getUserInfoById(@PathVariable(value = "id") String id) throws Exception {
         UserDto userInfo = userService.getUserDtoById(id);
         if (userInfo != null) {
             return new ResponseEntity<>(userInfo, HttpStatus.OK);
@@ -61,12 +62,19 @@ public class UserController {
 
     @RequestMapping(value = "/user/except", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity getUserInfoExceptId(@RequestParam(value = "userId")String userId) throws Exception {
-        List<UserDto> userDtoList  = userService.findAllUserDtoExceptId(userId);
+    public ResponseEntity getUserInfoExceptId(@RequestParam(value = "userId") String userId) throws Exception {
+        List<UserDto> userDtoList = userService.findAllUserDtoExceptId(userId);
         if (userDtoList != null) {
             return new ResponseEntity<>(userDtoList, HttpStatus.OK);
         } else {
             throw new UserNotFoundException("User List Not Found");
         }
+    }
+
+    @RequestMapping(value = "/user/id", method = RequestMethod.GET)
+    public ResponseEntity<List<String>> getUserIdList() {
+        List<UserDto> userList = userService.getUserDtoList();
+        return new ResponseEntity<>(userList.stream().map(UserDto::getId).collect(Collectors.toList()),
+                HttpStatus.OK);
     }
 }

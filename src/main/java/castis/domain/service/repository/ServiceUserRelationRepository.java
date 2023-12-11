@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface ServiceUserRelationRepository extends JpaRepository<ServiceUserRelation, ServiceUserRelationPK> {
 
-    @Query(value = "SELECT * FROM service_user_relation WHERE user_id = :userId" , nativeQuery = true)
+    @Query(value = "SELECT * FROM service_user_relation WHERE user_id = :userId", nativeQuery = true)
     List<ServiceUserRelation> findAllByUserId(String userId);
+
+    ServiceUserRelation findByUserIdAndServiceId(String userId, int serviceId);
 }

@@ -3,7 +3,6 @@ package castis.domain.point.controller;
 import castis.domain.point.dto.PointAndLevelDto;
 import castis.domain.point.dto.PointHistoryDto;
 import castis.domain.point.dto.PointSummaryDto;
-import castis.domain.point.entity.PointHistory;
 import castis.domain.point.service.PointService;
 import castis.domain.user.entity.User;
 import castis.domain.user.repository.UserRepository;

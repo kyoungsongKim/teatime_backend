@@ -4,11 +4,11 @@ import castis.domain.point.entity.PointHistory;
 import castis.domain.point.repository.PointHistoryRepository;
 import castis.domain.project.entity.Project;
 import castis.domain.project.repository.ProjectRepository;
-import castis.domain.ticket.repository.TicketRepository;
 import castis.domain.ticket.dto.EventDetailDto;
 import castis.domain.ticket.dto.EventDto;
 import castis.domain.ticket.dto.TicketDto;
 import castis.domain.ticket.entity.Ticket;
+import castis.domain.ticket.repository.TicketRepository;
 import castis.domain.vacation.entity.VacationHistory;
 import castis.domain.vacation.service.VacationHistoryService;
 import castis.util.holiday.HolidayService;
@@ -21,13 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.Predicate;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,19 +49,27 @@ public class TicketService {
             }
             LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), 1, 0, 0);
             YearMonth lastDay = YearMonth.from(startDate);
-            LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), lastDay.lengthOfMonth(), 0, 0);
+            LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month),
+                    lastDay.lengthOfMonth(), 0, 0);
             predicates.add(cb.between(con.get("startTime"), startDate, endDate));
 
             return predicates.size() > 0 ? cb.and(predicates.toArray(new Predicate[predicates.size()])) : null;
         };
+        long startTime = System.nanoTime();
         List<Ticket> list = ticketRepository.findAll(spec).stream().collect(Collectors.toList());
+        long endTime = System.nanoTime();
+
+        long duration = (endTime - startTime) / 1000000;
+
         list.forEach(i -> {
             result.add(new EventDto(i));
         });
 
+        long startTime1 = System.nanoTime();
         holidayService.getHolidayInfo(year, month).forEach(h -> {
             result.add(new EventDto(h));
         });
+        long endTime1 = System.nanoTime();
 
         return result;
     }
@@ -79,13 +85,16 @@ public class TicketService {
             }
 
             if (day != null && !"".equals(day)) {
-                LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), 0, 0);
-                LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), Integer.parseInt(day), 23, 59, 59);
+                LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month),
+                        Integer.parseInt(day), 0, 0);
+                LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month),
+                        Integer.parseInt(day), 23, 59, 59);
                 predicates.add(cb.between(con.get("startTime"), startDate, endDate));
             } else {
                 LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), 1, 0, 0);
                 YearMonth lastDay = YearMonth.from(startDate);
-                LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), lastDay.lengthOfMonth(), 0, 0);
+                LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month),
+                        lastDay.lengthOfMonth(), 0, 0);
                 predicates.add(cb.between(con.get("startTime"), startDate, endDate));
             }
 
@@ -104,7 +113,6 @@ public class TicketService {
             }
             result.add(eventDetailDto);
         });
-
         return result;
     }
 
@@ -119,7 +127,8 @@ public class TicketService {
             }
             LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), 1, 0, 0);
             YearMonth lastDay = YearMonth.from(startDate);
-            LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), lastDay.lengthOfMonth(), 0, 0);
+            LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month),
+                    lastDay.lengthOfMonth(), 0, 0);
             predicates.add(cb.between(con.get("startTime"), startDate, endDate));
 
             return predicates.size() > 0 ? cb.and(predicates.toArray(new Predicate[predicates.size()])) : null;
@@ -142,17 +151,21 @@ public class TicketService {
 
     public ResponseEntity saveTicketInfo(TicketDto ticketDto) {
         Ticket ticket = ticketRepository.save(new Ticket(ticketDto));
-        LocalDate date = LocalDate.parse(ticketDto.getEventStartDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDateTime date = LocalDateTime.parse(ticketDto.getEventStartDate(),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         LocalDateTime createDate = LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(), 0, 0, 0);
-        if(ticketDto.getId() == null || ticketDto.getId() == 0) {
-            List<PointHistory> pointHistoryList = pointHistoryRepository.findAllByRecverAndCreateDateAndCode(ticketDto.getUserName(), createDate, "AUTO").orElse(null);;
-            if ( pointHistoryList == null || pointHistoryList.size() == 0) {
-                PointHistory pointHistory = new PointHistory(ticketDto.getUserName(), ticketDto.getUserName(), 500, 0, "TICKET_POINT", "AUTO");
+        if (ticketDto.getId() == null || ticketDto.getId() == 0) {
+            List<PointHistory> pointHistoryList = pointHistoryRepository
+                    .findAllByRecverAndCreateDateAndCode(ticketDto.getUserName(), createDate, "AUTO").orElse(null);
+            ;
+            if (pointHistoryList == null || pointHistoryList.size() == 0) {
+                PointHistory pointHistory = new PointHistory(ticketDto.getUserName(), ticketDto.getUserName(), 500, 0,
+                        "TICKET_POINT", "AUTO");
                 pointHistory.setUseDate(LocalDateTime.now());
                 pointHistoryRepository.save(pointHistory);
             }
         }
-        if(ticketDto.getProject().equals("휴가")) {
+        if (ticketDto.getProject().equals("휴가")) {
             vacationHistoryService.saveVacationHistory(new VacationHistory(ticket));
         }
         return new ResponseEntity<>(null, HttpStatus.OK);

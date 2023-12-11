@@ -21,7 +21,7 @@ public class ServiceService {
     public List<ServiceDTO> getServiceList() {
         List<castis.domain.service.entity.Service> serviceList = serviceRepository.findAll();
         List<ServiceDTO> result = new ArrayList<>();
-        for(castis.domain.service.entity.Service service : serviceList) {
+        for (castis.domain.service.entity.Service service : serviceList) {
             result.add(new ServiceDTO(service));
         }
 
@@ -31,17 +31,27 @@ public class ServiceService {
     public List<ServiceChargeDTO> getAllServiceListWithCharge() {
         List<ServiceUserRelation> serviceUserRelationList = serviceUserRelationRepository.findAll();
         List<ServiceChargeDTO> result = new ArrayList<>();
-        for(ServiceUserRelation serviceUserRelation : serviceUserRelationList) {
+        for (ServiceUserRelation serviceUserRelation : serviceUserRelationList) {
             result.add(new ServiceChargeDTO(serviceUserRelation));
         }
         return result;
     }
+
     public List<ServiceChargeDTO> getServiceListWithCharge(String userId) {
         List<ServiceUserRelation> serviceUserRelationList = serviceUserRelationRepository.findAllByUserId(userId);
         List<ServiceChargeDTO> result = new ArrayList<>();
-        for(ServiceUserRelation serviceUserRelation : serviceUserRelationList) {
+        for (ServiceUserRelation serviceUserRelation : serviceUserRelationList) {
             result.add(new ServiceChargeDTO(serviceUserRelation));
         }
         return result;
+    }
+
+    public ServiceChargeDTO getServiceChargeByUserIdAndServiceId(String userId, int serviceId) {
+        ServiceUserRelation serviceUserRelation = serviceUserRelationRepository
+                .findByUserIdAndServiceId(userId, serviceId);
+        if (serviceUserRelation == null) {
+            return null;
+        }
+        return new ServiceChargeDTO(serviceUserRelation);
     }
 }

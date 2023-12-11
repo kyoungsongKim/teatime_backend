@@ -1,7 +1,6 @@
 package castis.domain.point.service;
 
 import castis.domain.point.dto.PointHistoryDto;
-import castis.domain.point.dto.PointSummaryDto;
 import castis.domain.point.entity.PointHistory;
 import castis.domain.point.repository.PointHistoryRepository;
 import castis.domain.project.dto.OtpDTO;

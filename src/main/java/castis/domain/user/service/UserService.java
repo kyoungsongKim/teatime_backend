@@ -1,10 +1,9 @@
 package castis.domain.user.service;
 
-import castis.domain.sign.dto.JoinDto;
 import castis.domain.user.dto.PasswordDto;
+import castis.domain.user.dto.UserDto;
 import castis.domain.user.dto.UserUpdateDto;
 import castis.domain.user.entity.User;
-import castis.domain.user.dto.UserDto;
 import castis.domain.user.repository.UserRepository;
 import castis.exception.custom.ForbiddenException;
 import castis.exception.custom.UserNotFoundException;
@@ -12,11 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +29,10 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public User getUser(String userId) throws EntityNotFoundException {
+        return userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+    }
+
     public UserDto getUserDtoById(String id) {
         Optional<User> user = findById(id);
         if (user.isPresent()) {
@@ -41,6 +44,10 @@ public class UserService {
 
     public List<User> getUserList() {
         return userRepository.findAll();
+    }
+
+    public List<UserDto> getUserDtoList() {
+        return userRepository.findAll().stream().map(UserDto::new).collect(Collectors.toList());
     }
 
     public Boolean updatePassword(PasswordDto passwordDto) {
