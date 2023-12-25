@@ -51,7 +51,9 @@ public class BoardController {
                                   @RequestParam(value="page" , defaultValue = "1") int page,
                                   @RequestParam(value="page_size", defaultValue = "10") int size,
                                   @RequestParam(value="agreementUserId", defaultValue="") String agreementUserId,
-                                  @RequestParam(value="searchKeyword", defaultValue="") String searchKeyword){
+                                  @RequestParam(value="searchKeyword", defaultValue="") String searchKeyword,
+                                  @RequestParam(value="startDate", defaultValue="") String startDate,
+                                  @RequestParam(value="endDate", defaultValue="") String endDate){
         long count;
         List<Board> boards;
         if ( searchKeyword.isEmpty() == false ) {
@@ -148,8 +150,8 @@ public class BoardController {
     }
 
     @PostMapping("/uploadFile")
-    public ResponseEntity uploadFile(@RequestParam("uploadFile") MultipartFile file, @RequestParam("boardNum") int num) throws IOException {
-        Boardfile boardfile = new Boardfile(num, file);
+    public ResponseEntity uploadFile(@RequestParam("uploadFile") MultipartFile file, @RequestParam("boardNum") int num, @RequestParam("prefix") String prefix) throws IOException {
+        Boardfile boardfile = new Boardfile(num, file, prefix);
         fs.saveFile(file, boardfile.getRealname());
         boardfileRepository.save(boardfile);
         return new ResponseEntity<>(null, HttpStatus.OK);

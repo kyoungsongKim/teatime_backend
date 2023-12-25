@@ -31,9 +31,9 @@ public class Boardfile {
     @Column(name = "FILESIZE")
     private Integer filesize;
 
-    public Boardfile(int brdno, MultipartFile file){
+    public Boardfile(int brdno, MultipartFile file, String prefix){
         this.brdno = brdno;
-        this.filename = file.getOriginalFilename();
+        this.filename = prefix.isEmpty() ? file.getOriginalFilename() : prefix + file.getOriginalFilename();
         this.filesize = Long.valueOf(file.getSize()).intValue();
         SimpleDateFormat ft = new SimpleDateFormat("yyyyMMddhhmmssSSS");
         this.realname =  ft.format(new Date()) + (int) (Math.random() * 10);
