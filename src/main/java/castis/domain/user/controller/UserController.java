@@ -77,4 +77,10 @@ public class UserController {
         return new ResponseEntity<>(userList.stream().map(UserDto::getId).collect(Collectors.toList()),
                 HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public ResponseEntity<List<UserDto>> getUserList() {
+        List<UserDto> userList = userService.getUserDtoList();
+        return new ResponseEntity<>(userList, HttpStatus.OK);
+    }
 }
