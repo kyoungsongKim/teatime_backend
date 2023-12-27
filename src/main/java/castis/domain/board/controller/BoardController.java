@@ -52,10 +52,12 @@ public class BoardController {
                                   @RequestParam(value="page_size", defaultValue = "10") int size,
                                   @RequestParam(value="agreementUserId", defaultValue="") String agreementUserId,
                                   @RequestParam(value="searchKeyword", defaultValue="") String searchKeyword,
-                                  @RequestParam(value="startDate", defaultValue="") String startDate,
-                                  @RequestParam(value="endDate", defaultValue="") String endDate){
+                                  @RequestParam(value="year", defaultValue="0") int year,
+                                  @RequestParam(value="month", defaultValue="0") int month){
         long count;
         List<Board> boards;
+        String prefix = year + "_" + String.format("%02d", month) + "_";
+
         if ( searchKeyword.isEmpty() == false ) {
             boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N').orElse(null);
             Iterator<Board> iter = boards.iterator();
@@ -70,11 +72,23 @@ public class BoardController {
             }
             count=boards.size();
         } else if (agreementUserId.isEmpty()) {
-            count = boardRepository.countBoardByBoardGroupAndBrddeleteflag(board, 'N');
-            boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
+            if (board == 5) {
+                // select target month
+                count = boardRepository.countBoardByBoardGroupAndBrddeleteflagAndBrdtitleStartsWith(board, 'N', prefix);
+                boards = boardRepository.findByBoardGroupAndBrddeleteflagAndBrdtitleStartsWithOrderByBoardNumDesc(board, 'N', prefix, PageRequest.of(page - 1, size)).orElse(null); //,
+            } else {
+                count = boardRepository.countBoardByBoardGroupAndBrddeleteflag(board, 'N');
+                boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
+            }
         } else {  // user
-            count = boardRepository.countBoardByBoardGroupAndAgreementUserIdAndBrddeleteflag(board, agreementUserId, 'N');
-            boards = boardRepository.findByBoardGroupAndAgreementUserIdAndBrddeleteflagOrderByBoardNumDesc(board, agreementUserId, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
+            if (board == 5) {
+                // selet target month condition prefix year_month_ ex) 2021_01_
+                count = boardRepository.countBoardByBoardGroupAndAgreementUserIdAndBrddeleteflagAndBrdtitleStartsWith(board, agreementUserId, 'N', prefix);
+                boards = boardRepository.findByBoardGroupAndAgreementUserIdAndBrddeleteflagAndBrdtitleStartsWithOrderByBoardNumDesc(board, agreementUserId, 'N', prefix, PageRequest.of(page - 1, size)).orElse(null); //,
+            } else {
+                count = boardRepository.countBoardByBoardGroupAndAgreementUserIdAndBrddeleteflag(board, agreementUserId, 'N');
+                boards = boardRepository.findByBoardGroupAndAgreementUserIdAndBrddeleteflagOrderByBoardNumDesc(board, agreementUserId, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
+            }
         }
         BoardListDto boardDto = new BoardListDto(count , size);
         boardDto.setBoardDataList(boards);
