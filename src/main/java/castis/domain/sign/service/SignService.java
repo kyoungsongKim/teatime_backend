@@ -7,6 +7,7 @@ import castis.domain.sign.dto.JoinDto;
 import castis.domain.sign.dto.LoginDto;
 import castis.domain.user.entity.User;
 import castis.domain.user.repository.UserRepository;
+import castis.enums.UserRole;
 import castis.exception.custom.DuplicatedException;
 import castis.exception.custom.ForbiddenException;
 import castis.exception.custom.UserNotFoundException;
@@ -35,7 +36,7 @@ public class SignService {
 
         // 데이터 등록(저장)
         userRepository.save(joinDto.toEntity());
-        authoritiesRepository.save(new Authorities(joinDto.getId(), "ROLE_USER"));
+        authoritiesRepository.save(new Authorities(joinDto.getId(), UserRole.ROLE_USER));
 
         return true;
     }
@@ -66,4 +67,8 @@ public class SignService {
                 .build();
     }
 
+    public boolean checkIsAdmin(String userId) {
+        Authorities authorities = authoritiesRepository.findByUserName(userId);
+        return authorities.getAuthority().equals(UserRole.ROLE_ADMIN);
+    }
 }

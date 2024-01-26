@@ -5,6 +5,7 @@ import castis.domain.user.dto.UserDto;
 import castis.domain.user.dto.UserUpdateDto;
 import castis.domain.user.entity.User;
 import castis.domain.user.repository.UserRepository;
+import castis.enums.UserRole;
 import castis.exception.custom.ForbiddenException;
 import castis.exception.custom.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -95,6 +96,12 @@ public class UserService {
             result.add(new UserDto(i));
         });
 
+        return result;
+    }
+
+    public List<UserDto> getAdminList() {
+        List<User> userList = userRepository.findAllByRole(UserRole.ROLE_ADMIN.getValue());
+        List<UserDto> result = userList.stream().map(UserDto::new).collect(Collectors.toList());
         return result;
     }
 }

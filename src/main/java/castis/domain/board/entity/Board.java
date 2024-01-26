@@ -29,7 +29,7 @@ public class Board {
     @Column(name = "BRDWRITER", length = 20)
     private String brdwriter;
 
-    @Column(name = "brdmemo", length = 20000)
+    @Column(name = "brdmemo", length = 16383)
     private String brdmemo;
 
     @Column(name = "BRDDATE")

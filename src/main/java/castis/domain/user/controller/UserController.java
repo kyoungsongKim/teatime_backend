@@ -83,4 +83,10 @@ public class UserController {
         List<UserDto> userList = userService.getUserDtoList();
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/admins", method = RequestMethod.GET)
+    public ResponseEntity<List<UserDto>> getAdminList() {
+        List<UserDto> result = userService.getAdminList();
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }

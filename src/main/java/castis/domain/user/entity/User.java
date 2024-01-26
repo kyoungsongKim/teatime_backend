@@ -16,6 +16,7 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @Table(name = "users")
 public class User {
+
     @Id
     @Column(name = "userid", nullable = false, length = 128)
     private String id;
@@ -55,8 +56,8 @@ public class User {
 
     @Builder
     public User(String id, String userName, String realName, String password,
-                String teamName, String position,
-                String cellphone, String email, String dailyReportList, String vacationReportList) {
+            String teamName, String position,
+            String cellphone, String email, String dailyReportList, String vacationReportList) {
         this.id = id;
         this.userName = userName;
         this.realName = realName;

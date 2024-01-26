@@ -57,11 +57,6 @@ public class AuthProvider {
         return BEARER_TYPE + builder.compact();
     }
 
-    // 토큰에서 회원 정보 추출
-    public String getUserPk(String token) {
-        return Jwts.parser().setSigningKey(signatureKey).parseClaimsJws(token).getBody().getSubject();
-    }
-
     /**
      * @method 설명 : 컨텍스트에 해당 유저에 대한 권한을 전달하고 API 접근 전 접근 권한을 확인하여 접근 허용 또는 거부를 진행한다.
      */
@@ -69,7 +64,8 @@ public class AuthProvider {
     public Authentication getAuthentication(String token) {
 
         // 토큰 기반으로 유저의 정보 파싱
-        Claims claims = Jwts.parser().setSigningKey(signatureKey).parseClaimsJws(token.replace(BEARER_TYPE, "")).getBody();
+        Claims claims = Jwts.parser().setSigningKey(signatureKey).parseClaimsJws(token.replace(BEARER_TYPE, ""))
+                .getBody();
 
         String username = claims.getSubject();
         String id = claims.get(ACCESS_USER_ID, String.class);

@@ -6,8 +6,12 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import castis.enums.UserRole;
 
 @Getter
 @Setter
@@ -20,9 +24,10 @@ public class Authorities {
     private String userName;
 
     @Column(name = "authority", nullable = false, length = 50)
-    private String authority;
+    @Enumerated(value = EnumType.STRING)
+    private UserRole authority;
 
-    public Authorities(String userName, String role) {
+    public Authorities(String userName, UserRole role) {
         this.userName = userName;
         this.authority = role;
     }

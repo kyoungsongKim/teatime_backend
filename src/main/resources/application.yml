@@ -72,11 +72,13 @@ cbank:
       url: http://bank.castis.net/cbank/api/v1/account/info/
     history:
       url: http://bank.castis.net/cbank/api/v1/account/history
-#    otp:
-#      url: http://172.16.48.201/cbank/api/v1/otp
-#    transfer:
-#      url: http://172.16.48.201/cbank/api/v1/transfer
-#    viewAccount:
-#      url: http://172.16.48.201/cbank/api/v1/account/info/
-#    history:
-#      url: http://172.16.48.201/cbank/api/v1/account/history
+
+kakao:
+  api-key: NCSWVSZSVEPHMDYP
+  secret: PVI4TYAMCT3GPPQDKRARO7O7Z3MBT9L3
+  pfid: KA01PF220906035048833ynNa3G1G1YN
+  messaging:
+    template:
+      assistance-apply-alarm: KA01TP240119012537734foTq4BqWv70
+    url: https://api.coolsms.co.kr
+    tel-origin: 01071649777
