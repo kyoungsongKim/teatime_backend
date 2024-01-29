@@ -62,6 +62,7 @@ public class AssistanceApplyService {
         User receiver = new User();
         receiver.setId(receiverId);
         assistanceApply.setReceiver(receiver);
+        assistanceApply.setStatus(AppliedAssistanceStatus.IN_PROGRESS);
         AssistanceApply result = assistanceApplyRepository.save(assistanceApply);
         return new AssistanceApplyDto(result);
     }

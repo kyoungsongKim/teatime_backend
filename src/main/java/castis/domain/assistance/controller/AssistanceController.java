@@ -64,65 +64,6 @@ public class AssistanceController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    // [WARNING] /{PathParameter} 형태의 경로로 매핑된 메소드보다 앞에 선언되어야함
-    @RequestMapping(value = "/apply", method = RequestMethod.GET)
-    public ResponseEntity<HashMap<String, List<AssistanceApplyDto>>> getAssistanceApplyList(
-            HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
-
-        List<AssistanceApplyDto> all = null;
-        if (user.getRoles().contains(UserRole.ROLE_ADMIN.getValue())) {
-            all = assistanceApplyService.getAssistanceApplyList();
-        }
-        List<AssistanceApplyDto> personal = assistanceApplyService.getAssistanceApplyListByApplierId(user.getUserId());
-
-        HashMap<String, List<AssistanceApplyDto>> result = new HashMap<>();
-        if (all != null) {
-            result.put("all", all);
-        }
-        result.put("my", personal);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/apply/{assistanceApplyId}/status", method = RequestMethod.PATCH)
-    public ResponseEntity<AssistanceApplyDto> receiveCompleteAssistance(HttpServletRequest request,
-            @PathVariable Integer assistanceApplyId, @RequestBody UpdateAssistanceApplyStatusBody body) {
-        // String token = request.getHeader("Authorization");
-        // CustomUserDetails user = (CustomUserDetails)
-        // authProvider.getAuthentication(token).getPrincipal();
-        assistanceApplyService.changeAssistanceApplyStatus(assistanceApplyId, body.getStatus());
-        return new ResponseEntity<>(null, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/apply/{assistanceApplyId}/receive", method = RequestMethod.PATCH)
-    public ResponseEntity<AssistanceApplyDto> receiveCompleteAssistance(HttpServletRequest request,
-            @PathVariable Integer assistanceApplyId) {
-        String token = request.getHeader("Authorization");
-        CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
-        assistanceApplyService.receiveAssistanceApply(assistanceApplyId, user.getUserId());
-        return new ResponseEntity<>(null, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/apply/{assistanceApplyId}/review", method = RequestMethod.POST)
-    public ResponseEntity<AssistanceApplyDto> reviewCompleteAssistance(HttpServletRequest request,
-            @RequestBody CreateAssistanceReviewBody body,
-            @PathVariable Integer assistanceApplyId) {
-        String token = request.getHeader("Authorization");
-        CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
-        AssistanceReview review = new AssistanceReview();
-        review.setContent(body.getContent());
-        review.setRating(body.getRating());
-        review.setReviewer(userService.getUser(user.getUserId()));
-        try {
-
-            assistanceApplyService.reviewAssistanceApply(assistanceApplyId, review);
-            return new ResponseEntity<>(null, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @RequestMapping(value = "/suggestion", method = RequestMethod.POST)
     public ResponseEntity assistanceSuggestion(HttpServletRequest request,
             @RequestBody CreateAssistanceSuggestionBody body) {
