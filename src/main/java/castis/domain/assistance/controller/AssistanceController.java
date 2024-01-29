@@ -1,28 +1,12 @@
 
 package castis.domain.assistance.controller;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import castis.domain.assistance.constant.AppliedAssistanceStatus;
 import castis.domain.assistance.dto.ApplyAssistanceBody;
-import castis.domain.assistance.dto.AssistanceApplyDto;
 import castis.domain.assistance.dto.AssistanceDto;
-import castis.domain.assistance.dto.CreateAssistanceReviewBody;
 import castis.domain.assistance.dto.CreateAssistanceSuggestionBody;
-import castis.domain.assistance.dto.UpdateAssistanceApplyStatusBody;
 import castis.domain.assistance.entity.Assistance;
 import castis.domain.assistance.entity.AssistanceApply;
-import castis.domain.assistance.entity.AssistanceReview;
 import castis.domain.assistance.entity.AssistanceSuggestion;
 import castis.domain.assistance.service.AssistanceApplyService;
 import castis.domain.assistance.service.AssistanceService;
@@ -32,17 +16,20 @@ import castis.domain.user.CustomUserDetails;
 import castis.domain.user.dto.UserDto;
 import castis.domain.user.entity.User;
 import castis.domain.user.service.UserService;
-import castis.enums.UserRole;
 import castis.util.email.EmailSender;
 import castis.util.email.EmailService;
 import castis.util.kakao.KakaoMessagingService;
-
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -111,8 +98,9 @@ public class AssistanceController {
 
         Assistance targetAssistance = assistanceService.getAssistance(assistanceId);
 
+        User applier = userService.getUser(user.getUserId());
         AssistanceApply assistanceApply = new AssistanceApply();
-        assistanceApply.setApplier(userService.getUser(user.getUserId()));
+        assistanceApply.setApplier(applier);
         assistanceApply.setContent(applyAssistanceBody.getContent());
         assistanceApply.setStatus(AppliedAssistanceStatus.WAITING);
         assistanceApply.setAssistance(targetAssistance);
@@ -121,7 +109,7 @@ public class AssistanceController {
         User messageTargetAdmin = targetAssistance.getMessageTargetAdmin();
         if (messageTargetAdmin.getCellphone() != null && messageTargetAdmin.getCellphone().length() > 0) {
             kakaoMessagingService.sendAssistanceApplyMessage(messageTargetAdmin.getCellphone(),
-                    messageTargetAdmin.getUserName(), targetAssistance.getName());
+                    applier.getRealName(), targetAssistance.getName());
         }
         List<UserDto> admins = userService.getAdminList();
 
@@ -134,7 +122,6 @@ public class AssistanceController {
                 "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>");
 
         String content = builder.toString();
-
         admins.forEach(admin -> {
             try {
                 emailService.sendEmail("[비서서비스 요청알림]", content, from, admin.getEmail());
