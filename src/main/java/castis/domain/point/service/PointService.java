@@ -1,5 +1,7 @@
 package castis.domain.point.service;
 
+import castis.domain.donation.dto.DonationDto;
+import castis.domain.donation.service.DonationService;
 import castis.domain.point.dto.PointHistoryDto;
 import castis.domain.point.entity.PointHistory;
 import castis.domain.point.repository.PointHistoryRepository;
@@ -37,6 +39,7 @@ public class PointService {
     private final PointHistoryRepository pointHistoryRepository;
     private final UserRepository userRepository;
     private final Environment environment;
+    private final DonationService donationService;
 
     public List<PointHistoryDto> findAllPointHistoryByRecver(String recver, String periodYear){
         List<PointHistoryDto> result = new ArrayList<>();
@@ -190,15 +193,12 @@ public class PointService {
                 if(receiver != null) {
                     jsonObject = new JSONObject();
                     jsonObject.put("userId", sender.getCbankId());
-                    if(sender.getCbankId().equalsIgnoreCase("teatime.coffee")) {
-                        jsonObject.put("sendAccountPwd", "Q2FzdGlzMzY1Kg==");
-                    } else if (sender.getCbankId().equalsIgnoreCase("teatime.ginger")) {
-                        jsonObject.put("sendAccountPwd", "MTQ0Ng==");
-                    } else if (sender.getCbankId().equalsIgnoreCase("besu2545")) {
-                        jsonObject.put("sendAccountPwd", "YXMxNjk1NDFeXg==");
+                    DonationDto donationDto = donationService.findByCbankId(sender.getCbankId());
+                    if (donationDto != null) {
+                        jsonObject.put("sendAccountPwd", donationDto.getCbankPass());
+                        jsonObject.put("recvAccountId", donationDto.getDonationAccount());
                     }
                     jsonObject.put("sendAccountId", sender.getCbankAccount());
-                    jsonObject.put("recvAccountId", "0379-0201");
                     jsonObject.put("amount", pointHistory.getPoint());
                     jsonObject.put("transferHistory", "기부금(" + pointHistory.getMemo() +")");
                     jsonObject.put("otp", res.getBody().getOtp());

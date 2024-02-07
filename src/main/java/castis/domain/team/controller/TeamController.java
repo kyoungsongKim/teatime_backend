@@ -21,7 +21,7 @@ public class TeamController {
     private final TeamService teamService;
 
     @RequestMapping(value = "/team", method = RequestMethod.GET)
-    public ResponseEntity getTeamList() throws Exception {
+    public ResponseEntity getTeamList() {
         List<TeamDto> teamDtoList = teamService.findAllTeam();
         return new ResponseEntity<>(teamDtoList, HttpStatus.OK);
     }
