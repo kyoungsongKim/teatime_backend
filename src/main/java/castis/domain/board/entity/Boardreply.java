@@ -1,7 +1,9 @@
 package castis.domain.board.entity;
 
 import castis.domain.board.dto.WriteReplyDto;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -11,6 +13,8 @@ import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "boardreply")
+@Getter
+@Setter
 @RequiredArgsConstructor
 public class Boardreply {
     @Id
@@ -47,15 +51,6 @@ public class Boardreply {
     @JoinColumn(name = "BRDNO", nullable = false)
     private Board brdno;
 
-    public Board getBrdno() {
-        return brdno;
-    }
-
-    public void setBrdno(Board brdno) {
-        this.brdno = brdno;
-    }
-
-
     public Boardreply(WriteReplyDto writeReplyDto, Board board){
         this.brdno = board;
         this.rewriter = writeReplyDto.getWriter();
@@ -71,62 +66,4 @@ public class Boardreply {
         this.redeleteflag = 'Y';
         return this;
     }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-
-    public String getRewriter() {
-        return rewriter;
-    }
-
-    public void setRewriter(String rewriter) {
-        this.rewriter = rewriter;
-    }
-
-    public String getRememo() {
-        return rememo;
-    }
-
-    public void setRememo(String rememo) {
-        this.rememo = rememo;
-    }
-
-    public String getRedate() {
-        return redate;
-    }
-
-    public void setRedate(String redate) {
-        this.redate = redate;
-    }
-
-    public Integer getReparent() {
-        return reparent;
-    }
-
-    public void setReparent(Integer reparent) {
-        this.reparent = reparent;
-    }
-
-    public Integer getRedepth() {
-        return redepth;
-    }
-
-    public void setRedepth(Integer redepth) {
-        this.redepth = redepth;
-    }
-
-    public Integer getReorder() {
-        return reorder;
-    }
-
-    public void setReorder(Integer reorder) {
-        this.reorder = reorder;
-    }
-
 }

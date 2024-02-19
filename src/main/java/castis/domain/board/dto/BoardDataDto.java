@@ -40,7 +40,7 @@ public class BoardDataDto implements Serializable {
         this.avatar = false;
         this.upvotes = board.getBrdhit().toString();
         this.summary = board.getBrdmemo();
-        this.repliesCount = board.getBoardreplies().size();
+        this.repliesCount = (int) board.getBoardreplies().stream().filter(reply -> reply.getRedeleteflag() == 'N').count();
         this.summaryLists = new ArrayList<>();
         this.agreementUserId = board.getAgreementUserId();
     }
