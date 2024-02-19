@@ -47,57 +47,67 @@ public class BoardController {
      */
     @GetMapping("/boardList")
     @Transactional
-    public BoardListDto boardList(@RequestParam(value="board", defaultValue="1")long board,
-                                  @RequestParam(value="page" , defaultValue = "1") int page,
-                                  @RequestParam(value="page_size", defaultValue = "10") int size,
-                                  @RequestParam(value="agreementUserId", defaultValue="") String agreementUserId,
-                                  @RequestParam(value="searchKeyword", defaultValue="") String searchKeyword,
-                                  @RequestParam(value="year", defaultValue="0") int year,
-                                  @RequestParam(value="month", defaultValue="0") int month){
+    public BoardListDto boardList(@RequestParam(value = "board", defaultValue = "1") long board,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "page_size", defaultValue = "10") int size,
+            @RequestParam(value = "agreementUserId", defaultValue = "") String agreementUserId,
+            @RequestParam(value = "searchKeyword", defaultValue = "") String searchKeyword,
+            @RequestParam(value = "year", defaultValue = "0") int year,
+            @RequestParam(value = "month", defaultValue = "0") int month) {
         long count;
         List<Board> boards;
         String prefix = year + "_" + String.format("%02d", month) + "_";
 
-        if ( searchKeyword.isEmpty() == false ) {
+        if (searchKeyword.isEmpty() == false) {
             boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N').orElse(null);
             Iterator<Board> iter = boards.iterator();
             while (iter.hasNext()) {
                 Board curBoard = iter.next();
-                String title = curBoard.getBrdtitle()==null?"":curBoard.getBrdtitle();
-                String agreeId = curBoard.getAgreementUserId()==null?"":curBoard.getAgreementUserId();
-                if ( title.contains(searchKeyword) || agreeId.contains(searchKeyword)) {
+                String title = curBoard.getBrdtitle() == null ? "" : curBoard.getBrdtitle();
+                String agreeId = curBoard.getAgreementUserId() == null ? "" : curBoard.getAgreementUserId();
+                if (title.contains(searchKeyword) || agreeId.contains(searchKeyword)) {
                     continue;
                 }
                 iter.remove();
             }
-            count=boards.size();
+            count = boards.size();
         } else if (agreementUserId.isEmpty()) {
             if (board == 5) {
                 // select target month
                 count = boardRepository.countBoardByBoardGroupAndBrddeleteflagAndBrdtitleStartsWith(board, 'N', prefix);
-                boards = boardRepository.findByBoardGroupAndBrddeleteflagAndBrdtitleStartsWithOrderByBoardNumDesc(board, 'N', prefix, PageRequest.of(page - 1, size)).orElse(null); //,
+                boards = boardRepository.findByBoardGroupAndBrddeleteflagAndBrdtitleStartsWithOrderByBoardNumDesc(board,
+                        'N', prefix, PageRequest.of(page - 1, size)).orElse(null); // ,
             } else {
                 count = boardRepository.countBoardByBoardGroupAndBrddeleteflag(board, 'N');
-                boards = boardRepository.findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
+                boards = boardRepository
+                        .findByBoardGroupAndBrddeleteflagOrderByBoardNumDesc(board, 'N', PageRequest.of(page - 1, size))
+                        .orElse(null); // ,
             }
-        } else {  // user
+        } else { // user
             if (board == 5) {
                 // selet target month condition prefix year_month_ ex) 2021_01_
-                count = boardRepository.countBoardByBoardGroupAndAgreementUserIdAndBrddeleteflagAndBrdtitleStartsWith(board, agreementUserId, 'N', prefix);
-                boards = boardRepository.findByBoardGroupAndAgreementUserIdAndBrddeleteflagAndBrdtitleStartsWithOrderByBoardNumDesc(board, agreementUserId, 'N', prefix, PageRequest.of(page - 1, size)).orElse(null); //,
+                count = boardRepository.countBoardByBoardGroupAndAgreementUserIdAndBrddeleteflagAndBrdtitleStartsWith(
+                        board, agreementUserId, 'N', prefix);
+                boards = boardRepository
+                        .findByBoardGroupAndAgreementUserIdAndBrddeleteflagAndBrdtitleStartsWithOrderByBoardNumDesc(
+                                board, agreementUserId, 'N', prefix, PageRequest.of(page - 1, size))
+                        .orElse(null); // ,
             } else {
-                count = boardRepository.countBoardByBoardGroupAndAgreementUserIdAndBrddeleteflag(board, agreementUserId, 'N');
-                boards = boardRepository.findByBoardGroupAndAgreementUserIdAndBrddeleteflagOrderByBoardNumDesc(board, agreementUserId, 'N', PageRequest.of(page - 1, size)).orElse(null); //,
+                count = boardRepository.countBoardByBoardGroupAndAgreementUserIdAndBrddeleteflag(board, agreementUserId,
+                        'N');
+                boards = boardRepository.findByBoardGroupAndAgreementUserIdAndBrddeleteflagOrderByBoardNumDesc(board,
+                        agreementUserId, 'N', PageRequest.of(page - 1, size)).orElse(null); // ,
             }
         }
-        BoardListDto boardDto = new BoardListDto(count , size);
+        BoardListDto boardDto = new BoardListDto(count, size);
         boardDto.setBoardDataList(boards);
         return boardDto;
     }
 
     @GetMapping("/boardData")
     @Transactional
-    public BoardDataDto boardData(@RequestParam(value="boardNum", defaultValue = "1") long bdNum, @RequestParam(value="hit", defaultValue = "false") boolean hit){
+    public BoardDataDto boardData(@RequestParam(value = "boardNum", defaultValue = "1") long bdNum,
+            @RequestParam(value = "hit", defaultValue = "false") boolean hit) {
         Board boardData = boardRepository.findByBoardNumAndBrddeleteflag(bdNum, 'N').orElse(null);
         if (hit) {
             boardData.hitUp();
@@ -112,25 +122,25 @@ public class BoardController {
             Matcher youtubeRegexMatcher = youtubeRegexCompiled.matcher(line);
             String type = "";
             String summary_line = "";
-            if(youtubeRegexMatcher.find()) {
-                try{
+            if (youtubeRegexMatcher.find()) {
+                try {
                     String validYoutubeVideoID = youtubeRegexMatcher.group(1);
                     summary_line = validYoutubeVideoID;
                     type = "youtube";
-                }catch (Exception ex){
-                    log.error("some exception : {}" , ex);
+                } catch (Exception ex) {
+                    log.error("some exception : {}", ex);
                 }
             } else {
                 Pattern httpRegexCompiled = Pattern.compile(httpRegex, Pattern.CASE_INSENSITIVE);
                 Matcher httpRegexMatcher = httpRegexCompiled.matcher(line);
-                if(httpRegexMatcher.find()) {
+                if (httpRegexMatcher.find()) {
                     try {
                         summary_line = "<a href='" + line + "' target='_blank'>" + line + "</a>";
                         type = "html";
                     } catch (Exception ex) {
-                        log.error("some exception : {}" , ex);
+                        log.error("some exception : {}", ex);
                     }
-                }else {
+                } else {
                     type = "default";
                     summary_line = line;
                 }
@@ -143,10 +153,10 @@ public class BoardController {
     }
 
     @GetMapping("/boardReplies")
-    public BoardReplyDto boardReplies(@RequestParam(value="boardNum", defaultValue = "1")int bdNum){
+    public BoardReplyDto boardReplies(@RequestParam(value = "boardNum", defaultValue = "1") int bdNum) {
         Board board = boardRepository.findByBoardNum(bdNum).orElse(null);
         List<Boardreply> replies = null;
-        if(board!=null) {
+        if (board != null) {
             replies = boardreplyRepository.findByBrdnoAndRedeleteflagOrderByReorder(board, 'N').orElse(null);
         }
         BoardReplyDto boardReplyDto = new BoardReplyDto(replies);
@@ -164,7 +174,8 @@ public class BoardController {
     }
 
     @PostMapping("/uploadFile")
-    public ResponseEntity uploadFile(@RequestParam("uploadFile") MultipartFile file, @RequestParam("boardNum") int num, @RequestParam("prefix") String prefix) throws IOException {
+    public ResponseEntity uploadFile(@RequestParam("uploadFile") MultipartFile file, @RequestParam("boardNum") int num,
+            @RequestParam("prefix") String prefix) throws IOException {
         Boardfile boardfile = new Boardfile(num, file, prefix);
         fs.saveFile(file, boardfile.getRealname());
         boardfileRepository.save(boardfile);
@@ -172,8 +183,9 @@ public class BoardController {
     }
 
     @GetMapping("/downloadFile")
-    public ResponseEntity downloadFile(@RequestParam("fileName") String file, @RequestParam("saveName") String save) throws IOException {
-        Path path = Paths.get(fs.getUploadFolder() + save);
+    public ResponseEntity downloadFile(@RequestParam("fileName") String file, @RequestParam("saveName") String save)
+            throws IOException {
+        Path path = Paths.get(fs.getSaveDirectory() + save);
         String contentType = Files.probeContentType(path);
 
         HttpHeaders headers = new HttpHeaders();
@@ -194,16 +206,16 @@ public class BoardController {
 
         List<Boardreply> boardreplies = boardreplyRepository.findByBrdno(boardData).orElse(null);
 
-        if(boardreplies != null) {
-            for (Boardreply reply : boardreplies){
+        if (boardreplies != null) {
+            for (Boardreply reply : boardreplies) {
                 reply.deleteData();
             }
             boardreplyRepository.saveAll(boardreplies);
         }
 
-        if(boardData == null) {
+        if (boardData == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }else {
+        } else {
             boardRepository.save(boardData);
             return new ResponseEntity<>(null, HttpStatus.OK);
         }
@@ -212,17 +224,21 @@ public class BoardController {
     @PostMapping("/writeReply")
     public ResponseEntity writeReply(@RequestBody WriteReplyDto reply) {
         Board board = boardRepository.findByBoardNum(reply.getBoardNum()).orElse(null);
-        if(board != null) {
+        if (board != null) {
             Boardreply boardreply = new Boardreply(reply, board);
             Boardreply parentReply = null;
             int order = 0;
             if (reply.getParentId() > 0) {
-                parentReply = boardreplyRepository.findByBrdnoAndIdOrderByReorderDesc(board, reply.getParentId()).orElse(null);
+                parentReply = boardreplyRepository.findByBrdnoAndIdOrderByReorderDesc(board, reply.getParentId())
+                        .orElse(null);
                 if (parentReply != null) {
                     boardreply.setRedepth(parentReply.getRedepth() + 1);
                     boardreply.setReparent(parentReply.getId());
 
-                    Boardreply nextReply = boardreplyRepository.findTop1ByBrdnoAndRedepthAndReorderGreaterThanOrderByReorder(board, parentReply.getRedepth(), parentReply.getReorder()).orElse(null);
+                    Boardreply nextReply = boardreplyRepository
+                            .findTop1ByBrdnoAndRedepthAndReorderGreaterThanOrderByReorder(board,
+                                    parentReply.getRedepth(), parentReply.getReorder())
+                            .orElse(null);
 
                     if (nextReply != null) {
                         order = nextReply.getReorder();
@@ -238,7 +254,8 @@ public class BoardController {
                 if (order == 0) {
                     order = parentReply.getReorder() + 1;
                 }
-                nextReply = boardreplyRepository.findByBrdnoAndReorderGreaterThanEqual(board, order).orElse(new ArrayList<>());
+                nextReply = boardreplyRepository.findByBrdnoAndReorderGreaterThanEqual(board, order)
+                        .orElse(new ArrayList<>());
             }
 
             boardreply.setReorder(order);
@@ -256,14 +273,14 @@ public class BoardController {
     }
 
     @DeleteMapping("/deleteReply/{replyId}")
-    public ResponseEntity deleteReply(@PathVariable int replyId ) {
+    public ResponseEntity deleteReply(@PathVariable int replyId) {
         Boardreply deleteReplyData = boardreplyRepository.findById(replyId)
                 .map(Boardreply::deleteData)
                 .orElse(null);
 
-        if(deleteReplyData == null) {
+        if (deleteReplyData == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }else {
+        } else {
             boardreplyRepository.save(deleteReplyData);
             return new ResponseEntity<>(null, HttpStatus.OK);
         }

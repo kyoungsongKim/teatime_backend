@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -13,6 +14,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import castis.domain.assistance.constant.AppliedAssistanceStatus;
+import castis.domain.filesystem.entity.FileMeta;
 import castis.domain.user.entity.User;
 
 @Getter
@@ -29,6 +31,9 @@ public class AssistanceApply {
 
     @Column(nullable = false)
     private String content;
+
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    private List<FileMeta> files;
 
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)

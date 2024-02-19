@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,6 +31,7 @@ public class AssistanceApplyController {
     private final AuthProvider authProvider;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
+    @Transactional
     public ResponseEntity<HashMap<String, List<AssistanceApplyDto>>> getAssistanceApplyList(
             HttpServletRequest request) {
         String token = request.getHeader("Authorization");
@@ -56,6 +59,7 @@ public class AssistanceApplyController {
     }
 
     @RequestMapping(value = "/{assistanceApplyId}/status", method = RequestMethod.PATCH)
+    @Transactional
     public ResponseEntity<AssistanceApplyDto> receiveCompleteAssistance(HttpServletRequest request,
             @PathVariable Integer assistanceApplyId, @RequestBody UpdateAssistanceApplyStatusBody body) {
         // String token = request.getHeader("Authorization");
@@ -66,6 +70,7 @@ public class AssistanceApplyController {
     }
 
     @RequestMapping(value = "/{assistanceApplyId}/receive", method = RequestMethod.PATCH)
+    @Transactional
     public ResponseEntity<AssistanceApplyDto> receiveCompleteAssistance(HttpServletRequest request,
             @PathVariable Integer assistanceApplyId) {
         String token = request.getHeader("Authorization");
@@ -75,6 +80,7 @@ public class AssistanceApplyController {
     }
 
     @RequestMapping(value = "/{assistanceApplyId}/review", method = RequestMethod.POST)
+    @Transactional
     public ResponseEntity<AssistanceApplyDto> reviewCompleteAssistance(HttpServletRequest request,
             @RequestBody CreateAssistanceReviewBody body,
             @PathVariable Integer assistanceApplyId) {
