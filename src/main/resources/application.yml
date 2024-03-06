@@ -21,13 +21,9 @@ spring:
       location: d:\\spring\\temp
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://172.16.48.45/ims
+    url: jdbc:mariadb://110.35.173.93/ims_tb
     username: root
-    password: Castis365*
-#    url: jdbc:mariadb://172.16.48.45/ims_240207
-#    username: root
-#    password: Castis365*
-    #hikari
+    password: ENC(Sp9rC3ZAun+jCeRSV6o/9r57JDO45NHW)
     hikari:
       idle-timeout: 300
       max-lifetime: 300
