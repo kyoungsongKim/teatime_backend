@@ -1,50 +1,56 @@
 package castis.domain.vacation.entity;
 
-import castis.domain.ticket.entity.Ticket;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.*;
-import java.time.LocalDate;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "vacation_history")
 public class VacationHistory {
-    public static final String STATUS_READY = "READY";
-    public static final String STATUS_DONE = "DONE";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private Long ticketNo;
-
-    @Column
     private String userId;
 
     @Column
-    private String memo;
+    private LocalDateTime eventStartDate;
 
     @Column
-    private LocalDate createDate;
+    private LocalDateTime eventEndDate;
 
     @Column
-    private LocalDate sendDate;
+    private float amount;
 
     @Column
-    private String status;
+    private String type;
 
-    public VacationHistory(Ticket ticket) {
-        this.ticketNo = ticket.getNo();
-        this.userId = ticket.getUserName();
-        this.memo = ticket.getContent();
-        this.createDate = LocalDate.now();
-        this.sendDate = ticket.getStartTime().toLocalDate();
-        this.status = VacationHistory.STATUS_READY;
-    }
+    @Column
+    private String reason;
+
+    @Column
+    private String adminMemo;
+
+    @CreatedDate
+    @Column
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    @Column
+    private LocalDateTime updatedDate;
+
 }

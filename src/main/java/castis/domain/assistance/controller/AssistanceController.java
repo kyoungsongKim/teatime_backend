@@ -31,7 +31,6 @@ import castis.domain.user.CustomUserDetails;
 import castis.domain.user.dto.UserDto;
 import castis.domain.user.entity.User;
 import castis.domain.user.service.UserService;
-import castis.util.email.EmailSender;
 import castis.util.email.EmailService;
 import castis.util.kakao.KakaoMessagingService;
 
@@ -41,6 +40,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
@@ -67,7 +68,7 @@ public class AssistanceController {
 
     @RequestMapping(value = "/suggestion", method = RequestMethod.POST)
     public ResponseEntity assistanceSuggestion(HttpServletRequest request,
-            @RequestBody CreateAssistanceSuggestionBody body) {
+            @RequestBody CreateAssistanceSuggestionBody body) throws UnsupportedEncodingException {
         String token = request.getHeader("Authorization");
         CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
         AssistanceSuggestion suggestion = new AssistanceSuggestion();
@@ -76,7 +77,8 @@ public class AssistanceController {
         assistanceSuggestionService.createAssistanceSuggestion(suggestion);
         List<UserDto> admins = userService.getAdminList();
 
-        EmailSender from = new EmailSender("kskim@castis.com", "사람사업부 전산시스템");
+        InternetAddress from = new InternetAddress("kskim@castis.com",
+                MimeUtility.encodeText("사람사업부 전산시스템", "UTF-8", "B"));
 
         StringBuilder builder = new StringBuilder();
         builder.append("<font style=\"font-family: 맑은 고딕; font-size:10pt\">" + suggestion.getContent());
@@ -86,7 +88,7 @@ public class AssistanceController {
 
         admins.forEach(admin -> {
             try {
-                emailService.sendEmail("[이런 서비스도 만들어주세요!]", content, from, admin.getEmail());
+                emailService.sendEmail("[이런 서비스도 만들어주세요!]", content, from, InternetAddress.parse(admin.getEmail()));
             } catch (UnsupportedEncodingException | MessagingException e) {
                 log.error("{}", e.getMessage());
                 e.printStackTrace();
@@ -139,7 +141,8 @@ public class AssistanceController {
         }
         List<UserDto> admins = userService.getAdminList();
 
-        EmailSender from = new EmailSender("kskim@castis.com", "사람사업부 전산시스템");
+        InternetAddress from = new InternetAddress("kskim@castis.com",
+                MimeUtility.encodeText("사람사업부 전산시스템", "UTF-8", "B"));
 
         StringBuilder builder = new StringBuilder();
         builder.append("<font style=\"font-family: 맑은 고딕; font-size:10pt\">(" + user.getUsername() + ")님께서<br>("
@@ -150,7 +153,7 @@ public class AssistanceController {
         String mailContent = builder.toString();
         admins.forEach(admin -> {
             try {
-                emailService.sendEmail("[비서서비스 요청알림]", mailContent, from, admin.getEmail());
+                emailService.sendEmail("[비서서비스 요청알림]", mailContent, from, InternetAddress.parse(admin.getEmail()));
             } catch (UnsupportedEncodingException | MessagingException e) {
                 log.error("{}", e.getMessage());
                 e.printStackTrace();

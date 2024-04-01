@@ -165,9 +165,9 @@ public class TicketService {
                 pointHistoryRepository.save(pointHistory);
             }
         }
-        if (ticketDto.getProject().equals("휴가")) {
-            vacationHistoryService.saveVacationHistory(new VacationHistory(ticket));
-        }
+        // if (ticketDto.getProject().equals("휴가")) {
+        // vacationHistoryService.saveVacationHistory(new VacationHistory(ticket));
+        // }
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
@@ -181,7 +181,6 @@ public class TicketService {
     @Transactional
     public ResponseEntity deleteTicketInfoByNo(Long no) {
         ticketRepository.deleteById(no);
-        vacationHistoryService.deleteVacationHistory(no);
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }

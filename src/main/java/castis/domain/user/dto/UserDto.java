@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 /**
  * A DTO for the {@link User} entity
@@ -22,6 +23,7 @@ public class UserDto implements Serializable {
     private String cellphone;
     private String email;
     private String dailyReportList;
+    private LocalDate renewalDate;
     private String vacationReportList;
 
     public UserDto(User user) {
@@ -33,6 +35,7 @@ public class UserDto implements Serializable {
         this.cellphone = user.getCellphone();
         this.email = user.getEmail();
         this.dailyReportList = user.getDailyReportList();
+        this.renewalDate = user.getRenewalDate();
         this.vacationReportList = user.getVacationReportList();
     }
 }

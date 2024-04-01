@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -45,6 +47,12 @@ public class User {
     @Column(name = "dailyreportlist", nullable = false, length = 1024)
     private String dailyReportList;
 
+    @Column(name = "joindate", nullable = true)
+    private LocalDate joinDate;
+
+    @Column(name = "renewaldate", nullable = true)
+    private LocalDate renewalDate;
+
     @Column(name = "vacationreportlist", nullable = false, length = 1024)
     private String vacationReportList;
 
@@ -57,7 +65,7 @@ public class User {
     @Builder
     public User(String id, String userName, String realName, String password,
             String teamName, String position,
-            String cellphone, String email, String dailyReportList, String vacationReportList) {
+            String cellphone, String email, String dailyReportList, LocalDate renewalDate, String vacationReportList) {
         this.id = id;
         this.userName = userName;
         this.realName = realName;
@@ -67,6 +75,7 @@ public class User {
         this.cellphone = cellphone;
         this.email = email;
         this.dailyReportList = dailyReportList;
+        this.renewalDate = renewalDate;
         this.vacationReportList = vacationReportList;
     }
 }

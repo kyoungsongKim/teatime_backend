@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailService {
 
     @Async
-    public void sendEmail(String title, String contents, EmailSender from, String to)
+    public void sendEmail(String title, String contents, InternetAddress from, InternetAddress[] to, InternetAddress cc)
             throws MessagingException, UnsupportedEncodingException {
 
         log.info("send e-mail title:{}, from:{}, to:{}", title, from, to);
@@ -70,10 +70,12 @@ public class EmailService {
         message.setHeader("MIME-Version", "1.0");
         message.setHeader("Content-Type", multipart.getContentType());
 
-        message.setFrom(
-                new InternetAddress(from.getEmailAddress(), MimeUtility.encodeText(from.getPersonal(), "UTF-8", "B")));
+        message.setFrom(from);
 
-        message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+        message.addRecipients(Message.RecipientType.TO, to);
+        if (cc != null) {
+            message.setRecipient(Message.RecipientType.CC, cc);
+        }
         message.setSubject(MimeUtility.encodeText(title, "UTF-8", "B"));
         message.setSentDate(new Date());
         message.setContent(multipart);
@@ -81,5 +83,11 @@ public class EmailService {
         Transport.send(message);
         log.info("send mail {} to {} success", from, to);
 
+    }
+
+    @Async
+    public void sendEmail(String title, String contents, InternetAddress from, InternetAddress[] to)
+            throws MessagingException, UnsupportedEncodingException {
+        sendEmail(title, contents, from, to, null);
     }
 }

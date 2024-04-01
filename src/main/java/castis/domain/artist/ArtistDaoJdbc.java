@@ -24,8 +24,10 @@ public class ArtistDaoJdbc implements ArtistDao {
     @Override
     public void add(Artist artist) {
         if (artist != null) {
-            this.jdbcTemplate.update("insert into artist(userid,username,realname,teamname,thumbnail,onelinetitle,skills,projectlist) values(?,?,?,?,?,?,?,?)",
-                    artist.getUserid(), artist.getUsername(), artist.getRealname(), artist.getTeamname(), artist.getThumbnail(), artist.getOnelinetitle(), artist.getSkills(), artist.getProjectlist());
+            this.jdbcTemplate.update(
+                    "insert into artist(userid,username,realname,teamname,thumbnail,onelinetitle,skills,projectlist) values(?,?,?,?,?,?,?,?)",
+                    artist.getUserid(), artist.getUsername(), artist.getRealname(), artist.getTeamname(),
+                    artist.getThumbnail(), artist.getOnelinetitle(), artist.getSkills(), artist.getProjectlist());
         }
     }
 
@@ -62,7 +64,7 @@ public class ArtistDaoJdbc implements ArtistDao {
 
     @Override
     public Artist get(long id) {
-        return jdbcTemplate.queryForObject("select * from artist where id = ?", new Object[]{id}, this.userMapper);
+        return jdbcTemplate.queryForObject("select * from artist where id = ?", new Object[] { id }, this.userMapper);
     }
 
 }

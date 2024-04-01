@@ -1,53 +1,108 @@
 package castis.domain.vacation.service;
 
+import castis.domain.vacation.dto.VacationHistoryDto;
+import castis.domain.vacation.dto.VacationInfoDto;
+import castis.domain.vacation.entity.IVacationInfo;
 import castis.domain.vacation.entity.VacationHistory;
 import castis.domain.vacation.repository.VacationHistoryRepository;
+import castis.util.vacation.MaximumVacationCalculator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Predicate;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 import java.util.stream.Collectors;
+
+import javax.persistence.EntityNotFoundException;
 
 @Service
 @RequiredArgsConstructor
 public class VacationHistoryService {
 
     private final VacationHistoryRepository vacationHistoryRepository;
+    private final MaximumVacationCalculator maximumVacationCalculator;
 
-    public ResponseEntity saveVacationHistory(VacationHistory vacationHistory) {
+    public VacationHistoryDto getById(long id) {
+        VacationHistory foundEntity = vacationHistoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+
+        return new VacationHistoryDto(foundEntity);
+    }
+
+    public void create(VacationHistory vacationHistory) {
         vacationHistoryRepository.save(vacationHistory);
-        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
-    public ResponseEntity deleteVacationHistory(Long no) {
-        vacationHistoryRepository.deleteByTicketNo(no, VacationHistory.STATUS_READY);
-        return new ResponseEntity<>(null, HttpStatus.OK);
+    public void delete(Long vacationHistoryId) {
+        vacationHistoryRepository.deleteById(vacationHistoryId);
     }
 
-    public List<VacationHistory> getVacationHistoryBySendDateToday() {
-        LocalDate currentDate = LocalDate.now();
+    public List<VacationHistoryDto> getVacationHistoryList() {
+        List<VacationHistoryDto> result = vacationHistoryRepository.findAll().stream().map(VacationHistoryDto::new)
+                .collect(Collectors.toList());
 
-        Specification<VacationHistory> spec = (con, query, cb) -> {
-            // ordering
-            List<Order> orders = new ArrayList<>();
-            //orders.add(cb.asc(con.get("seq")));
-            orders.add(cb.desc(con.get("createDate")));
-            query.orderBy(orders);
+        return result;
+    }
 
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(cb.between(con.get("sendDate"), currentDate, currentDate));
+    public List<VacationHistoryDto> getVacationHistoryList(LocalDateTime startDate,
+            LocalDateTime endDate, boolean includeAmount) {
 
-            return predicates.size() > 0 ? cb.and(predicates.toArray(new Predicate[predicates.size()])) : null;
-        };
-        List<VacationHistory> list = vacationHistoryRepository.findAll(spec).stream().collect(Collectors.toList());
+        List<VacationHistoryDto> result = vacationHistoryRepository
+                .findAllByBetweenDateRange(startDate, endDate, includeAmount).stream()
+                .map(VacationHistoryDto::new)
+                .collect(Collectors.toList());
 
+        return result;
+    }
+
+    public List<VacationHistoryDto> getVacationHistoryList(String userId, LocalDateTime startDate,
+            LocalDateTime endDate, boolean includeAmount) {
+
+        List<VacationHistoryDto> result = vacationHistoryRepository
+                .findAllByUserIdAndBetweenDateRange(userId, startDate, endDate, includeAmount).stream()
+                .map(VacationHistoryDto::new)
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
+    private VacationInfoDto calculateTotalVacationAmount(VacationInfoDto vacationInfo) {
+        if (vacationInfo.getRenewalDate() == null)
+            return vacationInfo;
+        float totalVacation = maximumVacationCalculator.getMaximumVacation(vacationInfo.getRenewalDate());
+        Float usedVacation = vacationInfo.getUsed();
+        usedVacation = usedVacation == null ? 0 : usedVacation;
+        float remainVacation = (totalVacation - usedVacation);
+        vacationInfo.setLeft(remainVacation);
+        vacationInfo.setUsed(usedVacation);
+        vacationInfo.setTotal(totalVacation);
+        return vacationInfo;
+    }
+
+    public VacationInfoDto getVacationInfo(String userId, LocalDate targetDate, boolean includeAmount) {
+
+        Optional<IVacationInfo> found = vacationHistoryRepository.findVacationInfo(userId, targetDate, includeAmount);
+        if (found.isPresent()) {
+            VacationInfoDto result = calculateTotalVacationAmount(new VacationInfoDto(found.get()));
+            return result;
+        } else {
+            VacationInfoDto result = new VacationInfoDto();
+            result.setUserId(userId);
+            return result;
+
+        }
+    }
+
+    public List<VacationInfoDto> getAllVacationInfo(LocalDate targetDate, boolean includeAmount) {
+
+        List<VacationInfoDto> list = vacationHistoryRepository.findAllVacationInfo(targetDate, includeAmount).stream()
+                .map(iVacationInfo -> {
+                    return calculateTotalVacationAmount(new VacationInfoDto(iVacationInfo));
+                })
+                .collect(Collectors.toList());
         return list;
     }
 

@@ -35,6 +35,7 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: none
+      # ddl-auto: update
       jdbc.batch_size: 100
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
@@ -47,6 +48,7 @@ jwt:
 scheduler:
   vacation:
     fixedRate: 30000
+    email-send-cron: 0 0 9 * * *
 
 useJwt: true
 
@@ -58,7 +60,7 @@ holiday:
     serviceKey: jwV6WKPafup8qqgOZ%2BtRbkR3lsuAsYJ4bbUyg8QfP9yh3CbEBOkb7n%2BB91U11TK0v2KjGdZ3CIkx0hwhg2vnTQ%3D%3D
 
 cbank:
-#  companyId: vhr_servicefee
+  #  companyId: vhr_servicefee
   companyId: teatime
   openApi:
     otp:
@@ -82,3 +84,22 @@ kakao:
 
 file-system:
   save-directory: /usr/local/imsfileupload/
+
+# 신입~1년차 = 1년차
+# 1년차~2년차 = 2년차
+# n년차: 휴가 수 형태로 표기
+# n년차 데이터가 존재하지 않는 경우 이전 년차로 거슬러 올라가 휴가 수를 참조
+# ex) 2년차 데이터가 없으므로 1년차 휴가 수를 참조
+vacation:
+  maximum-vacation-rule:
+    1: 15
+    3: 16
+    5: 17
+    7: 18
+    9: 19
+    11: 20
+    13: 21
+    15: 22
+    17: 23
+    19: 24
+    21: 25
