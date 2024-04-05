@@ -68,7 +68,10 @@ public class VacationController {
 
         List<Short> yearList = new ArrayList<Short>();
         int currentYear = Year.now().getValue();
-        for (short y = (short) foundUser.getRenewalDate().getYear(); y <= currentYear; y++) {
+        LocalDate renewalDate = foundUser.getRenewalDate();
+        LocalDate currentRenewalDate = renewalDate.withYear(currentYear);
+        boolean isRenewed = currentRenewalDate.isBefore(LocalDate.now());
+        for (short y = (short) (isRenewed ? renewalDate.getYear() - 1 : renewalDate.getYear()); y <= currentYear; y++) {
             yearList.add(y);
         }
         result.setUserId(userId);
