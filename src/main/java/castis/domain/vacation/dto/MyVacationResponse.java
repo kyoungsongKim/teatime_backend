@@ -9,6 +9,6 @@ import java.util.List;
 @NoArgsConstructor
 public class MyVacationResponse extends VacationInfoDto {
     List<VacationHistoryDto> histories;
-    List<Short> yearList;
+    List<Byte> workedYearList;
 
 }

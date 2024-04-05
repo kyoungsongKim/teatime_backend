@@ -36,7 +36,7 @@ public class VacationController {
     @GetMapping("")
     public ResponseEntity<MyVacationResponse> getVacationInfo(HttpServletRequest httpServletRequest,
             @RequestParam(name = "userId", required = true) String userId,
-            @RequestParam(name = "year", required = true) short year) {
+            @RequestParam(name = "workedYear", required = false) Byte workedYear) {
         String token = httpServletRequest.getHeader("Authorization");
         CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
 
@@ -50,8 +50,21 @@ public class VacationController {
         if (!isAdmin && !(foundUser.getId().equals(user.getUserId()))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
+        LocalDate renewalDate = foundUser.getRenewalDate();
 
-        LocalDate startDate = foundUser.getRenewalDate().withYear(year);
+        List<Byte> workedYearList = new ArrayList<Byte>();
+        int currentYear = Year.now().getValue();
+        LocalDate currentRenewalDate = renewalDate.withYear(currentYear);
+        boolean isRenewed = currentRenewalDate.isBefore(LocalDate.now());
+        byte fullyWorkedYear = (byte) (Year.now().getValue() - renewalDate.getYear() + (isRenewed ? 1 : 0));
+        for (byte y = 1; y <= fullyWorkedYear; y++) {
+            workedYearList.add(y);
+        }
+        if (workedYear == null) {
+            workedYear = workedYearList.get(workedYearList.size() - 1);
+        }
+
+        LocalDate startDate = renewalDate.plusYears(workedYear - 1);
         LocalDate endDate = startDate.plusYears(1);
         List<VacationHistoryDto> histories = vacationHistoryService.getVacationHistoryList(foundUser.getId(),
                 startDate.atStartOfDay(), endDate.atStartOfDay(), false);
@@ -66,17 +79,9 @@ public class VacationController {
             result.setTotal(vacationInfo.getTotal());
         }
 
-        List<Short> yearList = new ArrayList<Short>();
-        int currentYear = Year.now().getValue();
-        LocalDate renewalDate = foundUser.getRenewalDate();
-        LocalDate currentRenewalDate = renewalDate.withYear(currentYear);
-        boolean isRenewed = currentRenewalDate.isBefore(LocalDate.now());
-        for (short y = (short) (isRenewed ? renewalDate.getYear() - 1 : renewalDate.getYear()); y <= currentYear; y++) {
-            yearList.add(y);
-        }
         result.setUserId(userId);
-        result.setYearList(yearList);
-        result.setRenewalDate(foundUser.getRenewalDate());
+        result.setWorkedYearList(workedYearList);
+        result.setRenewalDate(renewalDate);
         result.setHistories(histories);
 
         return ResponseEntity.ok().body(result);
