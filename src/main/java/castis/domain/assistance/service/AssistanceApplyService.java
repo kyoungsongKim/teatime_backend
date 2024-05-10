@@ -70,7 +70,6 @@ public class AssistanceApplyService {
     public AssistanceApplyDto reviewAssistanceApply(int assistanceApplyId, AssistanceReview assistanceReview)
             throws IllegalArgumentException {
         AssistanceApply assistanceApply = getAssistanceApply(assistanceApplyId);
-        System.out.println("@@@@= " + assistanceApply.getReview());
         if (assistanceApply.getReview() != null) {
             throw new IllegalArgumentException("review already exist");
         }

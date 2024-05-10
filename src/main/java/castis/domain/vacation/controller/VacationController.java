@@ -3,6 +3,7 @@ package castis.domain.vacation.controller;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
@@ -70,9 +71,8 @@ public class VacationController {
                 startDate.atStartOfDay(), endDate.atStartOfDay(), false);
 
         MyVacationResponse result = new MyVacationResponse();
-
         VacationInfoDto vacationInfo = vacationHistoryService.getVacationInfo(userId,
-                startDate, false);
+                startDate.atStartOfDay(), false);
         if (vacationInfo != null) {
             result.setLeft(vacationInfo.getLeft());
             result.setUsed(vacationInfo.getUsed());
@@ -96,7 +96,7 @@ public class VacationController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        List<VacationInfoDto> result = vacationHistoryService.getAllVacationInfo(LocalDate.now(), false);
+        List<VacationInfoDto> result = vacationHistoryService.getAllVacationInfo(LocalDateTime.now(), false);
 
         return ResponseEntity.ok().body(result);
     }
@@ -115,8 +115,9 @@ public class VacationController {
         boolean isAdmin = user.getRoles().contains(UserRole.ROLE_ADMIN.getValue());
 
         VacationInfoDto vacationInfo = vacationHistoryService.getVacationInfo(createVacationBody.getUserId(),
-                LocalDate.now(), false);
+                createVacationBody.getEventStartDate(), false);
 
+        System.out.println(createVacationBody.getAmount() + " " + vacationInfo.getLeft());
         if (createVacationBody.getAmount() > vacationInfo.getLeft()) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Not enough vacation");
         }
@@ -150,7 +151,7 @@ public class VacationController {
         boolean isAdmin = user.getRoles().contains(UserRole.ROLE_ADMIN.getValue());
         VacationHistoryDto targetVacationHistory = vacationHistoryService.getById(id);
         VacationInfoDto vacationInfo = vacationHistoryService.getVacationInfo(updateVacationBody.getUserId(),
-                LocalDate.now(), false);
+                LocalDateTime.now(), false);
 
         if (updateVacationBody.getAmount() - targetVacationHistory.getAmount() > vacationInfo.getLeft()) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Not enough vacation");

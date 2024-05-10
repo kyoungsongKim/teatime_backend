@@ -1,7 +1,6 @@
 package castis.util.vacation;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import org.springframework.stereotype.Service;
 
@@ -19,11 +18,6 @@ public class MaximumVacationCalculator {
             foundValue = config.getMaximumVacationRule().get(continuousYears--);
         }
         return foundValue;
-    }
-
-    public float getMaximumVacation(Date renewalDate) {
-        byte continuousYears = (byte) (LocalDate.now().getYear() - renewalDate.getYear());
-        return getMaximumVacation(continuousYears);
     }
 
     public float getMaximumVacation(LocalDate renewalDate) {

@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-
+import java.time.Period;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
@@ -82,12 +81,25 @@ public class VacationHistoryService {
         return vacationInfo;
     }
 
-    public VacationInfoDto getVacationInfo(String userId, LocalDate targetDate, boolean includeAmount) {
+    private VacationInfoDto calculateTotalVacationAmount(VacationInfoDto vacationInfo, LocalDate targetDate) {
+        if (vacationInfo.getRenewalDate() == null)
+            return vacationInfo;
+        byte years = (byte) (Period.between(vacationInfo.getRenewalDate(), targetDate).getYears() + 1);
+        float totalVacation = maximumVacationCalculator.getMaximumVacation(years);
+        Float usedVacation = vacationInfo.getUsed();
+        usedVacation = usedVacation == null ? 0 : usedVacation;
+        float remainVacation = (totalVacation - usedVacation);
+        vacationInfo.setLeft(remainVacation);
+        vacationInfo.setUsed(usedVacation);
+        vacationInfo.setTotal(totalVacation);
+        return vacationInfo;
+    }
+
+    public VacationInfoDto getVacationInfo(String userId, LocalDateTime targetDate, boolean includeAmount) {
 
         Optional<IVacationInfo> found = vacationHistoryRepository.findVacationInfo(userId, targetDate, includeAmount);
         if (found.isPresent()) {
-            VacationInfoDto result = calculateTotalVacationAmount(new VacationInfoDto(found.get()));
-            return result;
+            return calculateTotalVacationAmount(new VacationInfoDto(found.get()), targetDate.toLocalDate());
         } else {
             VacationInfoDto result = new VacationInfoDto();
             result.setUserId(userId);
@@ -96,11 +108,11 @@ public class VacationHistoryService {
         }
     }
 
-    public List<VacationInfoDto> getAllVacationInfo(LocalDate targetDate, boolean includeAmount) {
+    public List<VacationInfoDto> getAllVacationInfo(LocalDateTime targetDate, boolean includeAmount) {
 
         List<VacationInfoDto> list = vacationHistoryRepository.findAllVacationInfo(targetDate, includeAmount).stream()
                 .map(iVacationInfo -> {
-                    return calculateTotalVacationAmount(new VacationInfoDto(iVacationInfo));
+                    return calculateTotalVacationAmount(new VacationInfoDto(iVacationInfo), targetDate.toLocalDate());
                 })
                 .collect(Collectors.toList());
         return list;
