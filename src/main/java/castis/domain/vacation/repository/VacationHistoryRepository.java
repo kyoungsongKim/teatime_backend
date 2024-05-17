@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Repository
@@ -25,10 +24,10 @@ public interface VacationHistoryRepository
         List<VacationHistory> findAllByBetweenDateRange(LocalDateTime startDate,
                         LocalDateTime endDate, boolean includeAmount);
 
-        @Query(nativeQuery = true, value = "SELECT users.userId, vacation_info.used, users.renewaldate FROM users LEFT OUTER JOIN (SELECT SUM(amount) as used, userId FROM vacation_history NATURAL JOIN users WHERE (DATE_FORMAT(renewaldate, CONCAT(YEAR(?1) - 1 + (DATE_FORMAT(renewaldate, CONCAT(YEAR(?1), '-%m-%d %T')) <= ?1), '-%m-%d %T')) <= IF(?2, DATE_ADD(eventStartDate, INTERVAL amount DIV 1 DAY), eventStartDate) AND eventStartDate < DATE_FORMAT(renewaldate, CONCAT(YEAR(?1) + (DATE_FORMAT(renewaldate, CONCAT(YEAR(?1), '-%m-%d %T')) <= ?1), '-%m-%d %T'))) GROUP BY userId) as vacation_info ON users.userId = vacation_info.userId ORDER BY users.userId")
+        @Query(nativeQuery = true, value = "SELECT users.userId, vacation_info.used, users.renewaldate FROM users LEFT OUTER JOIN (SELECT SUM(amount) as used, userId FROM vacation_history NATURAL JOIN users WHERE (DATE_FORMAT(renewaldate, CONCAT(YEAR(?1) - 1 + (DATE_FORMAT(renewaldate, CONCAT(YEAR(?1), '-%m-%d 00:00:00')) <= ?1), '-%m-%d 00:00:00')) <= IF(?2, DATE_ADD(eventStartDate, INTERVAL amount DIV 1 DAY), eventStartDate) AND eventStartDate < DATE_FORMAT(renewaldate, CONCAT(YEAR(?1) + (DATE_FORMAT(renewaldate, CONCAT(YEAR(?1), '-%m-%d 00:00:00')) <= ?1), '-%m-%d 00:00:00'))) GROUP BY userId) as vacation_info ON users.userId = vacation_info.userId ORDER BY users.userId")
         List<IVacationInfo> findAllVacationInfo(LocalDateTime targetDate, boolean includeAmount);
 
-        @Query(nativeQuery = true, value = "SELECT userId, SUM(amount) as used, renewaldate FROM vacation_history NATURAL JOIN users WHERE userId = ?1 AND (DATE_FORMAT(renewaldate, CONCAT(YEAR(?2) - 1 + (DATE_FORMAT(renewaldate, CONCAT(YEAR(?2), '-%m-%d %T')) <= ?2), '-%m-%d %T')) <= IF(?3, DATE_ADD(eventStartDate, INTERVAL amount DIV 1 DAY), eventStartDate) AND eventStartDate < DATE_FORMAT(renewaldate, CONCAT(YEAR(?2) + (DATE_FORMAT(renewaldate, CONCAT(YEAR(?2), '-%m-%d %T')) <= ?2), '-%m-%d %T')))")
+        @Query(nativeQuery = true, value = "SELECT userId, SUM(amount) as used, renewaldate FROM vacation_history NATURAL JOIN users WHERE userId = ?1 AND (DATE_FORMAT(renewaldate, CONCAT(YEAR(?2) - 1 + (DATE_FORMAT(renewaldate, CONCAT(YEAR(?2), '-%m-%d 00:00:00')) <= ?2), '-%m-%d 00:00:00')) <= IF(?3, DATE_ADD(eventStartDate, INTERVAL amount DIV 1 DAY), eventStartDate) AND eventStartDate < DATE_FORMAT(renewaldate, CONCAT(YEAR(?2) + (DATE_FORMAT(renewaldate, CONCAT(YEAR(?2), '-%m-%d 00:00:00')) <= ?2), '-%m-%d 00:00:00')))")
         Optional<IVacationInfo> findVacationInfo(String userId, LocalDateTime targetDate, boolean includeAmount);
 
 }
