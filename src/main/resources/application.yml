@@ -3,7 +3,8 @@ server:
   port: 9091
   servlet:
     context-path: /
-
+  tomcat:
+    max-http-form-post-size: 50MB
 logging:
   file:
     path: logs/teatime
@@ -16,8 +17,8 @@ spring:
       enabled: true
   servlet:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 10MB
+      max-file-size: 50MB
+      max-request-size: 50MB
       location: d:\\spring\\temp
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
@@ -35,7 +36,7 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: none
-      # ddl-auto: update
+      #      ddl-auto: update
       jdbc.batch_size: 100
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl

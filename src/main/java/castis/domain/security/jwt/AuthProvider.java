@@ -1,6 +1,7 @@
 package castis.domain.security.jwt;
 
 import castis.domain.user.CustomUserDetails;
+import castis.enums.UserRole;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class AuthProvider {
     private static final String AUTHORITIES_KEY = "auth";
     private static final String ACCESS_USER_ID = "id";
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000L * 60 * 60 * 12;
-
+    private final UserDetailsService userDetailsService;
     @Value("${jwt.secret.signature}")
     private String signatureKey;
 
@@ -32,8 +33,6 @@ public class AuthProvider {
     protected void init() {
         signatureKey = Base64.getEncoder().encodeToString(signatureKey.getBytes());
     }
-
-    private final UserDetailsService userDetailsService;
 
     /**
      * @throws Exception
@@ -73,6 +72,20 @@ public class AuthProvider {
 
         CustomUserDetails userDetails = new CustomUserDetails(id, username, role, token);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+
+    public boolean isAdmin(HttpServletRequest request) {
+        String token = resolveToken(request);
+        CustomUserDetails user = (CustomUserDetails) getAuthentication(token).getPrincipal();
+        return user.getRoles().contains(UserRole.ROLE_ADMIN.getValue());
+    }
+
+
+    public boolean isOwn(HttpServletRequest request, String userId) {
+        String token = resolveToken(request);
+        CustomUserDetails user = (CustomUserDetails) getAuthentication(token).getPrincipal();
+        return user.getUserId().equals(userId);
     }
 
     /**
