@@ -1,19 +1,17 @@
 package castis.domain.filesystem.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
-import javax.annotation.PostConstruct;
-import javax.transaction.Transactional;
-
+import castis.domain.filesystem.entity.FileMeta;
+import castis.domain.filesystem.repository.FileSystemRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import castis.domain.filesystem.entity.FileMeta;
-import castis.domain.filesystem.repository.FileSystemRepository;
-import lombok.RequiredArgsConstructor;
+import javax.annotation.PostConstruct;
+import javax.transaction.Transactional;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +37,7 @@ public class FileSystemService {
 
     @Transactional
     public FileMeta getFileMeta(Long fileId) {
-        FileMeta file = fileSystemRepository.findById(fileId).orElse(null);
-        return file;
+        return fileSystemRepository.findById(fileId).orElse(null);
     }
 
     public FileMeta parseFileMeta(MultipartFile file) {
@@ -54,16 +51,15 @@ public class FileSystemService {
         // uuid와 확장자 결합
         String savedName = uuid + extension;
 
-        FileMeta fileMeta = FileMeta.builder()
+        return FileMeta.builder()
                 .name(savedName)
                 .originalName(originalName)
                 .path(saveDirectory + savedName)
                 .size(file.getSize())
                 .build();
-
-        return fileMeta;
     }
 
+    @Transactional
     public FileMeta saveFile(MultipartFile file, FileMeta fileMeta) throws IllegalStateException, IOException {
         if (file == null || file.isEmpty() || fileMeta == null) {
             return null;
@@ -72,9 +68,7 @@ public class FileSystemService {
         File uploadFile = new File(fileMeta.getPath());
         file.transferTo(uploadFile);
 
-        FileMeta savedFileMeta = fileSystemRepository.save(fileMeta);
-
-        return savedFileMeta;
+        return fileSystemRepository.save(fileMeta);
     }
 
     @Transactional
@@ -87,8 +81,6 @@ public class FileSystemService {
         File uploadFile = new File(fileMeta.getPath());
         file.transferTo(uploadFile);
 
-        FileMeta savedFileMeta = fileSystemRepository.save(fileMeta);
-
-        return savedFileMeta;
+        return fileSystemRepository.save(fileMeta);
     }
 }
