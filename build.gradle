@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.example'
-version = '1.0.7-SNAPSHOT_HOTFIX'
+version = '1.0.8-SNAPSHOT'
 sourceCompatibility = '8'
 
 configurations {
