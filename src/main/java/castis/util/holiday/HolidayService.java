@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class HolidayService {
 
@@ -54,25 +56,29 @@ public class HolidayService {
         rd.close();
         conn.disconnect();
 
-        List<HolidayJsonDto> list = string2Map(sb.toString());
         ArrayList<HolidayDto> result = new ArrayList<>();
-        list.forEach(i -> {
-            result.add(new HolidayDto(i));
-        });
-        holidayMap.put(mapKey, result);
+        try {
+            List<HolidayJsonDto> list = string2Map(sb.toString());
+            list.forEach(i -> {
+                result.add(new HolidayDto(i));
+            });
+            holidayMap.put(mapKey, result);
+        } catch (Exception e){
+            log.error("[Holiday] holiday open API not work. please check https://www.data.go.kr/");
+        }
         return result;
 
     }
 
-    private List<HolidayJsonDto> string2Map(String json) {
+    private List<HolidayJsonDto> string2Map(String json) throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = null;
 
         try{
             map = mapper.readValue(json, Map.class);
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw e;
         }
         Map<String, Object> response = (Map<String, Object>)map.get("response");
         Map<String, Object> body = (Map<String, Object>)response.get("body");

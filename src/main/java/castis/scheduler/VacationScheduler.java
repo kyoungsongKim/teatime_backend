@@ -42,7 +42,8 @@ public class VacationScheduler {
                 endTime, false);
         vacationHistoryList.forEach(vacationHistory -> {
             log.info("vacation ticket toDayString:{} size:{}", now, vacationHistoryList.size());
-            sendEmail(vacationHistory);
+            // IMPORTANT: 휴가 중복 보내지는 현상때문에 임시 막아놓은. 추후 다시 풀어야함. 2025.01.13 김경송
+            //sendEmail(vacationHistory);
         });
 
     }

@@ -37,7 +37,7 @@ public class NoticeScheduler {
     public void findLastReflectMeetTime() {
         List<User> userList = userService.getUserList();
         for ( User user: userList) {
-            if ( user.getTeamName().equalsIgnoreCase("Teatime")) {
+            if ( user.getTeamName().equalsIgnoreCase("사람")) {
                 PointHistory ph = pointService.getLastReceivePointHistory(user.getId());
                 if ( ph == null ) {
                     //first time
@@ -45,7 +45,7 @@ public class NoticeScheduler {
                 } else {
                     //not first time
                     if ( user.getCellphone() != null && user.getCellphone().isEmpty() == false ) {
-                        if(user.getCbankId().equalsIgnoreCase("teatime.coffee")) {
+                        if(user.getCbankId().equalsIgnoreCase("teatime.coffee") && user.getUserName().equalsIgnoreCase("kskim")) {
                             long intervalDateCount = DAYS.between(ph.getCreateDate(), LocalDateTime.now());
                             UserSmsInfo usi = userSMSInfoService.getUSerSMSInfo(user.getId());
                             if ( usi != null  && usi.isSendmsg() == true && usi.getSendday() > 0 && intervalDateCount > usi.getSendday()) {
@@ -54,13 +54,13 @@ public class NoticeScheduler {
                                     dateStr = dateStr.substring(0, ph.getCreateDate().toString().indexOf("T"));
                                 }
                                 StringBuffer sb = new StringBuffer();
-                                sb.append("안녕하세요. ").append(user.getRealName()).append("님!").append("\n");
+                                sb.append("안녕하세요. ").append(user.getRealName()).append(" 고객님!").append("\n");
                                 if (user.getCbankId().equalsIgnoreCase("teatime.coffee")) {
-                                    sb.append("퇴근후티타임 소속 에이전트 김경송입니다.");
+                                    sb.append("사람 사업부 담당 에이전트 김경송입니다.\n");
                                 }
-                                sb.append("마지막 서비스 이용일은 [").append(dateStr).append("]로 ");
+                                sb.append("가장 최근 서비스 이용일은 [").append(dateStr).append("]로 ");
                                 sb.append(intervalDateCount).append("일이 지났습니다!\n");
-                                sb.append("많이 바쁘시겠지만 에이전트 서비스 이용 홍보차 연락드렸습니다. 많은 이용 부탁드리겠습니다.\n감사합니다!\n");
+                                sb.append("많이 바쁘시겠지만 에이전트 서비스 이용 홍보차 연락드렸습니다. 서비스 많은 이용 부탁드리겠습니다.\n감사합니다!\n");
                                 if (user.getCbankId().equalsIgnoreCase("teatime.coffee")) {
                                     sb.append("연락처:010-7164-9777\n");
                                     sb.append("서비스예약:https://coffee.castis.net\n");

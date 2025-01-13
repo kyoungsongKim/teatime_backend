@@ -20,6 +20,8 @@ public class AuthenticationDto {
 
     private String apiToken;
 
+    private String accessToken;
+
     @Builder
     public AuthenticationDto(String userId, String realName,
                              String teamName, String position,
@@ -33,5 +35,6 @@ public class AuthenticationDto {
         this.dailyReportList = dailyReportList;
         this.vacationReportList = vacationReportList;
         this.apiToken = apiToken;
+        this.accessToken = apiToken;
     }
 }

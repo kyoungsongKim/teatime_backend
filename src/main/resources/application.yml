@@ -22,11 +22,15 @@ spring:
       location: d:\\spring\\temp
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://110.35.173.93/ims_tb
+    url: jdbc:mariadb://172.16.48.45/ims
     username: root
-    password: ENC(Sp9rC3ZAun+jCeRSV6o/9r57JDO45NHW)
+    password: Castis365*
     hikari:
-      idle-timeout: 300
+      validation-timeout: 5000
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+      idle-timeout: 600000
       max-lifetime: 300
   jpa:
     show-sql: true
@@ -58,7 +62,7 @@ uploadLocation:
 
 holiday:
   openApi:
-    serviceKey: jwV6WKPafup8qqgOZ%2BtRbkR3lsuAsYJ4bbUyg8QfP9yh3CbEBOkb7n%2BB91U11TK0v2KjGdZ3CIkx0hwhg2vnTQ%3D%3D
+    serviceKey: CS%2FUp%2FLbENA%2BlEUX1MspXrax6t0tDG1vPi2jlteB4HwvEsqJEzjsCEvqpFVX9kZyBvBMXrzErm9bsFJQwYmHwA%3D%3D
 
 cbank:
   #  companyId: vhr_servicefee

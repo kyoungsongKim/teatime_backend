@@ -13,10 +13,12 @@ import castis.exception.custom.ForbiddenException;
 import castis.exception.custom.UserNotFoundException;
 import castis.util.validation.Empty;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service("signService")
+@Slf4j
 @RequiredArgsConstructor
 public class SignService {
 
@@ -45,10 +47,12 @@ public class SignService {
 
         // dto -> entity
         User loginEntity = loginDto.toEntity();
-
         // 회원 엔티티 객체 생성 및 조회시작
         User user = userRepository.findById(loginEntity.getId())
-                .orElseThrow(() -> new UserNotFoundException("User Not Found"));
+                .orElseThrow(() -> {
+                    log.error("there is some error at sing-in loginEntity.getId():{}", loginEntity.getId());
+                    return new UserNotFoundException("User Not Found");
+                });
 
         if (!passwordEncoder.matches(loginEntity.getPassword(), user.getPassword()))
             throw new ForbiddenException("Passwords do not match");

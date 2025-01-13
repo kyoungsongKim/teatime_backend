@@ -74,6 +74,13 @@ public class AuthProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
+    public String getUserIdFromToken(String token) {
+        Claims claims = Jwts.parser().setSigningKey(signatureKey).parseClaimsJws(token.replace(BEARER_TYPE, ""))
+                .getBody();
+        String id = claims.get(ACCESS_USER_ID, String.class);
+        return id;
+    }
+
 
     public boolean isAdmin(HttpServletRequest request) {
         String token = resolveToken(request);
