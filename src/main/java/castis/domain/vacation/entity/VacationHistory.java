@@ -53,4 +53,16 @@ public class VacationHistory {
     @Column
     private LocalDateTime updatedDate;
 
+    public VacationHistory(VacationHistoryDto dto) {
+        this.id = dto.getId();
+        this.userId = dto.getUserId();
+        this.eventStartDate = dto.getEventStartDate();
+        this.eventEndDate = dto.getEventEndDate();
+        this.amount = dto.getAmount();
+        this.type = dto.getType();
+        this.reason = dto.getReason();
+        this.adminMemo = dto.getAdminMemo();
+        this.createdDate = dto.getCreatedDate();
+        this.updatedDate = dto.getUpdatedDate();
+    }
 }
