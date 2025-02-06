@@ -1,5 +1,6 @@
 package castis.domain.vacation.entity;
 
+import castis.domain.vacation.dto.VacationHistoryDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
