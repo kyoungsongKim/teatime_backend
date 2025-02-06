@@ -58,8 +58,12 @@ public class VacationController {
         LocalDate currentRenewalDate = renewalDate.withYear(currentYear);
         boolean isRenewed = currentRenewalDate.isBefore(LocalDate.now());
         byte fullyWorkedYear = (byte) (Year.now().getValue() - renewalDate.getYear() + (isRenewed ? 1 : 0));
-        for (byte y = 1; y <= fullyWorkedYear; y++) {
-            workedYearList.add(y);
+        if (fullyWorkedYear < 1) {
+            workedYearList.add((byte) 1);
+        } else {
+            for (byte y = 1; y <= fullyWorkedYear; y++) {
+                workedYearList.add(y);
+            }
         }
         if (workedYear == null) {
             workedYear = workedYearList.get(workedYearList.size() - 1);
@@ -156,18 +160,16 @@ public class VacationController {
         if (updateVacationBody.getAmount() - targetVacationHistory.getAmount() > vacationInfo.getLeft()) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Not enough vacation");
         }
-        VacationHistory vacationHistory = new VacationHistory();
-        vacationHistory.setId(id);
+        VacationHistory vacationHistory = new VacationHistory(targetVacationHistory);
         vacationHistory.setEventStartDate(updateVacationBody.getEventStartDate());
         vacationHistory.setEventEndDate(updateVacationBody.getEventEndDate());
-        vacationHistory.setUserId(updateVacationBody.getUserId());
         vacationHistory.setReason(updateVacationBody.getReason());
         vacationHistory.setType(updateVacationBody.getType());
         vacationHistory.setAmount(updateVacationBody.getAmount());
-        vacationHistoryService.update(vacationHistory);
         if (isAdmin) {
             vacationHistory.setAdminMemo(updateVacationBody.getAdminMemo());
         }
+        vacationHistoryService.update(vacationHistory);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
