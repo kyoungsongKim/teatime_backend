@@ -81,13 +81,19 @@ public class AuthProvider {
         return id;
     }
 
+    public String getUserIdFromRequest(HttpServletRequest request) {
+        String token = resolveToken(request);
+        Claims claims = Jwts.parser().setSigningKey(signatureKey).parseClaimsJws(token.replace(BEARER_TYPE, ""))
+                .getBody();
+        String id = claims.get(ACCESS_USER_ID, String.class);
+        return id;
+    }
 
     public boolean isAdmin(HttpServletRequest request) {
         String token = resolveToken(request);
         CustomUserDetails user = (CustomUserDetails) getAuthentication(token).getPrincipal();
         return user.getRoles().contains(UserRole.ROLE_ADMIN.getValue());
     }
-
 
     public boolean isOwn(HttpServletRequest request, String userId) {
         String token = resolveToken(request);
