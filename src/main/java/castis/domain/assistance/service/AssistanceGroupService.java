@@ -33,6 +33,10 @@ public class AssistanceGroupService {
     public AssistanceGroupDto updateGroup(Integer id, AssistanceGroup group) {
         AssistanceGroup foundGroup = assistanceGroupRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Group not found with id: " + id));
+        if (foundGroup == null) {
+            throw new RuntimeException("Group not found with id: " + id);
+        }
+
         group.setName(group.getName());
         group.setOrder(group.getOrder());
         AssistanceGroup updatedGroup = assistanceGroupRepository.save(group);
