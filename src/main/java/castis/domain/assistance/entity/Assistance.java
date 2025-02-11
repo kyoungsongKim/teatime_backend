@@ -52,4 +52,7 @@ public class Assistance {
     @Column
     private LocalDateTime updatedDate;
 
+    @ManyToOne
+    @JoinColumn(name = "group_id", nullable = true)
+    private AssistanceGroup group;
 }
