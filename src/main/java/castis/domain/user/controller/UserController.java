@@ -4,6 +4,7 @@ import castis.domain.report.dto.ReportUserRequestDto;
 import castis.domain.user.dto.PasswordDto;
 import castis.domain.user.dto.UserDto;
 import castis.domain.user.dto.UserUpdateDto;
+import castis.domain.user.entity.User;
 import castis.domain.user.service.UserService;
 import castis.exception.custom.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -88,5 +89,18 @@ public class UserController {
     public ResponseEntity<List<UserDto>> getAdminList() {
         List<UserDto> result = userService.getAdminList();
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // 삭제시 teamname을 external로 변경
+    @RequestMapping(value = "/user/{userId}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public ResponseEntity deleteUserById(@PathVariable(value = "userId") String userId) throws Exception {
+        User userInfo = userService.getUser(userId);
+        if (userInfo != null) {
+            userService.updateTeamName(userInfo);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            throw new UserNotFoundException("User Not Found");
+        }
     }
 }

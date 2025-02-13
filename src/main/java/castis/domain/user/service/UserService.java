@@ -104,4 +104,9 @@ public class UserService {
         List<UserDto> result = userList.stream().map(UserDto::new).collect(Collectors.toList());
         return result;
     }
+
+    public void updateTeamName(User userInfo) {
+        userInfo.setTeamName("external");
+        userRepository.save(userInfo);
+    }
 }

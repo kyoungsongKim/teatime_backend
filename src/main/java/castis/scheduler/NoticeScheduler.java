@@ -37,7 +37,7 @@ public class NoticeScheduler {
     public void findLastReflectMeetTime() {
         List<User> userList = userService.getUserList();
         for ( User user: userList) {
-            if ( user.getTeamName().equalsIgnoreCase("사람")) {
+            if ( user.getTeamName().equalsIgnoreCase("saram")) {
                 PointHistory ph = pointService.getLastReceivePointHistory(user.getId());
                 if ( ph == null ) {
                     //first time
