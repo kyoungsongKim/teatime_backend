@@ -19,12 +19,12 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
-      location: d:\\spring\\temp
+      location: D:\\
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://172.16.48.45/ims
+    url: jdbc:mariadb://localhost:3306/ims
     username: root
-    password: Castis365*
+    password: castis
     hikari:
       validation-timeout: 5000
       maximum-pool-size: 20
