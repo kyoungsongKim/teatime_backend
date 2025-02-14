@@ -32,6 +32,9 @@ public class VacationHistoryService {
     }
 
     public void create(VacationHistory vacationHistory) {
+        if (isOfficialVacation(vacationHistory.getType())) {
+            vacationHistory.setAmount(0);
+        }
         vacationHistoryRepository.save(vacationHistory);
     }
 
@@ -119,6 +122,13 @@ public class VacationHistoryService {
     }
 
     public void update(VacationHistory vh) {
+        if (isOfficialVacation(vh.getType())) {
+            vh.setAmount(0);
+        }
         vacationHistoryRepository.save(vh);
+    }
+
+    private boolean isOfficialVacation(String type) {
+        return "경조".equals(type) || "공가".equals(type);
     }
 }
