@@ -18,9 +18,27 @@ public interface AgreementRepository
 
     @Query(
             nativeQuery = true,
-            value = "SELECT a.id as id, u.userid as userId, u.realname as realName, IFNULL(SUM(a.amount),0) as totalAmount, (SELECT a2.amount FROM agreement a2 WHERE a2.user_id = ?1 AND a2.type = 'GUARANTEE') as guaranteeAmount FROM agreement a RIGHT OUTER JOIN users u ON a.user_id = u.userid AND a.type != 'GUARANTEE' AND a.end_date >= ?2 WHERE u.userid = ?1 AND u.teamname LIKE 'saram' GROUP BY  u.userid, u.realname"
+            value = "SELECT " +
+                    "    a.id AS id, " +
+                    "    u.userid AS userId, " +
+                    "    u.realname AS realName, " +
+                    "    COUNT(CASE WHEN a.end_date >= ?2 THEN a.user_id ELSE NULL END) AS currentAgreementCount, " +
+                    "    COUNT(a.user_id) AS totalAgreementCount, " +
+                    "    IFNULL(SUM(CASE WHEN a.type != 'GUARANTEE' AND a.end_date >= ?2 THEN a.amount ELSE 0 END), 0) AS totalAmount, " +
+                    "    IFNULL(SUM(CASE WHEN a.type = 'GUARANTEE' THEN a.amount ELSE 0 END), 0) AS guaranteeAmount " +
+                    "FROM " +
+                    "    users u " +
+                    "LEFT JOIN " +
+                    "    agreement a ON u.userid = a.user_id " +
+                    "WHERE u.userid = ?1 AND " +
+                    "    u.teamname LIKE 'saram' " +
+                    "GROUP BY " +
+                    "    u.userid, " +
+                    "    u.realname"
     )
     IUserAgreementInfo findUserAgreementInfo(String userId, LocalDate minDate);
+
+
 
     @Query(
             nativeQuery = true,
