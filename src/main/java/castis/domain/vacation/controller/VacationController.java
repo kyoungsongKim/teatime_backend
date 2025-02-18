@@ -91,6 +91,30 @@ public class VacationController {
         return ResponseEntity.ok().body(result);
     }
 
+    @GetMapping("/list")
+    public ResponseEntity<List<VacationHistoryDto>> getVacationListByYear(HttpServletRequest httpServletRequest,
+                                                                    @RequestParam(name = "userId", required = true) String userId,
+                                                                    @RequestParam(name = "year", required = true) Integer year) {
+        String token = httpServletRequest.getHeader("Authorization");
+        CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
+
+        boolean isAdmin = user.getRoles().contains(UserRole.ROLE_ADMIN.getValue());
+
+        User foundUser = userService.getUser(userId);
+        if (foundUser.getRenewalDate() == null) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        if (!isAdmin && !(foundUser.getId().equals(user.getUserId()))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        List<VacationHistoryDto> vacationHistoryDtos = vacationHistoryService.getVacationHistoryListByUserIdAndYear(userId, year);
+
+
+        return ResponseEntity.ok().body(vacationHistoryDtos);
+    }
+
     @GetMapping("/all")
     public ResponseEntity<List<VacationInfoDto>> getVacationInfo(HttpServletRequest httpServletRequest) {
         String token = httpServletRequest.getHeader("Authorization");

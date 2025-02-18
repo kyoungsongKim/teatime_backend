@@ -71,6 +71,15 @@ public class VacationHistoryService {
         return result;
     }
 
+    public List<VacationHistoryDto> getVacationHistoryListByUserIdAndYear(String userId, int year) {
+        List<VacationHistoryDto> result = vacationHistoryRepository
+                .findAllByUserIdAndYear(userId, year).stream()
+                .map(VacationHistoryDto::new)
+                .collect(Collectors.toList());
+
+        return result;
+    }
+
     private VacationInfoDto calculateTotalVacationAmount(VacationInfoDto vacationInfo) {
         if (vacationInfo.getRenewalDate() == null)
             return vacationInfo;

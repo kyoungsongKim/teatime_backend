@@ -30,4 +30,6 @@ public interface VacationHistoryRepository
         @Query(nativeQuery = true, value = "SELECT userId, SUM(amount) as used, renewaldate FROM vacation_history NATURAL JOIN users WHERE userId = ?1 AND (DATE_FORMAT(renewaldate, CONCAT(YEAR(?2) - 1 + (DATE_FORMAT(renewaldate, CONCAT(YEAR(?2), '-%m-%d 00:00:00')) <= ?2), '-%m-%d 00:00:00')) <= IF(?3, DATE_ADD(eventStartDate, INTERVAL amount DIV 1 DAY), eventStartDate) AND eventStartDate < DATE_FORMAT(renewaldate, CONCAT(YEAR(?2) + (DATE_FORMAT(renewaldate, CONCAT(YEAR(?2), '-%m-%d 00:00:00')) <= ?2), '-%m-%d 00:00:00')))")
         Optional<IVacationInfo> findVacationInfo(String userId, LocalDateTime targetDate, boolean includeAmount);
 
+        @Query(nativeQuery = true, value = "SELECT * FROM vacation_history WHERE userId = ?1 AND YEAR(eventStartDate) = ?2")
+        List<VacationHistory> findAllByUserIdAndYear(String userId, int year);
 }
