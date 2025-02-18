@@ -49,8 +49,8 @@ public class AgreementController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/history/{userId}")
-    public ResponseEntity<List<AgreementDto>> getAgreementHistoryList(
+    @GetMapping(value = "/detail/{userId}")
+    public ResponseEntity<List<AgreementDto>> getAgreementDetailList(
             HttpServletRequest httpServletRequest,
             @PathVariable String userId
     ) {
@@ -59,7 +59,7 @@ public class AgreementController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        List<AgreementDto> result = agreementService.getAgreementListByUser(userId);
+        List<AgreementDto> result = agreementService.getAgreementHistoryListByUser(userId);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

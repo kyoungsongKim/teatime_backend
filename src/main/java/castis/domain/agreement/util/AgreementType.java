@@ -7,12 +7,14 @@ public enum AgreementType {
     GUARANTEE("GUARANTEE"),
     MANAGER("MANAGER"),
     JOINED("JOINED"),
-    OTHER("OTHER");
+    OTHER("OTHER"),
+    GUARANTEE_HISTORY("GUARANTEE_HISTORY"),
+    MANAGER_HISTORY("MANAGER_HISTORY"),
+    JOINED_HISTORY("JOINED_HISTORY");
 
     final String value;
 
     AgreementType(String value) {
         this.value = value;
     }
-
 }

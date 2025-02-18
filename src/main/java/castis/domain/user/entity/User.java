@@ -1,5 +1,6 @@
 package castis.domain.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,10 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -31,6 +29,9 @@ public class User {
 
     @Column(name = "password", nullable = false, length = 256)
     private String password;
+
+    @Column(name = "description", nullable = false, length = 256)
+    private String description;
 
     @Column(name = "teamname", nullable = false, length = 128)
     private String teamName;
@@ -61,6 +62,10 @@ public class User {
 
     @Column(name = "cbank_account", length = 50)
     private String cbankAccount;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private UserDetails userDetails;
 
     @Builder
     public User(String id, String userName, String realName, String password,

@@ -4,6 +4,7 @@ import castis.domain.agreement.dto.AgreementDto;
 import castis.domain.agreement.entity.Agreement;
 import castis.domain.agreement.entity.IUserAgreementInfo;
 import castis.domain.agreement.repository.AgreementRepository;
+import castis.domain.agreement.util.AgreementType;
 import castis.domain.filesystem.entity.FileMeta;
 import castis.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,8 +23,32 @@ public class AgreementService {
 
     private final AgreementRepository agreementRepository;
 
+    private static final Set<AgreementType> GENERAL_TYPES = EnumSet.of(
+            AgreementType.GUARANTEE,
+            AgreementType.MANAGER,
+            AgreementType.JOINED,
+            AgreementType.OTHER
+    );
+
+    private static final Set<AgreementType> HISTORY_TYPES = EnumSet.of(
+            AgreementType.GUARANTEE,
+            AgreementType.GUARANTEE_HISTORY
+    );
+
     public List<AgreementDto> getAgreementListByUser(String userId) {
-        return agreementRepository.findAllByUserId(userId).stream().map(AgreementDto::new).collect(Collectors.toList());
+        return agreementRepository.findAllByUserId(userId)
+                .stream()
+                .filter(agreement -> GENERAL_TYPES.contains(agreement.getType()))
+                .map(AgreementDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<AgreementDto> getAgreementHistoryListByUser(String userId) {
+        return agreementRepository.findAllByUserId(userId)
+                .stream()
+                .filter(greement -> !HISTORY_TYPES.contains(greement.getType()))
+                .map(AgreementDto::new)
+                .collect(Collectors.toList());
     }
 
     public List<IUserAgreementInfo> getUserAgreementInfoList() {
@@ -54,4 +81,16 @@ public class AgreementService {
         agreementRepository.deleteById(agreementId);
     }
 
+    private boolean isGeneralType(String type) {
+        return type.equals("GUARANTEE") ||
+                type.equals("MANAGER") ||
+                type.equals("JOINED") ||
+                type.equals("OTHER");
+    }
+
+    private boolean isHistoryType(String type) {
+        return type.equals("GUARANTEE_HISTORY") ||
+                type.equals("MANAGER_HISTORY") ||
+                type.equals("JOINED_HISTORY");
+    }
 }
