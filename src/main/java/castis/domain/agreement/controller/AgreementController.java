@@ -49,6 +49,20 @@ public class AgreementController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/history/{userId}")
+    public ResponseEntity<List<AgreementDto>> getAgreementHistoryList(
+            HttpServletRequest httpServletRequest,
+            @PathVariable String userId
+    ) {
+        boolean isAdmin = authProvider.isAdmin(httpServletRequest);
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        List<AgreementDto> result = agreementService.getAgreementListByUser(userId);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/info")
     public ResponseEntity<List<IUserAgreementInfo>> getUserAgreementInfoList(HttpServletRequest httpServletRequest) {
         boolean isAdmin = authProvider.isAdmin(httpServletRequest);
