@@ -9,7 +9,6 @@ import castis.domain.ticket.dto.EventDto;
 import castis.domain.ticket.dto.TicketDto;
 import castis.domain.ticket.entity.Ticket;
 import castis.domain.ticket.repository.TicketRepository;
-import castis.domain.vacation.entity.VacationHistory;
 import castis.domain.vacation.service.VacationHistoryService;
 import castis.util.holiday.HolidayService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.Predicate;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;

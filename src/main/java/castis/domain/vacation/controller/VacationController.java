@@ -93,8 +93,8 @@ public class VacationController {
 
     @GetMapping("/list")
     public ResponseEntity<List<VacationHistoryDto>> getVacationListByYear(HttpServletRequest httpServletRequest,
-                                                                    @RequestParam(name = "userId", required = true) String userId,
-                                                                    @RequestParam(name = "year", required = true) Integer year) {
+                                                                    @RequestParam(name = "userId") String userId,
+                                                                    @RequestParam(name = "year") Integer year) {
         String token = httpServletRequest.getHeader("Authorization");
         CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
 
@@ -217,6 +217,14 @@ public class VacationController {
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<VacationHistoryDto> getVacation(HttpServletRequest httpServletRequest,
             @PathVariable(value = "id") Long id) {
+        String token = httpServletRequest.getHeader("Authorization");
+        CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
+
+        // 정보가 없는 사용자는 조회 불가
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
         VacationHistoryDto result = vacationHistoryService.getById(id);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

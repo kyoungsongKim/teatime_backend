@@ -2,9 +2,6 @@ package castis.domain.vacation.dto;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import castis.domain.vacation.entity.VacationHistory;
 import lombok.Data;
 import lombok.NoArgsConstructor;
