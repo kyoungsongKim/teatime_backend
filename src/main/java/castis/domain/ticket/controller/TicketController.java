@@ -4,6 +4,8 @@ import castis.domain.ticket.dto.EventDetailDto;
 import castis.domain.ticket.dto.EventDto;
 import castis.domain.ticket.dto.TicketDto;
 import castis.domain.ticket.service.TicketService;
+import castis.domain.user.service.UserService;
+import castis.domain.user.entity.User;
 import castis.util.holiday.HolidayService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,8 @@ public class TicketController {
 
     private final TicketService ticketService;
     private final HolidayService holidayService;
+
+    private final UserService userService;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseEntity getTicketDataUsingUserNameAndPeroid(
@@ -58,6 +62,13 @@ public class TicketController {
     public ResponseEntity saveTicketData(HttpServletRequest httpServletRequest,
             @RequestBody TicketDto ticketDto) {
         log.info("request, uri[{}] ticketDto[{}]", httpServletRequest.getRequestURI(), ticketDto.toString());
+        User userInfo = userService.getUser(ticketDto.getUserName());
+
+        if (userInfo == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
+        ticketDto.setTeamName(userInfo.getTeamName());
         return ticketService.saveTicketInfo(ticketDto);
     }
 
@@ -67,6 +78,20 @@ public class TicketController {
         log.info("request, uri[{}] No[{}]", httpServletRequest.getRequestURI(), no);
         TicketDto dto = ticketService.getTicketInfoByNo(no);
         return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{no}", method = RequestMethod.PUT)
+    public ResponseEntity updateTicketData(HttpServletRequest httpServletRequest, @PathVariable(value = "no") Long no,
+            @RequestBody TicketDto ticketDto) {
+        log.info("request, uri[{}] No[{}], ticketDto[{}]", httpServletRequest.getRequestURI(), no, ticketDto.toString());
+        User userInfo = userService.getUser(ticketDto.getUserName());
+
+        if (userInfo == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
+        ticketDto.setTeamName(userInfo.getTeamName());
+        return ticketService.updateTicketInfoByNo(no, ticketDto);
     }
 
     @DeleteMapping(value = "/{no}")
