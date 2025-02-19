@@ -214,4 +214,11 @@ public class VacationController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
+    public ResponseEntity<VacationHistoryDto> getVacation(HttpServletRequest httpServletRequest,
+            @PathVariable(value = "id") Long id) {
+        VacationHistoryDto result = vacationHistoryService.getById(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 }
