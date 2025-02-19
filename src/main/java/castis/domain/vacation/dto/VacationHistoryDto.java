@@ -27,7 +27,6 @@ public class VacationHistoryDto {
 
     private String reason;
 
-    @JsonInclude(Include.NON_NULL)
     private String adminMemo;
 
     private LocalDateTime createdDate;
