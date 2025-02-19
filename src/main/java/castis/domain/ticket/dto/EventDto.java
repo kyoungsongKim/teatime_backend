@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Setter
@@ -15,8 +16,8 @@ import java.time.format.DateTimeFormatter;
 public class EventDto {
     private Long no;
     private String title;
-    private LocalDate start;
-    private LocalDate end;
+    private LocalDateTime start;
+    private LocalDateTime end;
     private String description;
     private String className;
     private String color;
@@ -24,8 +25,8 @@ public class EventDto {
     public EventDto (Ticket ticket) {
         this.no = ticket.getNo();
         this.title = ticket.getProjectName();
-        this.start = ticket.getStartTime().toLocalDate();
-        this.end = ticket.getEndTime().toLocalDate();
+        this.start = ticket.getStartTime();
+        this.end = ticket.getEndTime();
         this.description = ticket.getContent();
         //this.className = "Lorem ipsum dolor eiu idunt ut labore";
         this.className = "fc-event-danger fc-event-solid-warning";
@@ -36,10 +37,16 @@ public class EventDto {
     public EventDto (HolidayDto dto) {
         this.no = 0L;
         this.title = dto.getName();
-        this.start = LocalDate.parse(dto.getDate(), DateTimeFormatter.ofPattern("yyyyMMdd"));
-        this.end = LocalDate.parse(dto.getDate(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+        this.start = getLocalDateTime(dto.getDate(), 0, 0, 0);
+        this.end = getLocalDateTime(dto.getDate(), 23, 59, 59);
         this.className = "fc-event-danger fc-event-solid-warning";
         this.color = "#FF1100";
+    }
+
+    private LocalDateTime getLocalDateTime(String dateStr, int hour, int min, int sec) {
+        LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+        return date.atTime(hour, min, sec);
     }
 
 }
