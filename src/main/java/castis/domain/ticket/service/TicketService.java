@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.Predicate;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -176,6 +177,54 @@ public class TicketService {
         Project project = projectRepository.findById(ticket.getProjectName()).orElse(null);
         TicketDto dto = new TicketDto(ticket, project);
         return dto;
+    }
+
+    @Transactional
+    public ResponseEntity updateTicketInfoByNo(Long no, TicketDto ticketDto) {
+        Ticket ticket = ticketRepository.findById(no).orElse(null);
+        Ticket newTicket = new Ticket(ticketDto);
+        if (ticket == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
+        // newTicket과 ticket의 필드를 비교하여 변경된 필드만 수정
+        if (newTicket.getTeamName() != null && !newTicket.getTeamName().equals(ticket.getTeamName())) {
+            ticket.setTeamName(newTicket.getTeamName());
+        }
+        if (newTicket.getUserName() != null && !newTicket.getUserName().equals(ticket.getUserName())) {
+            ticket.setUserName(newTicket.getUserName());
+        }
+        if (newTicket.getProjectName() != null && !newTicket.getProjectName().equals(ticket.getProjectName())) {
+            ticket.setProjectName(newTicket.getProjectName());
+        }
+        if (newTicket.getTitle() != null && !newTicket.getTitle().equals(ticket.getTitle())) {
+            ticket.setTitle(newTicket.getTitle());
+        }
+        if (newTicket.getSubtitle() != null && !newTicket.getSubtitle().equals(ticket.getSubtitle())) {
+            ticket.setSubtitle(newTicket.getSubtitle());
+        }
+        if (newTicket.getContent() != null && !newTicket.getContent().equals(ticket.getContent())) {
+            ticket.setContent(newTicket.getContent());
+        }
+        if (newTicket.getEmd() != null && !newTicket.getEmd().equals(ticket.getEmd())) {
+            ticket.setEmd(newTicket.getEmd());
+        }
+        if (newTicket.getNmd() != null && !newTicket.getNmd().equals(ticket.getNmd())) {
+            ticket.setNmd(newTicket.getNmd());
+        }
+        if (newTicket.getStartTime() != null && !newTicket.getStartTime().equals(ticket.getStartTime())) {
+            ticket.setStartTime(newTicket.getStartTime());
+        }
+        if (newTicket.getEndTime() != null && !newTicket.getEndTime().equals(ticket.getEndTime())) {
+            ticket.setEndTime(newTicket.getEndTime());
+        }
+        if (newTicket.getHistory() != null && !newTicket.getHistory().equals(ticket.getHistory())) {
+            ticket.setHistory(newTicket.getHistory());
+        }
+
+        ticketRepository.save(ticket);
+
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
     @Transactional
