@@ -7,6 +7,8 @@ public interface IUserAgreementInfo {
 
     String getRealName();
 
+    String getAvatarImg();
+
     Integer getGuaranteeAmount();
 
     Integer getTotalAmount();

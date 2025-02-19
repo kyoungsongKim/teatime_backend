@@ -21,6 +21,7 @@ public interface AgreementRepository
             value = "SELECT " +
                     "    a.id AS id, " +
                     "    u.userid AS userId, " +
+                    "    ud.avatar_img AS avatarImg, " +
                     "    u.realname AS realName, " +
                     "    COUNT(CASE WHEN a.end_date >= ?2 THEN a.user_id ELSE NULL END) AS currentAgreementCount, " +
                     "    COUNT(a.user_id) AS totalAgreementCount, " +
@@ -30,6 +31,8 @@ public interface AgreementRepository
                     "    users u " +
                     "LEFT JOIN " +
                     "    agreement a ON u.userid = a.user_id " +
+                    "LEFT JOIN " +
+                    "    user_details ud ON u.userid = ud.userid " +
                     "WHERE u.userid = ?1 AND " +
                     "    u.teamname LIKE 'saram' AND " +
                     "    (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
@@ -46,6 +49,7 @@ public interface AgreementRepository
             value = "SELECT " +
                     "    a.id AS id, " +
                     "    u.userid AS userId, " +
+                    "    ud.avatar_img AS avatarImg, " +
                     "    u.realname AS realName, " +
                     "    COUNT(CASE WHEN a.end_date >= ?1 THEN a.user_id ELSE NULL END) AS currentAgreementCount, " +
                     "    COUNT(a.user_id) AS totalAgreementCount, " +
@@ -55,6 +59,8 @@ public interface AgreementRepository
                     "    users u " +
                     "LEFT JOIN " +
                     "    agreement a ON u.userid = a.user_id " +
+                    "LEFT JOIN " +
+                    "    user_details ud ON u.userid = ud.userid " +
                     "WHERE " +
                     "    u.teamname LIKE 'saram' AND " +
                     "    (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +

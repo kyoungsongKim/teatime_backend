@@ -25,6 +25,9 @@ public class UserDetails {
     @Column(name = "birthdate")
     private LocalDate birthDate;
 
+    @Column(name = "avatar_img", nullable = false)
+    private String avatarImg;
+
     @Column(name = "address", length = 512, nullable = false)
     private String address;
 

@@ -54,9 +54,12 @@ public class AgreementController {
             HttpServletRequest httpServletRequest,
             @PathVariable String userId
     ) {
-        boolean isAdmin = authProvider.isAdmin(httpServletRequest);
-        if (!isAdmin) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        boolean isOwn = authProvider.isOwn(httpServletRequest, userId);
+        if (!isOwn) {
+            boolean isAdmin = authProvider.isAdmin(httpServletRequest);
+            if (!isAdmin) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            }
         }
 
         List<AgreementDto> result = agreementService.getAgreementHistoryListByUser(userId);
