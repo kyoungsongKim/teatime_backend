@@ -81,16 +81,32 @@ public class AgreementService {
         agreementRepository.deleteById(agreementId);
     }
 
-    private boolean isGeneralType(String type) {
-        return type.equals("GUARANTEE") ||
-                type.equals("MANAGER") ||
-                type.equals("JOINED") ||
-                type.equals("OTHER");
+    @Transactional
+    public void deleteAgreementForHistory(Long agreementId) {
+        Agreement agreement = agreementRepository.findById(agreementId)
+                .orElseThrow(() -> new IllegalArgumentException("Agreement not found with ID: " + agreementId));
+
+        AgreementType newType = getHistoryType(agreement.getType());
+
+        if (newType != null) {
+            agreement.setType(newType);
+            agreementRepository.save(agreement);
+        } else {
+            throw new IllegalStateException("Invalid AgreementType: " + agreement.getType());
+        }
     }
 
-    private boolean isHistoryType(String type) {
-        return type.equals("GUARANTEE_HISTORY") ||
-                type.equals("MANAGER_HISTORY") ||
-                type.equals("JOINED_HISTORY");
+    private AgreementType getHistoryType(AgreementType type) {
+        if (type == AgreementType.GUARANTEE) {
+            return AgreementType.GUARANTEE_HISTORY;
+        } else if (type == AgreementType.MANAGER) {
+            return AgreementType.MANAGER_HISTORY;
+        } else if (type == AgreementType.JOINED) {
+            return AgreementType.JOINED_HISTORY;
+        } else if (type == AgreementType.OTHER) {
+            return AgreementType.OTHER_HISTORY;
+        } else {
+            return null;
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -20,6 +21,9 @@ public class UserDetails {
     @JoinColumn(name = "userid", referencedColumnName = "userid", insertable = false, updatable = false)
     @JsonBackReference
     private User user;
+
+    @Column(name = "birthdate")
+    private LocalDate birthDate;
 
     @Column(name = "address", length = 512, nullable = false)
     private String address;
@@ -53,6 +57,9 @@ public class UserDetails {
 
     @Column(name = "twitter_url", length = 512)
     private String twitterUrl;
+
+    @Column(name = "homepage_url", length = 512)
+    private String homepageUrl;
 
     @Column(name = "education_level", length = 128)
     private String educationLevel;

@@ -130,4 +130,14 @@ public class AgreementController {
         agreementService.deleteAgreement(agreementId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping(value = "/{agreementId}/history")
+    public ResponseEntity<Void> deleteAgreementForHistory(HttpServletRequest httpServletRequest, @PathVariable long agreementId) {
+        boolean isAdmin = authProvider.isAdmin(httpServletRequest);
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        agreementService.deleteAgreementForHistory(agreementId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
