@@ -31,7 +31,8 @@ public interface AgreementRepository
                     "LEFT JOIN " +
                     "    agreement a ON u.userid = a.user_id " +
                     "WHERE u.userid = ?1 AND " +
-                    "    u.teamname LIKE 'saram' " +
+                    "    u.teamname LIKE 'saram' AND " +
+                    "    (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
                     "GROUP BY " +
                     "    u.userid, " +
                     "    u.realname"
@@ -55,7 +56,8 @@ public interface AgreementRepository
                     "LEFT JOIN " +
                     "    agreement a ON u.userid = a.user_id " +
                     "WHERE " +
-                    "    u.teamname LIKE 'saram' " +
+                    "    u.teamname LIKE 'saram' AND " +
+                    "    (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
                     "GROUP BY " +
                     "    u.userid, " +
                     "    u.realname"
