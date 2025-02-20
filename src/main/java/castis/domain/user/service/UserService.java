@@ -1,9 +1,12 @@
 package castis.domain.user.service;
 
 import castis.domain.user.dto.PasswordDto;
+import castis.domain.user.dto.UserDetailDto;
 import castis.domain.user.dto.UserDto;
 import castis.domain.user.dto.UserUpdateDto;
 import castis.domain.user.entity.User;
+import castis.domain.user.entity.UserDetails;
+import castis.domain.user.repository.UserDetailsRepository;
 import castis.domain.user.repository.UserRepository;
 import castis.enums.UserRole;
 import castis.exception.custom.ForbiddenException;
@@ -23,6 +26,8 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+
+    private final UserDetailsRepository userDetailsRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -86,6 +91,32 @@ public class UserService {
         userRepository.save(user);
 
         return true;
+    }
+
+    public void postUserDetails(UserDetailDto dto) {
+        User user = userRepository.findById(dto.getUserId()).orElse(new User());
+        user.setId(dto.getUserId());
+        user.setRealName(dto.getRealName());
+        user.setTeamName(dto.getTeamName());
+        user.setPosition(dto.getPosition());
+        user.setDailyReportList(dto.getDailyReportList());
+        user.setVacationReportList(dto.getVacationReportList());
+        user.setDescription(dto.getDescription());
+
+        userRepository.save(user);
+
+        UserDetails userDetails = userDetailsRepository.findById(dto.getUserId()).orElse(new UserDetails());
+        userDetails.setUserId(dto.getUserId());
+        userDetails.setCellphone(dto.getCellphone());
+        userDetails.setEmail(dto.getEmail());
+        userDetails.setBirthDate(dto.getBirthDate());
+        userDetails.setAvatarImg(dto.getAvatarImg()); // Base64 데이터 그대로 저장
+        userDetails.setAddress(dto.getAddress());
+        userDetails.setEducationLevel(dto.getEducationLevel());
+        userDetails.setSkillLevel(dto.getSkillLevel());
+        userDetails.setCbankAccount(dto.getCbankAccount());
+
+        userDetailsRepository.save(userDetails);
     }
 
     public List<UserDto> findAllUserDtoExceptId(String id) {
