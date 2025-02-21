@@ -1,9 +1,6 @@
 package castis.domain.user.service;
 
-import castis.domain.user.dto.PasswordDto;
-import castis.domain.user.dto.UserDetailDto;
-import castis.domain.user.dto.UserDto;
-import castis.domain.user.dto.UserUpdateDto;
+import castis.domain.user.dto.*;
 import castis.domain.user.entity.User;
 import castis.domain.user.entity.UserDetails;
 import castis.domain.user.repository.UserDetailsRepository;
@@ -94,7 +91,13 @@ public class UserService {
     }
 
     public void postUserDetails(UserDetailDto dto) {
-        User user = userRepository.findById(dto.getUserId()).orElse(new User());
+        if (dto.getUserId() == null || dto.getUserId().trim().isEmpty()) {
+            throw new IllegalArgumentException("User ID는 필수입니다.");
+        }
+
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자가 존재하지 않습니다."));
+
         user.setId(dto.getUserId());
         user.setRealName(dto.getRealName());
         user.setTeamName(dto.getTeamName());
@@ -105,7 +108,9 @@ public class UserService {
 
         userRepository.save(user);
 
-        UserDetails userDetails = userDetailsRepository.findById(dto.getUserId()).orElse(new UserDetails());
+        UserDetails userDetails = userDetailsRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자가 존재하지 않습니다."));
+
         userDetails.setUserId(dto.getUserId());
         userDetails.setCellphone(dto.getCellphone());
         userDetails.setEmail(dto.getEmail());
@@ -115,6 +120,19 @@ public class UserService {
         userDetails.setEducationLevel(dto.getEducationLevel());
         userDetails.setSkillLevel(dto.getSkillLevel());
         userDetails.setCbankAccount(dto.getCbankAccount());
+
+        userDetailsRepository.save(userDetails);
+    }
+
+    public void postUserDetailsSocial(UserDetailSocialDto dto) {
+        UserDetails userDetails = userDetailsRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자가 존재하지 않습니다."));
+        userDetails.setUserId(dto.getUserId());
+        userDetails.setFacebookUrl(dto.getFacebookUrl());
+        userDetails.setInstagramUrl(dto.getInstagramUrl());
+        userDetails.setTwitterUrl(dto.getTwitterUrl());
+        userDetails.setLinkedinUrl(dto.getLinkedinUrl());
+        userDetails.setHomepageUrl(dto.getHomepageUrl());
 
         userDetailsRepository.save(userDetails);
     }

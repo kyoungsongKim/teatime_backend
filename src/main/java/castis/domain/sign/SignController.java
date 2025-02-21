@@ -26,7 +26,7 @@ public class SignController {
 
     private final AuthProvider authProvider;
 
-    @PostMapping(value = { "signup" })
+    @PostMapping(value = { "signup","api/auth/sign-up" })
     public ResponseEntity<AuthenticationDto> appJoin(@RequestBody JoinDto joinDto) throws Exception {
         String pass = joinDto.getPassword();
         boolean isJoinSuccess = apiSignService.regMember(joinDto);

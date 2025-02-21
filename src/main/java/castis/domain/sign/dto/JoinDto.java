@@ -1,6 +1,7 @@
 package castis.domain.sign.dto;
 
 import castis.domain.user.entity.User;
+import castis.domain.user.entity.UserDetails;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -46,6 +47,18 @@ public class JoinDto {
                 .password(password)
                 .teamName(team)
                 .position(position == null ? "" : position)
+                .cellphone(phone == null ? "" : phone)
+                .email(email)
+                .dailyReportList(reportEmail == null ? "" : reportEmail)
+                .vacationReportList(reportEmail == null ? "" : reportEmail)
+                .build();
+
+        return build;
+    }
+
+    public UserDetails toEntityForDetail() {
+        UserDetails build = UserDetails.builder()
+                .userId(id)
                 .cellphone(phone == null ? "" : phone)
                 .email(email)
                 .dailyReportList(reportEmail == null ? "" : reportEmail)

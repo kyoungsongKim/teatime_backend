@@ -1,7 +1,10 @@
 package castis.domain.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import io.netty.handler.codec.socksx.v4.Socks4CommandRequest;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -10,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "user_details")
 public class UserDetails {
 
@@ -71,8 +75,17 @@ public class UserDetails {
     private String skillLevel;
 
     @Column(name = "joindate")
-    private LocalDateTime joinDate;
+    private LocalDate joinDate;
 
     @Column(name = "renewaldate")
-    private LocalDateTime renewalDate;
+    private LocalDate renewalDate;
+
+    @Builder
+    public UserDetails(String userId, String cellphone, String email, String dailyReportList, String vacationReportList) {
+        this.userId = userId;
+        this.cellphone = cellphone;
+        this.email = email;
+        this.dailyReportList = dailyReportList;
+        this.vacationReportList = vacationReportList;
+    }
 }

@@ -1,10 +1,7 @@
 package castis.domain.user.controller;
 
 import castis.domain.report.dto.ReportUserRequestDto;
-import castis.domain.user.dto.PasswordDto;
-import castis.domain.user.dto.UserDetailDto;
-import castis.domain.user.dto.UserDto;
-import castis.domain.user.dto.UserUpdateDto;
+import castis.domain.user.dto.*;
 import castis.domain.user.entity.User;
 import castis.domain.user.service.UserService;
 import castis.exception.custom.UserNotFoundException;
@@ -49,6 +46,14 @@ public class UserController {
     public ResponseEntity postUserDetails(@RequestBody UserDetailDto userDetailDto) throws Exception {
         log.info("request /user/detail change user detail : {}", userDetailDto);
         userService.postUserDetails(userDetailDto);
+        return ResponseEntity.ok().body("user detail changed!");
+    }
+
+    @RequestMapping(value = "/user/details/social", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity postUserDetailsSocial(@RequestBody UserDetailSocialDto userDetailSocialDto) throws Exception {
+        log.info("request /user/detail/social change user detail social: {}", userDetailSocialDto);
+        userService.postUserDetailsSocial(userDetailSocialDto);
         return ResponseEntity.ok().body("user detail changed!");
     }
 

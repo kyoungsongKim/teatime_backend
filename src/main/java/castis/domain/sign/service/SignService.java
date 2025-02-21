@@ -6,6 +6,7 @@ import castis.domain.sign.dto.AuthenticationDto;
 import castis.domain.sign.dto.JoinDto;
 import castis.domain.sign.dto.LoginDto;
 import castis.domain.user.entity.User;
+import castis.domain.user.repository.UserDetailsRepository;
 import castis.domain.user.repository.UserRepository;
 import castis.enums.UserRole;
 import castis.exception.custom.DuplicatedException;
@@ -26,6 +27,7 @@ public class SignService {
     private final AuthoritiesRepository authoritiesRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserDetailsRepository userDetailsRepository;
 
     public Boolean regMember(JoinDto joinDto) {
 
@@ -38,6 +40,7 @@ public class SignService {
 
         // 데이터 등록(저장)
         userRepository.save(joinDto.toEntity());
+        userDetailsRepository.save(joinDto.toEntityForDetail());
         authoritiesRepository.save(new Authorities(joinDto.getId(), UserRole.ROLE_USER));
 
         return true;
