@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -149,9 +150,16 @@ public class UserService {
     }
 
     public List<UserDto> getAdminList() {
-        List<User> userList = userRepository.findAllByRole(UserRole.ROLE_ADMIN.getValue());
-        List<UserDto> result = userList.stream().map(UserDto::new).collect(Collectors.toList());
-        return result;
+        List<String> ADMIN_ROLES = Arrays.asList(
+                UserRole.ROLE_ADMIN.getValue(),
+                UserRole.ROLE_SUPER_ADMIN.getValue()
+        );
+
+        List<User> userList = userRepository.findAllByRoleIn(ADMIN_ROLES);
+
+        return userList.stream()
+                .map(UserDto::new)
+                .collect(Collectors.toList());
     }
 
     public void updateTeamName(User userInfo) {

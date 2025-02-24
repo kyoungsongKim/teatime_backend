@@ -7,6 +7,7 @@ import castis.domain.sign.dto.LoginDto;
 import castis.domain.sign.dto.TokenDto;
 import castis.domain.sign.service.SignService;
 import castis.domain.user.CustomUserDetails;
+import castis.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -50,9 +51,9 @@ public class SignController {
     @PostMapping(value = { "/login", "api/auth/sign-in" })
     public ResponseEntity<AuthenticationDto> appLogin(@Valid @RequestBody LoginDto loginDto) throws Exception {
         AuthenticationDto authentication = apiSignService.loginMember(loginDto);
-        boolean isAdmin = apiSignService.checkIsAdmin(authentication.getUserId());
+        UserRole userRole = apiSignService.checkIsAdmin(authentication.getUserId());
         String accessToken = authProvider.createToken(authentication.getUserId(), authentication.getRealName(),
-                isAdmin ? "ADMIN" : "USER");
+                userRole.getValue().substring(5));
         authentication.setApiToken(accessToken);
         //for new front-end
         authentication.setAccessToken(accessToken);

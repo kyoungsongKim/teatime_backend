@@ -1,6 +1,8 @@
 package castis.domain.vacation.controller;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,19 +40,16 @@ public class VacationController {
     public ResponseEntity<MyVacationResponse> getVacationInfo(HttpServletRequest httpServletRequest,
             @RequestParam(name = "userId", required = true) String userId,
             @RequestParam(name = "workedYear", required = false) Byte workedYear) {
-        String token = httpServletRequest.getHeader("Authorization");
-        CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
-
-        boolean isAdmin = user.getRoles().contains(UserRole.ROLE_ADMIN.getValue());
+        boolean isAdmin = authProvider.isAdmin(httpServletRequest);
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
 
         User foundUser = userService.getUser(userId);
         if (foundUser.getRenewalDate() == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
-        if (!isAdmin && !(foundUser.getId().equals(user.getUserId()))) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
         LocalDate renewalDate = foundUser.getRenewalDate();
 
         List<Byte> workedYearList = new ArrayList<Byte>();
@@ -95,18 +94,14 @@ public class VacationController {
     public ResponseEntity<List<VacationHistoryDto>> getVacationListByYear(HttpServletRequest httpServletRequest,
                                                                     @RequestParam(name = "userId") String userId,
                                                                     @RequestParam(name = "year") Integer year) {
-        String token = httpServletRequest.getHeader("Authorization");
-        CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
-
-        boolean isAdmin = user.getRoles().contains(UserRole.ROLE_ADMIN.getValue());
+        boolean isAdmin = authProvider.isAdmin(httpServletRequest);
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
 
         User foundUser = userService.getUser(userId);
         if (foundUser.getRenewalDate() == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-        }
-
-        if (!isAdmin && !(foundUser.getId().equals(user.getUserId()))) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
         List<VacationHistoryDto> vacationHistoryDtos = vacationHistoryService.getVacationHistoryListByUserIdAndYear(userId, year);
@@ -117,11 +112,9 @@ public class VacationController {
 
     @GetMapping("/all")
     public ResponseEntity<List<VacationInfoDto>> getVacationInfo(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader("Authorization");
-        CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
-
-        if (!user.getRoles().contains(UserRole.ROLE_ADMIN.getValue())) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        boolean isAdmin = authProvider.isAdmin(httpServletRequest);
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
         List<VacationInfoDto> result = vacationHistoryService.getAllVacationInfo(LocalDateTime.now(), false);
@@ -137,10 +130,10 @@ public class VacationController {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("User Not Found");
         }
 
-        String token = httpServletRequest.getHeader("Authorization");
-        CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
-
-        boolean isAdmin = user.getRoles().contains(UserRole.ROLE_ADMIN.getValue());
+        boolean isAdmin = authProvider.isAdmin(httpServletRequest);
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
 
         VacationInfoDto vacationInfo = vacationHistoryService.getVacationInfo(createVacationBody.getUserId(),
                 createVacationBody.getEventStartDate(), false);
@@ -173,10 +166,7 @@ public class VacationController {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("User Not Found");
         }
 
-        String token = httpServletRequest.getHeader("Authorization");
-        CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
-
-        boolean isAdmin = user.getRoles().contains(UserRole.ROLE_ADMIN.getValue());
+        boolean isAdmin = authProvider.isAdmin(httpServletRequest);
         VacationHistoryDto targetVacationHistory = vacationHistoryService.getById(id);
         VacationInfoDto vacationInfo = vacationHistoryService.getVacationInfo(updateVacationBody.getUserId(),
                 LocalDateTime.now(), false);
@@ -200,12 +190,7 @@ public class VacationController {
     @RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity updateVacation(HttpServletRequest httpServletRequest,
             @PathVariable(value = "id") Long id) {
-
-        String token = httpServletRequest.getHeader("Authorization");
-        CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
-
-        boolean isAdmin = user.getRoles().contains(UserRole.ROLE_ADMIN.getValue());
-
+        boolean isAdmin = authProvider.isAdmin(httpServletRequest);
         if (!isAdmin) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }

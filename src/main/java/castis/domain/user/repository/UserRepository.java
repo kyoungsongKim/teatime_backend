@@ -8,6 +8,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, String> {
+    @Query(value = "SELECT u.* " +
+    "FROM users u " +
+    "JOIN authorities a ON u.userId = a.username " +
+    "WHERE a.authority IN (:role)", nativeQuery = true)
+    List<User> findAllByRoleIn(@Param("role") List<String> role);
 
     @Query(value = "select count(*) " +
             "from users " +
@@ -18,5 +23,5 @@ public interface UserRepository extends JpaRepository<User, String> {
     List<User> findAllExceptId(@Param("userId") String userId);
 
     @Query(value = "select * from users join authorities on users.userId = authorities.username where authority = :role", nativeQuery = true)
-    List<User> findAllByRole(@Param("role") String role);
+    List<User> findAllByRole(@Param("role") List<String> role);
 }

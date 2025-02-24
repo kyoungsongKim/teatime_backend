@@ -13,8 +13,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -92,7 +94,11 @@ public class AuthProvider {
     public boolean isAdmin(HttpServletRequest request) {
         String token = resolveToken(request);
         CustomUserDetails user = (CustomUserDetails) getAuthentication(token).getPrincipal();
-        return user.getRoles().contains(UserRole.ROLE_ADMIN.getValue());
+        List<String> ADMIN_ROLES = Arrays.asList(
+                UserRole.ROLE_ADMIN.getValue(),
+                UserRole.ROLE_SUPER_ADMIN.getValue()
+        );
+        return user.getRoles().stream().anyMatch(ADMIN_ROLES::contains);
     }
 
     public boolean isOwn(HttpServletRequest request, String userId) {

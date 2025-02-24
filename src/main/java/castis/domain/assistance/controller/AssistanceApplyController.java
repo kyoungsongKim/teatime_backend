@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,8 +38,13 @@ public class AssistanceApplyController {
         String token = request.getHeader("Authorization");
         CustomUserDetails user = (CustomUserDetails) authProvider.getAuthentication(token).getPrincipal();
 
+        List<String> ADMIN_ROLES = Arrays.asList(
+                UserRole.ROLE_ADMIN.getValue(),
+                UserRole.ROLE_SUPER_ADMIN.getValue()
+        );
+
         List<AssistanceApplyDto> all = null;
-        if (user.getRoles().contains(UserRole.ROLE_ADMIN.getValue())) {
+        if (user.getRoles().stream().anyMatch(ADMIN_ROLES::contains)) {
             all = assistanceApplyService.getAssistanceApplyList();
         }
         List<AssistanceApplyDto> personal = assistanceApplyService.getAssistanceApplyListByApplierId(user.getUserId());
