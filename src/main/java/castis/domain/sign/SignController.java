@@ -39,7 +39,7 @@ public class SignController {
 
             AuthenticationDto authentication = apiSignService.loginMember(loginDto);
             authentication.setApiToken(
-                    authProvider.createToken(authentication.getUserId(), authentication.getRealName(), "USER"));
+                    authProvider.createToken(authentication.getUserId(), authentication.getRealName(), "USER_BASIC"));
 
             return ResponseEntity.ok().body(authentication);
         } else {
