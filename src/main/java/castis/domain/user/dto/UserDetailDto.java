@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Setter
 @Getter
@@ -20,7 +20,7 @@ public class UserDetailDto {
     private String address;
     private String position;
     private String teamName;
-    private OffsetDateTime birthDate;
+    private LocalDate birthDate;
     private String cbankAccount;
     private String educationLevel;
     private String skillLevel;

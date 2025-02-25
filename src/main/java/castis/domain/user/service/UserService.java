@@ -121,7 +121,7 @@ public class UserService {
         userDetails.setUserId(dto.getUserId());
         userDetails.setCellphone(dto.getCellphone());
         userDetails.setEmail(dto.getEmail());
-        userDetails.setBirthDate(dto.getBirthDate().toLocalDate());
+        userDetails.setBirthDate(dto.getBirthDate());
         userDetails.setAvatarImg(dto.getAvatarImg()); // Base64 데이터 그대로 저장
         userDetails.setAddress(dto.getAddress());
         userDetails.setEducationLevel(dto.getEducationLevel());
