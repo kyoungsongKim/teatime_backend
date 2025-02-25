@@ -144,9 +144,6 @@ public class VacationController {
         }
 
         boolean isAdmin = authProvider.isAdmin(httpServletRequest);
-        if (!isAdmin) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
 
         VacationInfoDto vacationInfo = vacationHistoryService.getVacationInfo(createVacationBody.getUserId(),
                 createVacationBody.getEventStartDate(), false);
