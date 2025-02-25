@@ -41,14 +41,16 @@ public class VacationController {
     public ResponseEntity<MyVacationResponse> getVacationInfo(HttpServletRequest httpServletRequest,
             @RequestParam(name = "userId", required = true) String userId,
             @RequestParam(name = "workedYear", required = false) Byte workedYear) {
+        String id = authProvider.getUserIdFromRequest(httpServletRequest);
         boolean isAdmin = authProvider.isAdmin(httpServletRequest);
-        if (!isAdmin) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
 
         User foundUser = userService.getUser(userId);
         if (foundUser.getRenewalDate() == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        if (!isAdmin && !(foundUser.getId().equals(id))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
         LocalDate renewalDate = foundUser.getRenewalDate();
@@ -95,14 +97,16 @@ public class VacationController {
     public ResponseEntity<List<VacationHistoryDto>> getVacationListByYear(HttpServletRequest httpServletRequest,
                                                                     @RequestParam(name = "userId") String userId,
                                                                     @RequestParam(name = "year") Integer year) {
+        String id = authProvider.getUserIdFromRequest(httpServletRequest);
         boolean isAdmin = authProvider.isAdmin(httpServletRequest);
-        if (!isAdmin) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
 
         User foundUser = userService.getUser(userId);
         if (foundUser.getRenewalDate() == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
+        if (!isAdmin && !(foundUser.getId().equals(id))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
         List<VacationHistoryDto> vacationHistoryDtos = vacationHistoryService.getVacationHistoryListByUserIdAndYear(userId, year);
