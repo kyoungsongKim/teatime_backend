@@ -5,9 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 @Setter
 @Getter
@@ -22,7 +20,7 @@ public class UserDetailDto {
     private String address;
     private String position;
     private String teamName;
-    private LocalDate birthDate;
+    private OffsetDateTime birthDate;
     private String cbankAccount;
     private String educationLevel;
     private String skillLevel;
