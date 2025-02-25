@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class VacationInfoDto {
 
     private String userId;
+    private String realName;
     private Float left;
     private Float used;
     private Float total;
@@ -18,6 +19,7 @@ public class VacationInfoDto {
 
     public VacationInfoDto(IVacationInfo vacationInfo) {
         this.userId = vacationInfo.getUserId();
+        this.realName = vacationInfo.getRealName();
         this.left = vacationInfo.getLeft();
         this.used = vacationInfo.getUsed();
         this.total = vacationInfo.getTotal();

@@ -121,13 +121,15 @@ public class VacationHistoryService {
     }
 
     public List<VacationInfoDto> getAllVacationInfo(LocalDateTime targetDate, boolean includeAmount) {
-
-        List<VacationInfoDto> list = vacationHistoryRepository.findAllVacationInfo(targetDate, includeAmount).stream()
-                .map(iVacationInfo -> {
-                    return calculateTotalVacationAmount(new VacationInfoDto(iVacationInfo), targetDate.toLocalDate());
-                })
+        return vacationHistoryRepository.findAllVacationInfo(targetDate, includeAmount).stream()
+                .map(iVacationInfo -> calculateTotalVacationAmount(new VacationInfoDto(iVacationInfo), targetDate.toLocalDate()))
                 .collect(Collectors.toList());
-        return list;
+    }
+
+    public List<VacationInfoDto> getAllVacationInfoByTeamName(LocalDateTime targetDate, boolean includeAmount, String teamName) {
+        return vacationHistoryRepository.findAllVacationInfoByTeamName(targetDate, includeAmount, teamName).stream()
+                .map(iVacationInfo -> calculateTotalVacationAmount(new VacationInfoDto(iVacationInfo), targetDate.toLocalDate()))
+                .collect(Collectors.toList());
     }
 
     public void update(VacationHistory vh) {

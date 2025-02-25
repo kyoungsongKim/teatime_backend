@@ -1,6 +1,8 @@
 package castis.domain.user.controller;
 
 import castis.domain.report.dto.ReportUserRequestDto;
+import castis.domain.security.jwt.AuthProvider;
+import castis.domain.user.CustomUserDetails;
 import castis.domain.user.dto.*;
 import castis.domain.user.entity.User;
 import castis.domain.user.service.UserService;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
+    private final AuthProvider authProvider;
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     @ResponseBody
@@ -94,9 +98,18 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public ResponseEntity<List<UserDto>> getUserList() {
-        List<UserDto> userList = userService.getUserDtoList();
-        return new ResponseEntity<>(userList, HttpStatus.OK);
+    public ResponseEntity<List<UserDto>> getUserList(HttpServletRequest httpServletRequest) {
+        CustomUserDetails userDetails = authProvider.getUserDetails(httpServletRequest);
+        if (userDetails.getRoles().contains("ROLE_ADMIN")) {
+            User user = userService.getUser(userDetails.getUserId());
+            List<UserDto> userList = userService.getUserTeamDtoList(user.getTeamName());
+            return new ResponseEntity<>(userList, HttpStatus.OK);
+        } else if (userDetails.getRoles().contains("ROLE_SUPER_ADMIN")) {
+            List<UserDto> userList = userService.getUserDtoList();
+            return new ResponseEntity<>(userList, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @RequestMapping(value = "/admins", method = RequestMethod.GET)

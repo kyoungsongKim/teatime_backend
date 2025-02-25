@@ -51,6 +51,10 @@ public class AgreementService {
                 .collect(Collectors.toList());
     }
 
+    public List<IUserAgreementInfo> getUserAgreementInfoByTeamNameList(String teamName) {
+        return agreementRepository.findUserAgreementInfoByTeamNameList(LocalDateTime.now().toLocalDate(), teamName);
+    }
+
     public List<IUserAgreementInfo> getUserAgreementInfoList() {
         return agreementRepository.findUserAgreementInfoList(LocalDateTime.now().toLocalDate());
     }

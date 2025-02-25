@@ -13,10 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,8 +47,17 @@ public class UserService {
         return userRepository.findAll();
     }
 
+
+    public List<UserDto> getUserTeamDtoList(String teamName) {
+        return userRepository.findByTeamName(teamName)
+                .stream()
+                .sorted(Comparator.comparing(User::getRealName))
+                .map(UserDto::new)
+                .collect(Collectors.toList());
+    }
+
     public List<UserDto> getUserDtoList() {
-        return userRepository.findAll().stream().map(UserDto::new).collect(Collectors.toList());
+        return userRepository.findAll().stream().sorted(Comparator.comparing(User::getRealName)).map(UserDto::new).collect(Collectors.toList());
     }
 
     public Boolean updatePassword(PasswordDto passwordDto) {

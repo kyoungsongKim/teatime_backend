@@ -7,7 +7,9 @@ import castis.domain.agreement.service.AgreementService;
 import castis.domain.filesystem.dto.FileMetaDto;
 import castis.domain.filesystem.service.FileSystemService;
 import castis.domain.security.jwt.AuthProvider;
+import castis.domain.user.CustomUserDetails;
 import castis.domain.user.dto.UserDto;
+import castis.domain.user.entity.User;
 import castis.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,8 +75,17 @@ public class AgreementController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        List<IUserAgreementInfo> result = agreementService.getUserAgreementInfoList();
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        CustomUserDetails userDetails = authProvider.getUserDetails(httpServletRequest);
+        if (userDetails.getRoles().contains("ROLE_ADMIN")) {
+            User user = userService.getUser(userDetails.getUserId());
+            List<IUserAgreementInfo> result = agreementService.getUserAgreementInfoByTeamNameList(user.getTeamName());
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else if (userDetails.getRoles().contains("ROLE_SUPER_ADMIN")) {
+            List<IUserAgreementInfo> result = agreementService.getUserAgreementInfoList();
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
     }
 
     @GetMapping(value = "/info/{userId}")

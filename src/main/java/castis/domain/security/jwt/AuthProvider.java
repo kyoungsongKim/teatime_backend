@@ -91,6 +91,11 @@ public class AuthProvider {
         return id;
     }
 
+    public CustomUserDetails getUserDetails(HttpServletRequest request) {
+        String token = resolveToken(request);
+        return (CustomUserDetails) getAuthentication(token).getPrincipal();
+    }
+
     public boolean isAdmin(HttpServletRequest request) {
         String token = resolveToken(request);
         CustomUserDetails user = (CustomUserDetails) getAuthentication(token).getPrincipal();

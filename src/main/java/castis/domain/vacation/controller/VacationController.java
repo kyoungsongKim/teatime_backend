@@ -1,5 +1,6 @@
 package castis.domain.vacation.controller;
 
+import castis.domain.agreement.entity.IUserAgreementInfo;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
@@ -117,9 +118,17 @@ public class VacationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        List<VacationInfoDto> result = vacationHistoryService.getAllVacationInfo(LocalDateTime.now(), false);
-
-        return ResponseEntity.ok().body(result);
+        CustomUserDetails userDetails = authProvider.getUserDetails(httpServletRequest);
+        if (userDetails.getRoles().contains("ROLE_ADMIN")) {
+            User user = userService.getUser(userDetails.getUserId());
+            List<VacationInfoDto> result = vacationHistoryService.getAllVacationInfoByTeamName(LocalDateTime.now(), false, user.getTeamName());
+            return ResponseEntity.ok().body(result);
+        } else if (userDetails.getRoles().contains("ROLE_SUPER_ADMIN")) {
+            List<VacationInfoDto> result = vacationHistoryService.getAllVacationInfo(LocalDateTime.now(), false);
+            return ResponseEntity.ok().body(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
     }
 
     @RequestMapping(path = "", method = RequestMethod.POST)

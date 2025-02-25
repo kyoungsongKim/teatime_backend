@@ -5,6 +5,8 @@ import java.time.LocalDate;
 public interface IVacationInfo {
     String getUserId();
 
+    String getRealName();
+
     Float getLeft();
 
     Float getUsed();

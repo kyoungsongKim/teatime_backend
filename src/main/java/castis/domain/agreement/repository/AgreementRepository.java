@@ -42,8 +42,6 @@ public interface AgreementRepository
     )
     IUserAgreementInfo findUserAgreementInfo(String userId, LocalDate minDate);
 
-
-
     @Query(
             nativeQuery = true,
             value = "SELECT " +
@@ -69,4 +67,30 @@ public interface AgreementRepository
                     "    u.realname"
     )
     List<IUserAgreementInfo> findUserAgreementInfoList(LocalDate minDate);
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT " +
+                    "    a.id AS id, " +
+                    "    u.userid AS userId, " +
+                    "    ud.avatar_img AS avatarImg, " +
+                    "    u.realname AS realName, " +
+                    "    COUNT(CASE WHEN a.end_date >= ?1 THEN a.user_id ELSE NULL END) AS currentAgreementCount, " +
+                    "    COUNT(a.user_id) AS totalAgreementCount, " +
+                    "    IFNULL(SUM(CASE WHEN a.type != 'GUARANTEE' AND a.end_date >= ?1 THEN a.amount ELSE 0 END), 0) AS totalAmount, " +
+                    "    IFNULL(SUM(CASE WHEN a.type = 'GUARANTEE' THEN a.amount ELSE 0 END), 0) AS guaranteeAmount " +
+                    "FROM " +
+                    "    users u " +
+                    "LEFT JOIN " +
+                    "    agreement a ON u.userid = a.user_id " +
+                    "LEFT JOIN " +
+                    "    user_details ud ON u.userid = ud.userid " +
+                    "WHERE " +
+                    "    u.teamname LIKE ?2 AND " +
+                    "    (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
+                    "GROUP BY " +
+                    "    u.userid, " +
+                    "    u.realname"
+    )
+    List<IUserAgreementInfo> findUserAgreementInfoByTeamNameList(LocalDate minDate, String teamName);
 }
