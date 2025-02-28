@@ -20,8 +20,10 @@ public class AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
 
-    public List<Attendance> getAttendance(String userId, LocalDate workDate) {
-        if (userId != null && workDate != null) {
+    public List<Attendance> getAttendance(String userId, LocalDate workDate, LocalDate endDate) {
+        if (userId != null && workDate != null && endDate != null) {
+            return attendanceRepository.findByUserIdAndWorkDateBetween(userId, workDate, endDate);
+        } else if (userId != null && workDate != null) {
             return attendanceRepository.findByUserIdAndWorkDate(userId, workDate);
         } else if (userId != null) {
             return attendanceRepository.findByUserId(userId);

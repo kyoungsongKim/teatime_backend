@@ -25,8 +25,10 @@ public class AttendanceController {
     @GetMapping
     public ResponseEntity<List<Attendance>> getAttendance(
             @RequestParam(required = false) String userId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate workDate) {
-        return ResponseEntity.ok(attendanceService.getAttendance(userId, workDate));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate workDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        return ResponseEntity.ok(attendanceService.getAttendance(userId, workDate, endDate));
     }
 
     @PostMapping
