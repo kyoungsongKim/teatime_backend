@@ -4,6 +4,7 @@ import castis.domain.report.dto.ReportEmailRequestDto;
 import castis.domain.report.dto.ReportRequestDto;
 import castis.domain.report.dto.ReportUserRequestDto;
 import castis.domain.report.dto.ReportUserResponseDto;
+import castis.domain.report.service.ReportService;
 import castis.domain.user.entity.User;
 import castis.domain.user.service.UserService;
 import castis.exception.custom.UserNotFoundException;
@@ -23,6 +24,8 @@ import java.util.*;
 public class ReportController {
 
     private final UserService userService;
+
+    private final ReportService reportService;
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     @ResponseBody
@@ -121,7 +124,7 @@ public class ReportController {
     public Map<String, Object> sendServiceRequestEmails(@RequestBody ReportEmailRequestDto req) throws Exception {
         String sendUserName = req.getSendUserName();
         User user = userService.findById(sendUserName).orElseThrow(() -> new UserNotFoundException("User Not Found"));
-        String title = "[업무보고] " + req.getTitle();
+        String title = req.getTitle();
         List<String> recvEmail = req.getReceiveEmail();
         String senderEmail = user.getEmail();
 
@@ -200,11 +203,14 @@ public class ReportController {
             Transport.send(message);
             response.put("isSuccess", true);
             log.info("send mail {} to {} success", sendUserName, senderEmail);
+
+            reportService.saveReport(sendUserName, recvEmail.toString(), title, builder.toString(), "Success");
         } catch (MessagingException mex) {
             log.error("{}", mex.getMessage());
             response.put("isSuccess", false);
             response.put("errorString", mex.getMessage());
             mex.printStackTrace();
+            reportService.saveReport(sendUserName, recvEmail.toString(), title, builder.toString(), "Fail");
         }
 
         return response;

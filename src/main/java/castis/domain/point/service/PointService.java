@@ -24,12 +24,11 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
-import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +39,9 @@ public class PointService {
     private final UserRepository userRepository;
     private final Environment environment;
     private final DonationService donationService;
+
+    private static final String CHARSET = "123456789ABCDEFGHJKLMNOPQRSTUVWXYZ";
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     public List<PointHistoryDto> findAllPointHistoryByRecver(String recver, String periodYear){
         List<PointHistoryDto> result = new ArrayList<>();
@@ -118,20 +120,20 @@ public class PointService {
     }
 
     public String savePointHistoryAndCodeReturn(String sender, String receiver, Integer point, String memo) {
-        UUID uuid = UUID.randomUUID();
-        long l = ByteBuffer.wrap(uuid.toString().getBytes()).getLong();
-        List<PointHistory> pointHistoryList = null;
-        String code = "";
+        String code;
+        List<PointHistory> pointHistoryList;
+
         do {
-            code = Long.toString(l, Character.MAX_RADIX);
-            code = code.toUpperCase().substring(0,4);
-            pointHistoryList = pointHistoryRepository.findByCodeAndRecver(code.toUpperCase(), receiver).orElse(null);
-        } while (pointHistoryList == null);
+            code = generateRandomCode();
+            pointHistoryList = pointHistoryRepository.findByCodeAndRecver(code, receiver).orElse(null);
+        } while (pointHistoryList != null && !pointHistoryList.isEmpty());
+
         PointHistory pointHistory = new PointHistory(sender, receiver, point, 0, memo, code);
-        if ( point < 0 ) {
+        if (point < 0) {
             pointHistory.setUseDate(LocalDateTime.now());
             pointHistory.setCode(code + "_COMPLETE");
         }
+
         pointHistoryRepository.save(pointHistory);
         return code;
     }
@@ -220,5 +222,13 @@ public class PointService {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(HttpStatus.NOT_FOUND);
+    }
+
+    private String generateRandomCode() {
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < 4; i++) {
+            code.append(CHARSET.charAt(RANDOM.nextInt(CHARSET.length())));
+        }
+        return code.toString();
     }
 }

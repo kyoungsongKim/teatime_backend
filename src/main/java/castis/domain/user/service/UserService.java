@@ -109,9 +109,11 @@ public class UserService {
         user.setRealName(dto.getRealName());
         user.setTeamName(dto.getTeamName());
         user.setPosition(dto.getPosition());
+        user.setDescription(dto.getDescription());
+
+        // 추후 제거
         user.setDailyReportList(dto.getDailyReportList());
         user.setVacationReportList(dto.getVacationReportList());
-        user.setDescription(dto.getDescription());
 
         userRepository.save(user);
 
@@ -127,6 +129,8 @@ public class UserService {
         userDetails.setEducationLevel(dto.getEducationLevel());
         userDetails.setSkillLevel(dto.getSkillLevel());
         userDetails.setCbankAccount(dto.getCbankAccount());
+        userDetails.setDailyReportList(dto.getDailyReportList());
+        userDetails.setVacationReportList(dto.getVacationReportList());
 
         userDetailsRepository.save(userDetails);
     }
