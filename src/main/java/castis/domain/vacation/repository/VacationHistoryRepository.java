@@ -110,4 +110,8 @@ public interface VacationHistoryRepository extends JpaRepository<VacationHistory
                         "WHERE userId = ?1 " +
                         "AND YEAR(eventStartDate) = ?2")
         List<VacationHistory> findAllByUserIdAndYear(String userId, int year);
+
+        // 특정 월 모든 유저의 휴가 기록 조회
+        @Query("SELECT v FROM VacationHistory v WHERE YEAR(v.eventStartDate) = :year AND MONTH(v.eventStartDate) = :month")
+        List<VacationHistory> findByMonth(int year, int month);
 }
