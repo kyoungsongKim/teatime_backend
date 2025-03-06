@@ -5,6 +5,7 @@ import castis.domain.vacation.entity.VacationHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -112,6 +113,9 @@ public interface VacationHistoryRepository extends JpaRepository<VacationHistory
         List<VacationHistory> findAllByUserIdAndYear(String userId, int year);
 
         // 특정 월 모든 유저의 휴가 기록 조회
-        @Query("SELECT v FROM VacationHistory v WHERE YEAR(v.eventStartDate) = :year AND MONTH(v.eventStartDate) = :month")
-        List<VacationHistory> findByMonth(int year, int month);
+        @Query("SELECT v FROM VacationHistory v " +
+                "JOIN User u ON v.userId = u.id " +
+                "WHERE YEAR(v.eventStartDate) = :year AND MONTH(v.eventStartDate) = :month " +
+                "AND (:teamName IS NULL OR :teamName = '' OR u.teamName = :teamName)")
+        List<VacationHistory> findByMonth(int year, int month, @Param("teamName") String teamName);
 }

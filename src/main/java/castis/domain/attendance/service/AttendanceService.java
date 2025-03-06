@@ -75,10 +75,16 @@ public class AttendanceService {
         }
     }
 
-    public List<Map<String, Object>> getMonthlyAttendance(int year, int month, List<HolidayDto> holidays) throws IOException {
-        List<User> allUsers = userRepository.findAll(); // 전체 사용자 조회
-        List<AttendanceSummaryDto> attendanceRecords = attendanceRepository.findByMonthWithUser(year, month);
-        List<VacationHistory> vacationRecords = vacationHistoryRepository.findByMonth(year, month);
+    public List<Map<String, Object>> getMonthlyAttendance(int year, int month, List<HolidayDto> holidays, String teamName) {
+        List<User> allUsers;
+        // teamName이 공백이 아니면 해당 팀 사용자만 조회
+        if (teamName != null && !teamName.trim().isEmpty()) {
+            allUsers = userRepository.findByTeamName(teamName);
+        } else {
+            allUsers = userRepository.findAll(); // 전체 사용자 조회
+        }
+        List<AttendanceSummaryDto> attendanceRecords = attendanceRepository.findByMonthWithUser(year, month, teamName);
+        List<VacationHistory> vacationRecords = vacationHistoryRepository.findByMonth(year, month, teamName);
 
         // 공휴일을 Set으로 저장 (빠른 검색을 위해)
         Set<LocalDate> holidaySet = holidays.stream()
