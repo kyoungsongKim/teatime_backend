@@ -51,9 +51,9 @@ public class MoneyCheckDto {
         this.userName = user.getUserName();
         this.realName = user.getRealName();
         this.teamName = user.getTeamName();
-        this.email = user.getEmail();
-        this.cbankAccount = user.getCbankAccount();
-        this.cbankId = user.getCbankId();
+        this.email = user.getUserDetails().getEmail();
+        this.cbankAccount = user.getUserDetails().getCbankAccount();
+        this.cbankId = user.getUserDetails().getCbankId();
         this.defaultRSrate="";
         this.selfDecidedMoney="";
         this.emergencyPersonService="X";

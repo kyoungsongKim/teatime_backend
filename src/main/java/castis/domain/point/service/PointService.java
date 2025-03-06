@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,18 +55,18 @@ public class PointService {
             query.orderBy(orders);
 
             List<Predicate> predicates = new ArrayList<>();
-            if (recver != null && !"".equals(recver)) {
+            if (recver != null && !recver.isEmpty()) {
                 predicates.add(cb.equal(con.get("recver"), recver));
             }
-            if (periodYear != null && !"".equals(periodYear)) {
+            if (periodYear != null && !periodYear.isEmpty()) {
                 LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(periodYear), 1, 1, 0, 0);
                 LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(periodYear), 12, 31, 23, 59);
                 predicates.add(cb.between(con.get("createDate"), startDate, endDate));
             }
 
-            return predicates.size() > 0 ? cb.and(predicates.toArray(new Predicate[predicates.size()])) : null;
+            return !predicates.isEmpty() ? cb.and(predicates.toArray(new Predicate[0])) : null;
         };
-        List<PointHistory> list = pointHistoryRepository.findAll(spec).stream().collect(Collectors.toList());
+        List<PointHistory> list = new ArrayList<>(pointHistoryRepository.findAll(spec));
         list.forEach(i -> {
             result.add(new PointHistoryDto(i));
         });
@@ -90,9 +91,8 @@ public class PointService {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             String username = userDetails.getUsername();
             List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeAndRecver(code.toUpperCase(), username).orElse(null);
-            if(pointHistoryList != null && pointHistoryList.size() > 0) {
-                PointHistory pointHistory = pointHistoryList.get(0);
-                return pointHistory;
+            if(pointHistoryList != null && !pointHistoryList.isEmpty()) {
+                return pointHistoryList.get(0);
             }
         }
         return null;
@@ -100,9 +100,9 @@ public class PointService {
 
     public PointHistory getLastReceivePointHistory(String recver) {
         List<PointHistory> pointHistoryList = pointHistoryRepository.findAllByRecverOrderByCreateDateDesc(recver).orElse(null);
-        if(pointHistoryList != null && pointHistoryList.size() > 0) {
+        if(pointHistoryList != null && !pointHistoryList.isEmpty()) {
             for ( PointHistory ph : pointHistoryList ) {
-                if ( (ph.getCode().equalsIgnoreCase("LEVEL_UP") || ph.getCode().equalsIgnoreCase("AUTO")) == false) {
+                if (!(ph.getCode().equalsIgnoreCase("LEVEL_UP") || ph.getCode().equalsIgnoreCase("AUTO"))) {
                     return ph;
                 }
             }
@@ -159,9 +159,7 @@ public class PointService {
         int totalPoint = 0;
         List<PointHistoryDto> pointHistoryDtoList = findAllPointHistory();
         if (pointHistoryDtoList != null) {
-            Iterator<PointHistoryDto> phIterrator = pointHistoryDtoList.iterator();
-            while (phIterrator.hasNext()) {
-                PointHistoryDto curDto = phIterrator.next();
+            for (PointHistoryDto curDto : pointHistoryDtoList) {
                 if (curDto != null) {
                     if (curDto.getRecver().equalsIgnoreCase(userId) && curDto.getUseDate() != null) {
                         totalPoint += curDto.getPoint();
@@ -173,50 +171,53 @@ public class PointService {
     }
 
     @Transactional
-    public ResponseEntity updatePointHistoryComplete(String code, String userName) throws Exception {
+    public ResponseEntity updatePointHistoryComplete(String code, String userName) {
         code = code.toUpperCase();
         if (code.contains("LEVEL_UP") || code.contains("AUTO")) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         List<PointHistory> pointHistoryList = pointHistoryRepository.findByCodeAndRecver(code.toUpperCase(), userName).orElse(null);
-        if(pointHistoryList != null && pointHistoryList.size() > 0) {
+        if(pointHistoryList != null && !pointHistoryList.isEmpty()) {
             PointHistory pointHistory = pointHistoryList.get(0);
 
             //cbank 기준 sender
             User sender = userRepository.findById(pointHistory.getRecver()).orElse(null);
             if(sender != null) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("userId", sender.getCbankId());
-                jsonObject.put("companyId", environment.getProperty("cbank.companyId"));
-                ResponseEntity<OtpDTO> res = new RestTemplate().postForEntity(environment.getProperty("cbank.openApi.otp.url")
-                        , jsonObject, OtpDTO.class);
-                //cbank 기준 receiver
-                User receiver = userRepository.findById(pointHistory.getSender()).orElse(null);
-                if(receiver != null) {
-                    jsonObject = new JSONObject();
-                    jsonObject.put("userId", sender.getCbankId());
-                    DonationDto donationDto = donationService.findByCbankId(sender.getCbankId());
-                    if (donationDto != null) {
-                        jsonObject.put("sendAccountPwd", donationDto.getCbankPass());
-                        jsonObject.put("recvAccountId", donationDto.getDonationAccount());
-                    }
-                    jsonObject.put("sendAccountId", sender.getCbankAccount());
-                    jsonObject.put("amount", pointHistory.getPoint());
-                    jsonObject.put("transferHistory", "기부금(" + pointHistory.getMemo() +")");
-                    jsonObject.put("otp", res.getBody().getOtp());
-                    jsonObject.put("memo", "");
+                castis.domain.user.entity.UserDetails userDetails = sender.getUserDetails();
+                if(userDetails != null) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("userId", userDetails.getCbankId());
+                    jsonObject.put("companyId", environment.getProperty("cbank.companyId"));
+                    ResponseEntity<OtpDTO> res = new RestTemplate().postForEntity(Objects.requireNonNull(environment.getProperty("cbank.openApi.otp.url"))
+                            , jsonObject, OtpDTO.class);
+                    //cbank 기준 receiver
+                    User receiver = userRepository.findById(pointHistory.getSender()).orElse(null);
+                    if(receiver != null) {
+                        jsonObject = new JSONObject();
+                        jsonObject.put("userId", userDetails.getCbankId());
+                        DonationDto donationDto = donationService.findByCbankId(userDetails.getCbankId());
+                        if (donationDto != null) {
+                            jsonObject.put("sendAccountPwd", donationDto.getCbankPass());
+                            jsonObject.put("recvAccountId", donationDto.getDonationAccount());
+                        }
+                        jsonObject.put("sendAccountId", userDetails.getCbankAccount());
+                        jsonObject.put("amount", pointHistory.getPoint());
+                        jsonObject.put("transferHistory", "기부금(" + pointHistory.getMemo() +")");
+                        jsonObject.put("otp", res.getBody().getOtp());
+                        jsonObject.put("memo", "");
 
-                    ResponseEntity<TransferDTO> result = new RestTemplate().postForEntity(environment.getProperty("cbank.openApi.transfer.url")
-                            , jsonObject, TransferDTO.class);
+                        ResponseEntity<TransferDTO> result = new RestTemplate().postForEntity(Objects.requireNonNull(environment.getProperty("cbank.openApi.transfer.url"))
+                                , jsonObject, TransferDTO.class);
 
-                    if(!result.getBody().getResultCode().equals("200")) {
-                        new ResponseEntity(result.getBody().getResultMsg(), HttpStatus.BAD_REQUEST);
+                        if(!Objects.requireNonNull(result.getBody()).getResultCode().equals("200")) {
+                            new ResponseEntity(result.getBody().getResultMsg(), HttpStatus.BAD_REQUEST);
+                        }
+                        pointHistory.setCode(code + "_COMPLETE");
+                        pointHistory.setPoint(pointHistory.getPoint() * 100);
+                        pointHistory.setUseDate(LocalDateTime.now());
+                        pointHistoryRepository.save(pointHistory);
+                        return new ResponseEntity(HttpStatus.OK);
                     }
-                    pointHistory.setCode(code + "_COMPLETE");
-                    pointHistory.setPoint(pointHistory.getPoint() * 100);
-                    pointHistory.setUseDate(LocalDateTime.now());
-                    pointHistoryRepository.save(pointHistory);
-                    return new ResponseEntity(HttpStatus.OK);
                 }
             }
             return new ResponseEntity(HttpStatus.NOT_FOUND);

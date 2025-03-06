@@ -2,6 +2,7 @@ package castis.scheduler;
 
 import castis.domain.user.dto.UserDto;
 import castis.domain.user.entity.User;
+import castis.domain.user.entity.UserDetails;
 import castis.domain.user.service.UserService;
 import castis.domain.vacation.dto.VacationHistoryDto;
 import castis.domain.vacation.service.VacationHistoryService;
@@ -52,7 +53,7 @@ public class VacationScheduler {
         String sendUserName = vacationHistory.getUserId();
         Optional<User> userTemp = userService.findById(sendUserName);
         User user = null;
-        if (userTemp.isPresent() == false) {
+        if (!userTemp.isPresent()) {
             log.error("get user info fail [sendUserName={}]", sendUserName);
             return false;
         } else {
@@ -80,17 +81,22 @@ public class VacationScheduler {
                 .append(
                         "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.(http://teatime.castis.net/)</font>");
 
-        String vacationEmails = user.getVacationReportList();
+        UserDetails userDetails = user.getUserDetails();
+        if (userDetails == null) {
+            log.error("userDetails is null [sendUserName={}]", sendUserName);
+            return false;
+        }
+        String vacationEmails = userDetails.getVacationReportList();
         List<UserDto> admins = userService.getAdminList();
-        String adminEmails = admins.stream().map(admin -> admin.getEmail())
+        String adminEmails = admins.stream().map(UserDto::getEmail)
                 .reduce((emails, admin) -> emails + "," + admin).get();
-        vacationEmails = vacationEmails.length() == 0 ? adminEmails : vacationEmails + "," + adminEmails;
+        vacationEmails = vacationEmails.isEmpty() ? adminEmails : vacationEmails + "," + adminEmails;
         try {
             InternetAddress from = new InternetAddress("kskim@castis.com",
                     MimeUtility.encodeText("사람사업부 전산시스템", "UTF-8", "B"));
             InternetAddress[] addresses = InternetAddress.parse(vacationEmails);
             emailService.sendEmail(title, builder.toString(), from, addresses,
-                    new InternetAddress(user.getEmail()));
+                    new InternetAddress(userDetails.getEmail()));
             log.info("send mail {} to {} success", sendUserName, vacationEmails);
         } catch (MessagingException | UnsupportedEncodingException mex) {
             log.error("{}", mex.getMessage());

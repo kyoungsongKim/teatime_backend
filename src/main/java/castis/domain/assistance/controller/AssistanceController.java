@@ -1,6 +1,7 @@
 
 package castis.domain.assistance.controller;
 
+import castis.domain.user.entity.UserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import castis.domain.assistance.constant.AppliedAssistanceStatus;
-import castis.domain.assistance.dto.ApplyAssistanceBody;
 import castis.domain.assistance.dto.AssistanceDto;
 import castis.domain.assistance.dto.CreateAssistanceSuggestionBody;
 import castis.domain.assistance.entity.Assistance;
@@ -80,11 +80,8 @@ public class AssistanceController {
         InternetAddress from = new InternetAddress("kskim@castis.com",
                 MimeUtility.encodeText("사람사업부 전산시스템", "UTF-8", "B"));
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("<font style=\"font-family: 맑은 고딕; font-size:10pt\">" + suggestion.getContent());
-        builder.append(
-                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>");
-        String content = builder.toString();
+        String content = "<font style=\"font-family: 맑은 고딕; font-size:10pt\">" + suggestion.getContent() +
+                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>";
 
         admins.forEach(admin -> {
             try {
@@ -135,8 +132,10 @@ public class AssistanceController {
         assistanceApplyService.applyAssistance(assistanceApply);
 
         User messageTargetAdmin = targetAssistance.getMessageTargetAdmin();
-        if (messageTargetAdmin.getCellphone() != null && messageTargetAdmin.getCellphone().length() > 0) {
-            kakaoMessagingService.sendAssistanceApplyMessage(messageTargetAdmin.getCellphone(),
+
+        UserDetails userDetails = messageTargetAdmin.getUserDetails();
+        if (userDetails != null &&  userDetails.getCellphone() != null && !userDetails.getCellphone().isEmpty()) {
+            kakaoMessagingService.sendAssistanceApplyMessage(userDetails.getCellphone(),
                     applier.getRealName(), targetAssistance.getName());
         }
         List<UserDto> admins = userService.getAdminList();
@@ -144,13 +143,9 @@ public class AssistanceController {
         InternetAddress from = new InternetAddress("kskim@castis.com",
                 MimeUtility.encodeText("사람사업부 전산시스템", "UTF-8", "B"));
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("<font style=\"font-family: 맑은 고딕; font-size:10pt\">(" + user.getUsername() + ")님께서<br>("
-                + targetAssistance.getName() + ")를 신청하셨습니다.");
-        builder.append(
-                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>");
-
-        String mailContent = builder.toString();
+        String mailContent = "<font style=\"font-family: 맑은 고딕; font-size:10pt\">(" + user.getUsername() + ")님께서<br>("
+                + targetAssistance.getName() + ")를 신청하셨습니다." +
+                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>";
         admins.forEach(admin -> {
             try {
                 emailService.sendEmail("[비서서비스 요청알림]", mailContent, from, InternetAddress.parse(admin.getEmail()));

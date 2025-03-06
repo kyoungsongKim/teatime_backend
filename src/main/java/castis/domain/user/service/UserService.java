@@ -86,10 +86,14 @@ public class UserService {
         user.setUserName(updateDto.getName());
         user.setTeamName(updateDto.getTeam());
         user.setPosition(updateDto.getPosition());
-        user.setCellphone(updateDto.getPhone());
-        user.setEmail(updateDto.getEmail());
-        user.setDailyReportList(updateDto.getReportEmail());
-        user.setVacationReportList(updateDto.getVacationReportList());
+
+        UserDetails userDetails = userDetailsRepository.findById(updateDto.getId()).orElse(new UserDetails());
+
+        userDetailsRepository.save(userDetails);
+        userDetails.setCellphone(updateDto.getPhone());
+        userDetails.setEmail(updateDto.getEmail());
+        userDetails.setDailyReportList(updateDto.getReportEmail());
+        userDetails.setVacationReportList(updateDto.getVacationReportList());
 
         // 데이터 등록(저장)
         userRepository.save(user);
@@ -110,15 +114,9 @@ public class UserService {
         user.setTeamName(dto.getTeamName());
         user.setPosition(dto.getPosition());
         user.setDescription(dto.getDescription());
-
-        // 추후 제거
-        user.setDailyReportList(dto.getDailyReportList());
-        user.setVacationReportList(dto.getVacationReportList());
-
         userRepository.save(user);
 
-        UserDetails userDetails = userDetailsRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자가 존재하지 않습니다."));
+        UserDetails userDetails = userDetailsRepository.findById(dto.getUserId()).orElse(new UserDetails());
 
         userDetails.setUserId(dto.getUserId());
         userDetails.setCellphone(dto.getCellphone());

@@ -36,11 +36,11 @@ public class UserDto implements Serializable {
         this.description = user.getDescription();
         this.teamName = user.getTeamName();
         this.position = user.getPosition();
-        this.cellphone = user.getCellphone();
-        this.email = user.getEmail();
-        this.dailyReportList = user.getDailyReportList();
-        this.renewalDate = user.getRenewalDate();
-        this.vacationReportList = user.getVacationReportList();
         this.userDetails = user.getUserDetails();
+        this.cellphone = userDetails.getCellphone();
+        this.email = userDetails.getEmail();
+        this.dailyReportList = userDetails.getDailyReportList();
+        this.renewalDate = userDetails.getRenewalDate();
+        this.vacationReportList = userDetails.getVacationReportList();
     }
 }

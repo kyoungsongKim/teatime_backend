@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Service("signService")
 @Slf4j
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class SignService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserDetailsRepository userDetailsRepository;
 
+    @Transactional
     public Boolean regMember(JoinDto joinDto) {
 
         // 아이디 중복체크
@@ -67,10 +70,10 @@ public class SignService {
                 .realName(user.getRealName())
                 .teamName(user.getTeamName())
                 .position(user.getPosition())
-                .cellphone(user.getCellphone())
-                .email(user.getEmail())
-                .dailyReportList(user.getDailyReportList())
-                .vacationReportList(user.getVacationReportList())
+                .cellphone(user.getUserDetails().getCellphone())
+                .email(user.getUserDetails().getEmail())
+                .dailyReportList(user.getUserDetails().getDailyReportList())
+                .vacationReportList(user.getUserDetails().getVacationReportList())
                 .build();
     }
 

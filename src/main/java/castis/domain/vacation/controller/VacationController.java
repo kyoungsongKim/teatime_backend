@@ -1,9 +1,8 @@
 package castis.domain.vacation.controller;
 
-import castis.domain.agreement.entity.IUserAgreementInfo;
+import castis.domain.user.entity.UserDetails;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Arrays;
 import java.util.List;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,7 +25,6 @@ import castis.domain.vacation.dto.VacationHistoryDto;
 import castis.domain.vacation.dto.VacationInfoDto;
 import castis.domain.vacation.entity.VacationHistory;
 import castis.domain.vacation.service.VacationHistoryService;
-import castis.enums.UserRole;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,11 +39,16 @@ public class VacationController {
     public ResponseEntity<MyVacationResponse> getVacationInfo(HttpServletRequest httpServletRequest,
             @RequestParam(name = "userId", required = true) String userId,
             @RequestParam(name = "workedYear", required = false) Byte workedYear) {
+        if(userId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
         String id = authProvider.getUserIdFromRequest(httpServletRequest);
         boolean isAdmin = authProvider.isAdmin(httpServletRequest);
 
         User foundUser = userService.getUser(userId);
-        if (foundUser.getRenewalDate() == null) {
+        UserDetails userDetails = foundUser.getUserDetails();
+        if (userDetails == null || userDetails.getRenewalDate() == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 
@@ -53,7 +56,7 @@ public class VacationController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
-        LocalDate renewalDate = foundUser.getRenewalDate();
+        LocalDate renewalDate = userDetails.getRenewalDate();
 
         List<Byte> workedYearList = new ArrayList<Byte>();
         int currentYear = Year.now().getValue();
@@ -101,7 +104,8 @@ public class VacationController {
         boolean isAdmin = authProvider.isAdmin(httpServletRequest);
 
         User foundUser = userService.getUser(userId);
-        if (foundUser.getRenewalDate() == null) {
+        UserDetails userDetails = foundUser.getUserDetails();
+        if (userDetails == null || userDetails.getRenewalDate() == null) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
         }
 

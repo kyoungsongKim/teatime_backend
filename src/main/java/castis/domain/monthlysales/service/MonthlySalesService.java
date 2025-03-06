@@ -4,6 +4,7 @@ import castis.domain.monthlysales.dto.*;
 import castis.domain.monthlysales.entity.MonthlySales;
 import castis.domain.monthlysales.repository.MonthlySalesRepository;
 import castis.domain.user.entity.User;
+import castis.domain.user.entity.UserDetails;
 import castis.domain.user.service.UserService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,19 +68,22 @@ public class MonthlySalesService {
         }
 
         public List<Integer> getYearListHasMonthlySales(String userName) {
-                List<Integer> result = monthlySalesRepository.findAllYearByUser_Id(userName);
-                return result;
+            return monthlySalesRepository.findAllYearByUser_Id(userName);
         }
 
         public List<CBankHistoryDto> getCBankHistory(String userId, int year, int month)
                         throws EntityNotFoundException, IllegalArgumentException {
 
                 User user = userService.getUser(userId);
-                if (user.getCbankId() == null || user.getCbankAccount() == null) {
+                UserDetails userDetails = user.getUserDetails();
+                if (userDetails == null) {
+                        throw new IllegalArgumentException("user's details is empty");
+                }
+                if (userDetails.getCbankId() == null || userDetails.getCbankAccount() == null) {
                         throw new IllegalArgumentException("user's cbank information is empty");
                 }
                 CBankOtpRequestDto otpRequestBody = new CBankOtpRequestDto();
-                otpRequestBody.setUserId(user.getCbankId());
+                otpRequestBody.setUserId(userDetails.getCbankId());
                 otpRequestBody.setCompanyId(cbankCompanyId);
 
                 CBankOtpResponseDto otpResponse = otpClient.post().bodyValue(otpRequestBody)
@@ -88,8 +92,8 @@ public class MonthlySalesService {
                                 .block();
 
                 CBankHistoryRequestDto historyRequestBody = new CBankHistoryRequestDto();
-                historyRequestBody.setAccountId(user.getCbankAccount());
-                historyRequestBody.setUserId(user.getCbankId());
+                historyRequestBody.setAccountId(userDetails.getCbankAccount());
+                historyRequestBody.setUserId(userDetails.getCbankId());
 
                 LocalDateTime end = LocalDateTime.of(year, month, 25, 0, 0);
                 LocalDateTime start = end.minusMonths(1).plusDays(1);

@@ -3,6 +3,7 @@ package castis.domain.monthlysales.controller;
 import castis.domain.monthlysales.dto.CBankHistoryDto;
 import castis.domain.monthlysales.service.MonthlySalesService;
 import castis.domain.user.entity.User;
+import castis.domain.user.entity.UserDetails;
 import castis.domain.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
@@ -35,12 +36,13 @@ public class MonthlySalesController {
         List<CBankHistoryDto> result = monthlySalesService.getCBankHistory(userId, today.getYear(),
                 today.getMonthValue());
         User user = userService.getUser(userId);
+        UserDetails userDetails = user.getUserDetails();
         float totalSales = 0f;
-        if (result.size() > 0) {
-            totalSales = result.stream().filter(history -> history.getRecvAccount().equals(user.getCbankAccount()))
+        if (userDetails != null && !result.isEmpty()) {
+            totalSales = result.stream().filter(history -> history.getRecvAccount().equals(userDetails.getCbankAccount()))
                     .map(history -> Float.parseFloat(history.getAmount())).reduce(
-                            totalSales, (a, b) -> a + b);
+                            totalSales, Float::sum);
         }
-        return new ResponseEntity<String>(String.format("%.2f CAS", totalSales), HttpStatus.OK);
+        return new ResponseEntity<>(String.format("%.2f CAS", totalSales), HttpStatus.OK);
     }
 }

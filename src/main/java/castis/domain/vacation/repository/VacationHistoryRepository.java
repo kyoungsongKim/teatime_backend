@@ -41,44 +41,46 @@ public interface VacationHistoryRepository extends JpaRepository<VacationHistory
 
         /**
          * 전체 사용자에 대한 휴가 사용 정보 조회
-         * targetDate 기준으로 사용된 휴가를 포함할지 여부 결정 (includeAmount)
          */
         @Query(nativeQuery = true, value =
-                "SELECT u.userId, u.realname, v.used, u.renewaldate " +
+                "SELECT u.userId, u.realname, v.used, d.renewaldate " +
                         "FROM users u " +
+                        "JOIN user_details d ON u.userId = d.userId " +
                         "LEFT JOIN ( " +
                         "   SELECT SUM(amount) AS used, userId " +
-                        "   FROM vacation_history NATURAL JOIN users " +
+                        "   FROM vacation_history v " +
+                        "   JOIN user_details d ON v.userId = d.userId " +
                         "   WHERE ( " +
-                        "       DATE_FORMAT(renewaldate, CONCAT(YEAR(?1) - 1 + " +
-                        "       (DATE_FORMAT(renewaldate, '%Y-%m-%d 00:00:00') <= ?1), '-%m-%d 00:00:00')) <= " +
-                        "       IF(?2, DATE_ADD(eventStartDate, INTERVAL amount DAY), eventStartDate) " +
-                        "       AND eventStartDate < DATE_FORMAT(renewaldate, CONCAT(YEAR(?1) + " +
-                        "       (DATE_FORMAT(renewaldate, '%Y-%m-%d 00:00:00') <= ?1), '-%m-%d 00:00:00')) " +
+                        "       DATE_FORMAT(d.renewaldate, CONCAT(YEAR(?1) - 1 + " +
+                        "       (DATE_FORMAT(d.renewaldate, '%Y-%m-%d 00:00:00') <= ?1), '-%m-%d 00:00:00')) <= " +
+                        "       IF(?2, DATE_ADD(v.eventStartDate, INTERVAL amount DAY), v.eventStartDate) " +
+                        "       AND v.eventStartDate < DATE_FORMAT(d.renewaldate, CONCAT(YEAR(?1) + " +
+                        "       (DATE_FORMAT(d.renewaldate, '%Y-%m-%d 00:00:00') <= ?1), '-%m-%d 00:00:00')) " +
                         "   ) " +
-                        "   GROUP BY userId " +
+                        "   GROUP BY v.userId " +
                         ") v ON u.userId = v.userId " +
                         "ORDER BY u.realname")
         List<IVacationInfo> findAllVacationInfo(LocalDateTime targetDate, boolean includeAmount);
 
         /**
          * 같은 팀 사용자에 대한 휴가 사용 정보 조회
-         * targetDate 기준으로 사용된 휴가를 포함할지 여부 결정 (includeAmount)
          */
         @Query(nativeQuery = true, value =
-                "SELECT u.userId, u.realname, v.used, u.renewaldate " +
+                "SELECT u.userId, u.realname, COALESCE(v.used, 0) AS used, d.renewaldate " +
                         "FROM users u " +
+                        "JOIN user_details d ON u.userId = d.userId " +
                         "LEFT JOIN ( " +
-                        "   SELECT SUM(amount) AS used, userId " +
-                        "   FROM vacation_history NATURAL JOIN users " +
+                        "   SELECT SUM(v.amount) AS used, v.userId " +
+                        "   FROM vacation_history v " +
+                        "   JOIN user_details d ON v.userId = d.userId " +
                         "   WHERE ( " +
-                        "       DATE_FORMAT(renewaldate, CONCAT(YEAR(?1) - 1 + " +
-                        "       (DATE_FORMAT(renewaldate, '%Y-%m-%d 00:00:00') <= ?1), '-%m-%d 00:00:00')) <= " +
-                        "       IF(?2, DATE_ADD(eventStartDate, INTERVAL amount DAY), eventStartDate) " +
-                        "       AND eventStartDate < DATE_FORMAT(renewaldate, CONCAT(YEAR(?1) + " +
+                        "       DATE_FORMAT(d.renewaldate, CONCAT(YEAR(?1) - 1 + " +
+                        "       (DATE_FORMAT(d.renewaldate, '%Y-%m-%d 00:00:00') <= ?1), '-%m-%d 00:00:00')) <= " +
+                        "       IF(?2, DATE_ADD(v.eventStartDate, INTERVAL amount DAY), v.eventStartDate) " +
+                        "       AND v.eventStartDate < DATE_FORMAT(d.renewaldate, CONCAT(YEAR(?1) + " +
                         "       (DATE_FORMAT(renewaldate, '%Y-%m-%d 00:00:00') <= ?1), '-%m-%d 00:00:00')) " +
                         "   ) " +
-                        "   GROUP BY userId " +
+                        "   GROUP BY v.userId " +
                         ") v ON u.userId = v.userId " +
                         "WHERE u.teamname = ?3 " +
                         "ORDER BY u.realname")
@@ -86,18 +88,18 @@ public interface VacationHistoryRepository extends JpaRepository<VacationHistory
 
         /**
          * 특정 사용자의 휴가 사용 정보 조회
-         * targetDate 기준으로 사용된 휴가를 포함할지 여부 결정 (includeAmount)
          */
         @Query(nativeQuery = true, value =
-                "SELECT userId, SUM(amount) AS used, renewaldate " +
-                        "FROM vacation_history NATURAL JOIN users " +
-                        "WHERE userId = ?1 " +
+                "SELECT v.userId, SUM(v.amount) AS used, d.renewaldate " +
+                        "FROM vacation_history v " +
+                        "JOIN user_details d ON v.userId = d.userId " +
+                        "WHERE v.userId = ?1 " +
                         "AND ( " +
-                        "   DATE_FORMAT(renewaldate, CONCAT(YEAR(?2) - 1 + " +
-                        "   (DATE_FORMAT(renewaldate, '%Y-%m-%d 00:00:00') <= ?2), '-%m-%d 00:00:00')) <= " +
-                        "   IF(?3, DATE_ADD(eventStartDate, INTERVAL amount DAY), eventStartDate) " +
-                        "   AND eventStartDate < DATE_FORMAT(renewaldate, CONCAT(YEAR(?2) + " +
-                        "   (DATE_FORMAT(renewaldate, '%Y-%m-%d 00:00:00') <= ?2), '-%m-%d 00:00:00')) " +
+                        "   DATE_FORMAT(d.renewaldate, CONCAT(YEAR(?2) - 1 + " +
+                        "   (DATE_FORMAT(d.renewaldate, '%Y-%m-%d 00:00:00') <= ?2), '-%m-%d 00:00:00')) <= " +
+                        "   IF(?3, DATE_ADD(v.eventStartDate, INTERVAL v.amount DAY), v.eventStartDate) " +
+                        "   AND v.eventStartDate < DATE_FORMAT(d.renewaldate, CONCAT(YEAR(?2) + " +
+                        "   (DATE_FORMAT(d.renewaldate, '%Y-%m-%d 00:00:00') <= ?2), '-%m-%d 00:00:00')) " +
                         ")")
         Optional<IVacationInfo> findVacationInfo(
                 String userId, LocalDateTime targetDate, boolean includeAmount
@@ -112,10 +114,15 @@ public interface VacationHistoryRepository extends JpaRepository<VacationHistory
                         "AND YEAR(eventStartDate) = ?2")
         List<VacationHistory> findAllByUserIdAndYear(String userId, int year);
 
-        // 특정 월 모든 유저의 휴가 기록 조회
+        // 특정 월 모든 유저의 휴가 기록 조회 (teamName 필터 추가)
         @Query("SELECT v FROM VacationHistory v " +
                 "JOIN User u ON v.userId = u.id " +
+                "JOIN UserDetails d ON u.id = d.userId " +
                 "WHERE YEAR(v.eventStartDate) = :year AND MONTH(v.eventStartDate) = :month " +
                 "AND (:teamName IS NULL OR :teamName = '' OR u.teamName = :teamName)")
-        List<VacationHistory> findByMonth(int year, int month, @Param("teamName") String teamName);
+        List<VacationHistory> findByMonth(
+                @Param("year") int year,
+                @Param("month") int month,
+                @Param("teamName") String teamName
+        );
 }

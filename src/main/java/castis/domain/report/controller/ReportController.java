@@ -6,6 +6,7 @@ import castis.domain.report.dto.ReportUserRequestDto;
 import castis.domain.report.dto.ReportUserResponseDto;
 import castis.domain.report.service.ReportService;
 import castis.domain.user.entity.User;
+import castis.domain.user.entity.UserDetails;
 import castis.domain.user.service.UserService;
 import castis.exception.custom.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +36,8 @@ public class ReportController {
         if (userInfo.isPresent()) {
             ReportUserResponseDto reportUserResponseDto = new ReportUserResponseDto();
             reportUserResponseDto.setSendUserName(userInfo.get().getUserName());
-            reportUserResponseDto.setReceiveEmail(userInfo.get().getDailyReportList());
-            reportUserResponseDto.setSenderEmail(userInfo.get().getEmail());
+            reportUserResponseDto.setReceiveEmail(userInfo.get().getUserDetails().getDailyReportList());
+            reportUserResponseDto.setSenderEmail(userInfo.get().getUserDetails().getEmail());
 
             return ResponseEntity.ok().body(reportUserResponseDto);
         } else {
@@ -124,9 +125,13 @@ public class ReportController {
     public Map<String, Object> sendServiceRequestEmails(@RequestBody ReportEmailRequestDto req) throws Exception {
         String sendUserName = req.getSendUserName();
         User user = userService.findById(sendUserName).orElseThrow(() -> new UserNotFoundException("User Not Found"));
+        UserDetails userDetails = user.getUserDetails();
+        if (userDetails == null) {
+            throw new UserNotFoundException("UserDetail Not Found");
+        }
         String title = req.getTitle();
         List<String> recvEmail = req.getReceiveEmail();
-        String senderEmail = user.getEmail();
+        String senderEmail = userDetails.getEmail();
 
         log.info("send mail sendServiceRequestEmail, sendUserName:{} recvEmail:{} title:{}", sendUserName, recvEmail,
                 title);

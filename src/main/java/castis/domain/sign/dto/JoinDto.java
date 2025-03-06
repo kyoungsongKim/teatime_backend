@@ -47,10 +47,6 @@ public class JoinDto {
                 .password(password)
                 .teamName(team)
                 .position(position == null ? "" : position)
-                .cellphone(phone == null ? "" : phone)
-                .email(email)
-                .dailyReportList(reportEmail == null ? "" : reportEmail)
-                .vacationReportList(reportEmail == null ? "" : reportEmail)
                 .build();
 
         return build;

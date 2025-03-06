@@ -22,7 +22,7 @@ public class CustomUserDetailService implements UserDetailsService {
         User entity = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("존재하지 않는 회원의 정보입니다."));
 
-        UserDetails member = new CustomUserDetails(entity.getId(), entity.getEmail(), "USER");
+        UserDetails member = new CustomUserDetails(entity.getId(), entity.getUserDetails().getEmail(), "USER");
 
         return member;
     }
