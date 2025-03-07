@@ -46,7 +46,7 @@ public class AgreementService {
     public List<AgreementDto> getAgreementHistoryListByUser(String userId) {
         return agreementRepository.findAllByUserId(userId)
                 .stream()
-                .filter(greement -> !HISTORY_TYPES.contains(greement.getType()))
+                .filter(agreement -> !HISTORY_TYPES.contains(agreement.getType()))
                 .map(AgreementDto::new)
                 .collect(Collectors.toList());
     }
