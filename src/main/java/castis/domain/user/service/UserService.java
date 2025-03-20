@@ -47,7 +47,6 @@ public class UserService {
         return userRepository.findAll();
     }
 
-
     public List<UserDto> getUserTeamDtoList(String teamName) {
         return userRepository.findByTeamName(teamName)
                 .stream()

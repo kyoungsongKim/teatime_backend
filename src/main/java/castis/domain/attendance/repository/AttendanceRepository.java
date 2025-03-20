@@ -15,12 +15,12 @@ import java.util.Optional;
 
 @Repository
 public interface AttendanceRepository extends JpaRepository<Attendance, Long>, JpaSpecificationExecutor<Attendance> {
-    List<Attendance> findByUserId(String userId);
-    List<Attendance> findByWorkDate(LocalDate workDate);
-    List<Attendance> findByUserIdAndWorkDate(String userId, LocalDate workDate);
-    List<Attendance> findByWorkDateAfter(LocalDate minDate);
+    List<Attendance> findByUserIdOrderByWorkDateDescWorkStartTimeDesc(String userId);
+    List<Attendance> findByWorkDateOrderByWorkDateDescWorkStartTimeDesc(LocalDate workDate);
+    List<Attendance> findByUserIdAndWorkDateOrderByWorkDateDescWorkStartTimeDesc(String userId, LocalDate workDate);
+    List<Attendance> findByWorkDateAfterOrderByWorkDateDescWorkStartTimeDesc(LocalDate minDate);
+    List<Attendance> findByUserIdAndWorkDateBetweenOrderByWorkDateDescWorkStartTimeDesc(String userId, LocalDate startDate, LocalDate endDate);
     Optional<Attendance> findByUserIdAndWorkTypeAndWorkDate(String userid, WorkType workType, LocalDate workDate);
-    List<Attendance> findByUserIdAndWorkDateBetween(String userId, LocalDate startDate, LocalDate endDate);
 
     @Query("SELECT new castis.domain.attendance.dto.AttendanceSummaryDto(a.userId, u.realName, a.workDate, a.workStartTime, a.workEndTime, a.workType) " +
             "FROM Attendance a " +

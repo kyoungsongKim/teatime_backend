@@ -34,16 +34,16 @@ public class AttendanceService {
 
     public List<Attendance> getAttendance(String userId, LocalDate workDate, LocalDate endDate) {
         if (userId != null && workDate != null && endDate != null) {
-            return attendanceRepository.findByUserIdAndWorkDateBetween(userId, workDate, endDate);
+            return attendanceRepository.findByUserIdAndWorkDateBetweenOrderByWorkDateDescWorkStartTimeDesc(userId, workDate, endDate);
         } else if (userId != null && workDate != null) {
-            return attendanceRepository.findByUserIdAndWorkDate(userId, workDate);
+            return attendanceRepository.findByUserIdAndWorkDateOrderByWorkDateDescWorkStartTimeDesc(userId, workDate);
         } else if (userId != null) {
-            return attendanceRepository.findByUserId(userId);
+            return attendanceRepository.findByUserIdOrderByWorkDateDescWorkStartTimeDesc(userId);
         } else if (workDate != null) {
-            return attendanceRepository.findByWorkDate(workDate);
+            return attendanceRepository.findByWorkDateOrderByWorkDateDescWorkStartTimeDesc(workDate);
         } else {
-            LocalDate threeMonthsAgo = LocalDate.now().minus(3, ChronoUnit.MONTHS);
-            return attendanceRepository.findByWorkDateAfter(threeMonthsAgo);
+            LocalDate threeMonthsAgo = LocalDate.now().minusMonths(3);
+            return attendanceRepository.findByWorkDateAfterOrderByWorkDateDescWorkStartTimeDesc(threeMonthsAgo);
         }
     }
 
