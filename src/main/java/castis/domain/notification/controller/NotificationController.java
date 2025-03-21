@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -49,7 +50,8 @@ public class NotificationController {
     }
 
     @PatchMapping("/readUser/{id}")
-    public ResponseEntity<Void> readNotifications(@PathVariable Long id, @RequestBody String reply) {
+    public ResponseEntity<Void> readNotifications(@PathVariable Long id, @RequestBody Map<String, String> requestBody) {
+        String reply = requestBody.get("reply");
         notificationService.readNotification(id, reply);
         return ResponseEntity.ok().build();
     }
