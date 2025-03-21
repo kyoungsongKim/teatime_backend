@@ -47,7 +47,7 @@ public interface VacationHistoryRepository extends JpaRepository<VacationHistory
                         "FROM users u " +
                         "JOIN user_details d ON u.userId = d.userId " +
                         "LEFT JOIN ( " +
-                        "   SELECT SUM(amount) AS used, userId " +
+                        "   SELECT SUM(v.amount) AS used, v.userId " +
                         "   FROM vacation_history v " +
                         "   JOIN user_details d ON v.userId = d.userId " +
                         "   WHERE ( " +
