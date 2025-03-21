@@ -125,21 +125,29 @@ public class NotificationService {
     }
 
     @Transactional
-    public void deleteNotification(Long notificationId) {
-        notificationRepository.deleteById(notificationId);
+    public void readAllNotifications(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
+
+        userNotificationRepository.findByUserOrderByCreatedAtDesc(user)
+                .forEach(userNotification -> {
+                    userNotification.setIsRead(true);
+                    userNotificationRepository.save(userNotification);
+                });
     }
 
     @Transactional
-    public void sendNotificationToUser(NotificationRequest request) {
-        User receiver = userRepository.findById(request.getUserIds().get(0)) // 단일 사용자 처리
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
+    public void readNotification(Long id, String reply) {
+        UserNotification userNotification = userNotificationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("사용자 알림을 찾을 수 없음"));
 
-        Notification notification = new Notification();
-        notification.setTitle(request.getTitle());
-        notification.setContent(request.getContent());
-        notification.setIsGlobal(false);
-        notificationRepository.save(notification);
+        userNotification.setIsRead(true);
+        userNotification.setReply(reply);
+        userNotificationRepository.save(userNotification);
+    }
 
-        saveUserNotification(receiver, notification);
+    @Transactional
+    public void deleteNotification(Long notificationId) {
+        notificationRepository.deleteById(notificationId);
     }
 }

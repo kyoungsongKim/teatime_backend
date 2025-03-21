@@ -42,6 +42,18 @@ public class NotificationController {
         return ResponseEntity.ok(notifications);
     }
 
+    @PatchMapping("/readAll/{userId}")
+    public ResponseEntity<Void> readAllNotifications(@PathVariable String userId) {
+        notificationService.readAllNotifications(userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/readUser/{id}")
+    public ResponseEntity<Void> readNotifications(@PathVariable Long id, @RequestBody String reply) {
+        notificationService.readNotification(id, reply);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {
         notificationService.deleteNotification(id);
