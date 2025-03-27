@@ -30,19 +30,25 @@ public class UserDto implements Serializable {
     private UserDetails userDetails;
 
     public UserDto(User user) {
+        this(user, true); // isDetail 기본값을 true로 설정
+    }
+
+    public UserDto(User user, Boolean isDetail) {
         this.id = user.getId();
         this.userName = user.getUserName();
         this.realName = user.getRealName();
         this.description = user.getDescription();
         this.teamName = user.getTeamName();
         this.position = user.getPosition();
-        this.userDetails = user.getUserDetails();
-        if(user.getUserDetails() != null) {
-            this.cellphone = user.getUserDetails().getCellphone();
-            this.email = user.getUserDetails().getEmail();
-            this.dailyReportList = user.getUserDetails().getDailyReportList();
-            this.renewalDate = user.getUserDetails().getRenewalDate();
-            this.vacationReportList = user.getUserDetails().getVacationReportList();
+        if(isDetail){
+            this.userDetails = user.getUserDetails();
+            if(user.getUserDetails() != null) {
+                this.cellphone = user.getUserDetails().getCellphone();
+                this.email = user.getUserDetails().getEmail();
+                this.dailyReportList = user.getUserDetails().getDailyReportList();
+                this.renewalDate = user.getUserDetails().getRenewalDate();
+                this.vacationReportList = user.getUserDetails().getVacationReportList();
+            }
         }
     }
 }

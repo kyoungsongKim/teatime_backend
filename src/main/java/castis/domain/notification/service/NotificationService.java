@@ -1,5 +1,6 @@
 package castis.domain.notification.service;
 
+import castis.domain.agreement.entity.IUserAgreementInfo;
 import castis.domain.notification.dto.NotificationRequest;
 import castis.domain.notification.dto.NotificationResponse;
 import castis.domain.notification.dto.UserNotificationResponse;
@@ -7,9 +8,12 @@ import castis.domain.notification.entity.Notification;
 import castis.domain.notification.entity.UserNotification;
 import castis.domain.notification.repository.NotificationRepository;
 import castis.domain.notification.repository.UserNotificationRepository;
+import castis.domain.user.CustomUserDetails;
 import castis.domain.user.entity.User;
 import castis.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +29,7 @@ public class NotificationService {
     private final UserNotificationRepository userNotificationRepository;
 
     @Transactional
-    public void createNotification(NotificationRequest request) {
+    public void createNotification(NotificationRequest request, String teamName) {
         User createUser = userRepository.findById(request.getCreateUserId())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
         Notification notification;
@@ -61,7 +65,11 @@ public class NotificationService {
 
         List<User> users;
         if (request.getIsGlobal()) {
-            users = userRepository.findAll();
+            if (teamName != null) {
+                users = userRepository.findByTeamName(teamName);
+            } else {
+                users = userRepository.findAll();
+            }
         } else {
             users = userRepository.findAllById(request.getUserIds());
         }
@@ -111,7 +119,7 @@ public class NotificationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
 
-        return userNotificationRepository.findByUserOrderByCreatedAtDesc(user)
+        return userNotificationRepository.findByUserOrderByIdDesc(user)
                 .stream()
                 .map(userNotification -> new UserNotificationResponse(
                         userNotification.getId(),
@@ -129,7 +137,7 @@ public class NotificationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
 
-        userNotificationRepository.findByUserOrderByCreatedAtDesc(user)
+        userNotificationRepository.findByUserOrderByIdDesc(user)
                 .forEach(userNotification -> {
                     userNotification.setIsRead(true);
                     userNotificationRepository.save(userNotification);

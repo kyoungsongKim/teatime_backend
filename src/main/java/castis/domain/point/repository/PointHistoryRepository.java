@@ -17,6 +17,6 @@ public interface PointHistoryRepository extends JpaRepository<PointHistory, Long
     Optional<List<PointHistory>> findAllByRecverOrderByCreateDateDesc(String recver);
     Optional<List<PointHistory>> findAllByRecverAndCreateDateAndCode(String recver, LocalDateTime date, String code);
     Optional<List<PointHistory>> findByCodeAndRecver(String code,String recver);
-    @Query("select p from PointHistory p where year(p.createDate) = ?1 and month(p.createDate) = ?2")
+    @Query("select p from PointHistory p where year(p.useDate) = ?1 and month(p.useDate) = ?2")
     List<PointHistory> findAllByYearAndMonth(Integer year, Integer month);
 }

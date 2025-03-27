@@ -49,10 +49,10 @@ public class AssistanceApplyDto {
         this.createdDate = assistanceApply.getCreatedDate();
         this.updatedDate = assistanceApply.getUpdatedDate();
         if (assistanceApply.getApplier() != null) {
-            this.applier = new UserDto(assistanceApply.getApplier());
+            this.applier = new UserDto(assistanceApply.getApplier(), false);
         }
         if (assistanceApply.getReceiver() != null) {
-            this.receiver = new UserDto(assistanceApply.getReceiver());
+            this.receiver = new UserDto(assistanceApply.getReceiver(), false);
         }
         if (assistanceApply.getAssistance() != null) {
             this.assistance = new AssistanceDto(assistanceApply.getAssistance());
