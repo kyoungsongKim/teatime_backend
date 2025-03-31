@@ -37,7 +37,7 @@ public class TicketService {
     private final HolidayService holidayService;
     private final VacationHistoryService vacationHistoryService;
 
-    public List<EventDto> findAllByUserNameAndPeroid(String userName, String year, String month) throws IOException {
+    public List<EventDto> findAllByUserNameAndPeriod(String userName, String year, String month) throws IOException {
 
         List<EventDto> result = new ArrayList<>();
 
@@ -49,10 +49,10 @@ public class TicketService {
             LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), 1, 0, 0);
             YearMonth lastDay = YearMonth.from(startDate);
             LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month),
-                    lastDay.lengthOfMonth(), 0, 0);
+                    lastDay.lengthOfMonth(), 23, 59);
             predicates.add(cb.between(con.get("startTime"), startDate, endDate));
 
-            return predicates.size() > 0 ? cb.and(predicates.toArray(new Predicate[predicates.size()])) : null;
+            return !predicates.isEmpty() ? cb.and(predicates.toArray(new Predicate[predicates.size()])) : null;
         };
         long startTime = System.nanoTime();
         List<Ticket> list = ticketRepository.findAll(spec).stream().collect(Collectors.toList());
@@ -73,17 +73,17 @@ public class TicketService {
         return result;
     }
 
-    public List<EventDetailDto> findAllByUserNameAndPeroid(String userName, String year, String month, String day) {
+    public List<EventDetailDto> findAllByUserNameAndPeriod(String userName, String year, String month, String day) {
 
         List<EventDetailDto> result = new ArrayList<>();
 
         Specification<Ticket> spec = (con, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (userName != null && !"".equals(userName)) {
+            if (userName != null && !userName.isEmpty()) {
                 predicates.add(cb.equal(con.get("userName"), userName));
             }
 
-            if (day != null && !"".equals(day)) {
+            if (day != null && !day.isEmpty()) {
                 LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month),
                         Integer.parseInt(day), 0, 0);
                 LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month),
@@ -93,11 +93,11 @@ public class TicketService {
                 LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), 1, 0, 0);
                 YearMonth lastDay = YearMonth.from(startDate);
                 LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month),
-                        lastDay.lengthOfMonth(), 0, 0);
+                        lastDay.lengthOfMonth(), 23, 59);
                 predicates.add(cb.between(con.get("startTime"), startDate, endDate));
             }
 
-            return predicates.size() > 0 ? cb.and(predicates.toArray(new Predicate[predicates.size()])) : null;
+            return !predicates.isEmpty() ? cb.and(predicates.toArray(new Predicate[predicates.size()])) : null;
         };
         List<Project> projectList = projectRepository.findAll();
         List<Ticket> list = ticketRepository.findAll(spec).stream().collect(Collectors.toList());
@@ -127,7 +127,7 @@ public class TicketService {
             LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), 1, 0, 0);
             YearMonth lastDay = YearMonth.from(startDate);
             LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month),
-                    lastDay.lengthOfMonth(), 0, 0);
+                    lastDay.lengthOfMonth(), 23, 59);
             predicates.add(cb.between(con.get("startTime"), startDate, endDate));
 
             return predicates.size() > 0 ? cb.and(predicates.toArray(new Predicate[predicates.size()])) : null;

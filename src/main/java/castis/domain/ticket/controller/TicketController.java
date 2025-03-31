@@ -39,7 +39,7 @@ public class TicketController {
             @RequestParam(name = "periodMonth") String periodMonth,
             @RequestParam(name = "userName", required = false) String userName) throws IOException {
         log.info("request, uri[{}]", httpServletRequest.getRequestURI());
-        List<EventDto> ticketDtoList = ticketService.findAllByUserNameAndPeroid(userName, periodYear, periodMonth);
+        List<EventDto> ticketDtoList = ticketService.findAllByUserNameAndPeriod(userName, periodYear, periodMonth);
 
         return new ResponseEntity<>(ticketDtoList, HttpStatus.OK);
     }
@@ -52,7 +52,7 @@ public class TicketController {
             @RequestParam(name = "userName", required = false) String userName) {
         log.info("request, uri[{}] periodYear[{}], periodMonth[{}], periodDay[{}], userName[{}]",
                 httpServletRequest.getRequestURI(), periodYear, periodMonth, periodDay, userName);
-        List<EventDetailDto> ticketDtoList = ticketService.findAllByUserNameAndPeroid(userName, periodYear, periodMonth,
+        List<EventDetailDto> ticketDtoList = ticketService.findAllByUserNameAndPeriod(userName, periodYear, periodMonth,
                 periodDay);
 
         return new ResponseEntity<>(ticketDtoList, HttpStatus.OK);

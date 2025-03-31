@@ -53,7 +53,7 @@ public class StatisticsService {
             LocalDateTime startDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month), 1, 0, 0);
             YearMonth lastDay = YearMonth.from(startDate);
             LocalDateTime endDate = LocalDateTime.of(Integer.parseInt(year), Integer.parseInt(month),
-                    lastDay.lengthOfMonth(), 0, 0);
+                    lastDay.lengthOfMonth(), 23, 59);
             predicates.add(cb.between(con.get("startTime"), startDate, endDate));
 
             return predicates.size() > 0 ? cb.and(predicates.toArray(new Predicate[predicates.size()])) : null;

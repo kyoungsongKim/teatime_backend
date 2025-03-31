@@ -59,7 +59,7 @@ public class MonthlySalesService {
 
         public List<MonthlySalesDto> findAllByUsernameAndYear(String userName, int year) {
                 LocalDateTime startDate = LocalDateTime.of(year, 1, 1, 0, 0);
-                LocalDateTime endDate = LocalDateTime.of(year + 1, 1, 1, 0, 0);
+                LocalDateTime endDate = LocalDateTime.of(year + 1, 1, 1, 23, 59);
                 List<MonthlySales> monthlySales = monthlySalesRepository
                                 .findAllByUser_IdAndSummaryDateGreaterThanEqualAndSummaryDateLessThan(
                                                 userName,
