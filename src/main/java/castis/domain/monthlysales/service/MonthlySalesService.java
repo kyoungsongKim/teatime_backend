@@ -17,7 +17,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -109,6 +111,47 @@ public class MonthlySalesService {
                                 .retrieve()
                                 .bodyToMono(CBankHistoryResponseDto.class)
                                 .block();
+
+                return historyResponse.getHistory();
+        }
+
+        public List<CBankHistoryDto> getCBankHistory(String userId, LocalDate start, LocalDate end)
+                throws EntityNotFoundException, IllegalArgumentException {
+
+                User user = userService.getUser(userId);
+                UserDetails userDetails = user.getUserDetails();
+                if (userDetails == null) {
+                        throw new IllegalArgumentException("user's details is empty");
+                }
+                if (userDetails.getCbankId() == null || userDetails.getCbankAccount() == null) {
+                        throw new IllegalArgumentException("user's cbank information is empty");
+                }
+
+                CBankOtpRequestDto otpRequestBody = new CBankOtpRequestDto();
+                otpRequestBody.setUserId(userDetails.getCbankId());
+                otpRequestBody.setCompanyId(cbankCompanyId);
+
+                CBankOtpResponseDto otpResponse = otpClient.post()
+                        .bodyValue(otpRequestBody)
+                        .retrieve()
+                        .bodyToMono(CBankOtpResponseDto.class)
+                        .block();
+
+                CBankHistoryRequestDto historyRequestBody = new CBankHistoryRequestDto();
+                historyRequestBody.setAccountId(userDetails.getCbankAccount());
+                historyRequestBody.setUserId(userDetails.getCbankId());
+
+                // 날짜 포맷 (yyyyMMdd)
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                historyRequestBody.setStartDate(start.format(formatter));
+                historyRequestBody.setEndDate(end.format(formatter));
+                historyRequestBody.setOtp(otpResponse.getOtp());
+
+                CBankHistoryResponseDto historyResponse = historyClient.post()
+                        .bodyValue(historyRequestBody)
+                        .retrieve()
+                        .bodyToMono(CBankHistoryResponseDto.class)
+                        .block();
 
                 return historyResponse.getHistory();
         }

@@ -17,5 +17,5 @@ public class CBankHistoryDto {
     private String date;
     private String status;
     private String memo;
-
+    private boolean income;
 }

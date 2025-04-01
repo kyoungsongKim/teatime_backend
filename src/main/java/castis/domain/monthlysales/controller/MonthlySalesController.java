@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -44,5 +46,33 @@ public class MonthlySalesController {
                             totalSales, Float::sum);
         }
         return new ResponseEntity<>(String.format("%.2f CAS", totalSales), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/history", method = RequestMethod.GET)
+    public ResponseEntity<List<CBankHistoryDto>> getCbankHistory(
+            HttpServletRequest httpServletRequest,
+            @RequestParam String userId,
+            @RequestParam String startDate,
+            @RequestParam String endDate
+    ) {
+
+        log.info("request, uri[{}]", httpServletRequest.getRequestURI());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate start = LocalDate.parse(startDate, formatter);
+        LocalDate end = LocalDate.parse(endDate, formatter);
+
+        User user = userService.getUser(userId);
+        UserDetails userDetails = user.getUserDetails();
+        String userCbankId = userDetails.getCbankAccount();
+
+        List<CBankHistoryDto> historyList = monthlySalesService.getCBankHistory(userId, start, end);
+
+        for (CBankHistoryDto dto : historyList) {
+            boolean isIncome = userCbankId != null && userCbankId.equals(dto.getRecvAccount());
+            dto.setIncome(isIncome);
+        }
+
+        return new ResponseEntity<>(historyList, HttpStatus.OK);
     }
 }

@@ -35,7 +35,7 @@ public class MoneyCheckController {
             while(mcIterator.hasNext()){
                 MoneyCheckDto curDto = mcIterator.next();
                 if(curDto!=null){
-                    if (curDto.getTeamName().contains("Teatime") == false ) {
+                    if (!curDto.getTeamName().contains("saram")) {
                         mcIterator.remove();
                     } else {
                         String accountId = curDto.getCbankAccount();
@@ -48,7 +48,7 @@ public class MoneyCheckController {
                                 curDto.setCurrentAccountMoney(String.valueOf(result.getBody().getBalance()));
                             }
                         } catch ( Exception e) {
-                            continue;
+                            log.error(e.getMessage(), e);
                         }
                     }
                 }
