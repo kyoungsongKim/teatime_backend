@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CBankHistoryRequestDto {
     private String userId;
+    private String userPwd;
     private String accountId;
     private String duration;
     private String startDate;

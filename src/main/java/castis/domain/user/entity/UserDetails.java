@@ -50,6 +50,9 @@ public class UserDetails {
     @Column(name = "cbank_id", length = 50)
     private String cbankId;
 
+    @Column(name = "cbank_pwd", length = 512)
+    private String cbankPwd;
+
     @Column(name = "cbank_account", length = 50)
     private String cbankAccount;
 

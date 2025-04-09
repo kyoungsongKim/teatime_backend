@@ -90,17 +90,24 @@ public interface VacationHistoryRepository extends JpaRepository<VacationHistory
          * 특정 사용자의 휴가 사용 정보 조회
          */
         @Query(nativeQuery = true, value =
-                "SELECT v.userId, SUM(v.amount) AS used, d.renewaldate " +
-                        "FROM vacation_history v " +
-                        "JOIN user_details d ON v.userId = d.userId " +
-                        "WHERE v.userId = ?1 " +
-                        "AND ( " +
-                        "   DATE_FORMAT(d.renewaldate, CONCAT(YEAR(?2) - 1 + " +
-                        "   (DATE_FORMAT(d.renewaldate, '%Y-%m-%d 00:00:00') <= ?2), '-%m-%d 00:00:00')) <= " +
-                        "   IF(?3, DATE_ADD(v.eventStartDate, INTERVAL v.amount DAY), v.eventStartDate) " +
-                        "   AND v.eventStartDate < DATE_FORMAT(d.renewaldate, CONCAT(YEAR(?2) + " +
-                        "   (DATE_FORMAT(d.renewaldate, '%Y-%m-%d 00:00:00') <= ?2), '-%m-%d 00:00:00')) " +
-                        ")")
+                "SELECT u.userId, u.realname, COALESCE(v.used, 0) AS used, d.renewaldate " +
+                        "FROM users u " +
+                        "JOIN user_details d ON u.userId = d.userId " +
+                        "LEFT JOIN ( " +
+                        "   SELECT SUM(v.amount) AS used, v.userId " +
+                        "   FROM vacation_history v " +
+                        "   JOIN user_details d ON v.userId = d.userId " +
+                        "   WHERE ( " +
+                        "       DATE_FORMAT(d.renewaldate, CONCAT(YEAR(?2) - 1 + " +
+                        "       (DATE_FORMAT(d.renewaldate, '%Y-%m-%d 00:00:00') <= ?2), '-%m-%d 00:00:00')) <= " +
+                        "       IF(?3, DATE_ADD(v.eventStartDate, INTERVAL amount DAY), v.eventStartDate) " +
+                        "       AND v.eventStartDate < DATE_FORMAT(d.renewaldate, CONCAT(YEAR(?2) + " +
+                        "       (DATE_FORMAT(renewaldate, '%Y-%m-%d 00:00:00') <= ?2), '-%m-%d 00:00:00')) " +
+                        "   ) " +
+                        "   GROUP BY v.userId " +
+                        ") v ON u.userId = v.userId " +
+                        "WHERE u.userId = ?1 " +
+                        "ORDER BY u.realname")
         Optional<IVacationInfo> findVacationInfo(
                 String userId, LocalDateTime targetDate, boolean includeAmount
         );

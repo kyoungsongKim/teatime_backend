@@ -96,6 +96,7 @@ public class MonthlySalesService {
                 CBankHistoryRequestDto historyRequestBody = new CBankHistoryRequestDto();
                 historyRequestBody.setAccountId(userDetails.getCbankAccount());
                 historyRequestBody.setUserId(userDetails.getCbankId());
+                historyRequestBody.setUserPwd(userDetails.getCbankPwd());
 
                 LocalDateTime end = LocalDateTime.of(year, month, 25, 0, 0);
                 LocalDateTime start = end.minusMonths(1).plusDays(1);
@@ -140,6 +141,7 @@ public class MonthlySalesService {
                 CBankHistoryRequestDto historyRequestBody = new CBankHistoryRequestDto();
                 historyRequestBody.setAccountId(userDetails.getCbankAccount());
                 historyRequestBody.setUserId(userDetails.getCbankId());
+                historyRequestBody.setUserPwd(userDetails.getCbankPwd());
 
                 // 날짜 포맷 (yyyyMMdd)
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
