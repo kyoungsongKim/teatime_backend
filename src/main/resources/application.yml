@@ -54,6 +54,9 @@ scheduler:
   vacation:
     fixedRate: 30000
     email-send-cron: 0 0 9 * * *
+  notice:
+    enable: true
+    smsNumber: 01071649777
 
 useJwt: true
 

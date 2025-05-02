@@ -15,6 +15,7 @@ import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,12 @@ public class NoticeScheduler {
     private final SMSHistoryService smsHistoryService;
     private final UserSMSInfoService userSMSInfoService;
 
+    @Value("${scheduler.notice.enable:true}")
+    private boolean schedulerNoticeEnable;
+
+    @Value("${scheduler.notice.smsNumber:01071649777}")
+    private String smsNumber;
+
     // mon - fri, 13:00
     @Scheduled(cron = "0 00 13 * * MON,WED,FRI")
     public void findLastReflectMeetTime() {
@@ -48,7 +55,7 @@ public class NoticeScheduler {
                     if (userDetails != null){
                         //not first time
                         if ( userDetails.getCellphone() != null && !userDetails.getCellphone().isEmpty()) {
-                            if (userDetails.getCbankId().equalsIgnoreCase("teatime.coffee") && user.getUserName().equalsIgnoreCase("kskim")) {
+                            if (userDetails.getCbankId().equalsIgnoreCase("teatime.coffee")) {
                                 long intervalDateCount = DAYS.between(ph.getCreateDate(), LocalDateTime.now());
                                 UserSmsInfo usi = userSMSInfoService.getUSerSMSInfo(user.getId());
                                 if (usi != null && usi.isSendmsg() && usi.getSendday() > 0 && intervalDateCount > usi.getSendday()) {
@@ -65,12 +72,18 @@ public class NoticeScheduler {
                                     sb.append(intervalDateCount).append("일이 지났습니다!\n");
                                     sb.append("많이 바쁘시겠지만 에이전트 서비스 이용 홍보차 연락드렸습니다. 서비스 많은 이용 부탁드리겠습니다.\n감사합니다!\n");
                                     if (userDetails.getCbankId().equalsIgnoreCase("teatime.coffee")) {
-                                        sb.append("연락처:010-7164-9777\n");
+                                        sb.append("연락처:");
+                                        sb.append(smsNumber);
+                                        sb.append("\n");
                                         sb.append("서비스예약:https://coffee.castis.net\n");
                                     }
                                     sb.append("(본 문자의 수신 거부를 희망하실 경우 회신 주시면 바로 반영하도록 하겠습니다!)");
-                                    if (userDetails.getCbankId().equalsIgnoreCase("teatime.coffee")) {
-                                        sendSMS("01071649777", userDetails.getCellphone(), sb.toString());
+                                    if(schedulerNoticeEnable) {
+                                        if (userDetails.getCbankId().equalsIgnoreCase("teatime.coffee")) {
+                                            sendSMS(smsNumber, userDetails.getCellphone(), sb.toString());
+                                        }
+                                    } else {
+                                        log.debug("[findLastReflectMeetTime] schedulerNoticeEnable is false");
                                     }
                                 }
                             }
