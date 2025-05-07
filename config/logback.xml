@@ -1,12 +1,12 @@
 <configuration>
-    <property name="appName" value="Teatime.be"/>
-    <!--<property name="productVersion" value="0.0.1"/>-->
+    <property name="appName" value="Saram.be"/>
+    <property name="productVersion" value="1.0.10.rc1"/>
 
     <appender name="DR" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${LOG_PATH}/${appName}.log</File>
         <encoder>
             <charset>UTF-8</charset>
-            <pattern>${appName},%X{productVersion},%d{yyyy-MM-dd HH:mm:ss.SSS},%p,[%F:%L],thread[%t],%X{history}%m%X{processingTimeMSec}%n</pattern>
+            <pattern>${appName},${productVersion},%d{yyyy-MM-dd HH:mm:ss.SSS},%p,[%F:%L],thread[%t],%X{history}%m%X{processingTimeMSec}%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
@@ -18,7 +18,7 @@
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <charset>UTF-8</charset>
-            <pattern>${appName},%X{productVersion},%d{yyyy-MM-dd HH:mm:ss.SSS},%p,[%F:%L],%X{history}%X{processingTimeMSec}%m%n</pattern>
+            <pattern>${appName},${productVersion},%d{yyyy-MM-dd HH:mm:ss.SSS},%p,[%F:%L],%X{history}%X{processingTimeMSec}%m%n</pattern>
         </encoder>
     </appender>
     <logger name="com.danga" level="ERROR"/>

@@ -48,7 +48,7 @@ public class NoticeScheduler {
     private String recvId;
 
     // mon - fri, 13:00
-    @Scheduled(cron = "0 00 13 * * MON,WED,FRI")
+    @Scheduled(cron = "${scheduler.notice.notice-send-cron:0 00 13 * * MON,WED,FRI}")
     public void findLastReflectMeetTime() {
         List<User> userList = userService.getUserList();
         for (User user: userList) {
