@@ -1,5 +1,7 @@
 package castis.scheduler;
 
+import castis.domain.notification.dto.NotificationRequest;
+import castis.domain.notification.service.NotificationService;
 import castis.domain.point.entity.PointHistory;
 import castis.domain.point.service.PointService;
 import castis.domain.user.entity.User;
@@ -20,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -33,12 +36,16 @@ public class NoticeScheduler {
     private final PointService pointService;
     private final SMSHistoryService smsHistoryService;
     private final UserSMSInfoService userSMSInfoService;
+    private final NotificationService notificationService;
 
     @Value("${scheduler.notice.enable:true}")
     private boolean schedulerNoticeEnable;
 
     @Value("${scheduler.notice.smsNumber:01071649777}")
     private String smsNumber;
+
+    @Value("${scheduler.notice.recvId:kskim}")
+    private String recvId;
 
     // mon - fri, 13:00
     @Scheduled(cron = "0 00 13 * * MON,WED,FRI")
@@ -64,26 +71,24 @@ public class NoticeScheduler {
                                         dateStr = dateStr.substring(0, ph.getCreateDate().toString().indexOf("T"));
                                     }
                                     StringBuffer sb = new StringBuffer();
-                                    sb.append("안녕하세요. ").append(user.getRealName()).append(" 고객님!").append("\n");
-                                    if (userDetails.getCbankId().equalsIgnoreCase("teatime.coffee")) {
-                                        sb.append("사람 사업부 담당 에이전트 김경송입니다.\n");
-                                    }
+                                    sb.append(user.getRealName()).append(" 고객님!").append("\n");
                                     sb.append("가장 최근 서비스 이용일은 [").append(dateStr).append("]로 ");
                                     sb.append(intervalDateCount).append("일이 지났습니다!\n");
-                                    sb.append("많이 바쁘시겠지만 에이전트 서비스 이용 홍보차 연락드렸습니다. 서비스 많은 이용 부탁드리겠습니다.\n감사합니다!\n");
-                                    if (userDetails.getCbankId().equalsIgnoreCase("teatime.coffee")) {
-                                        sb.append("연락처:");
-                                        sb.append(smsNumber);
-                                        sb.append("\n");
-                                        sb.append("서비스예약:https://coffee.castis.net\n");
-                                    }
-                                    sb.append("(본 문자의 수신 거부를 희망하실 경우 회신 주시면 바로 반영하도록 하겠습니다!)");
                                     if(schedulerNoticeEnable) {
                                         if (userDetails.getCbankId().equalsIgnoreCase("teatime.coffee")) {
-                                            sendSMS(smsNumber, userDetails.getCellphone(), sb.toString());
+                                            NotificationRequest request = new NotificationRequest();
+                                            List<String> userIds = new java.util.ArrayList<>(Collections.emptyList());
+                                            userIds.add(recvId);
+                                            request.setTitle("[사람] 에이전트 서비스 이용 안내");
+                                            request.setCreateUserId(recvId);
+                                            request.setUserIds(userIds);
+                                            request.setIsGlobal(false);
+                                            request.setNotificationType("None");
+                                            request.setContent(sb.toString());
+                                            notificationService.createNotification(request, null);
                                         }
                                     } else {
-                                        log.debug("[findLastReflectMeetTime] schedulerNoticeEnable is false");
+                                        log.info("[findLastReflectMeetTime] schedulerNoticeEnable is false");
                                     }
                                 }
                             }

@@ -57,6 +57,7 @@ scheduler:
   notice:
     enable: true
     smsNumber: 01071649777
+    recvId: kskim
 
 useJwt: true
 
