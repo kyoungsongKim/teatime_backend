@@ -62,7 +62,7 @@ public class ReportController {
                 + req.getTitle() + "<br><br>");
         builder.append(req.getContents().replaceAll("\n", "<br>").replaceAll(" ", "&nbsp;"));
         builder.append(
-                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>");
+                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(https://saram.serviz.net/)</font>");
 
         boolean sessionDebug = false;
         Properties props = System.getProperties();
@@ -142,7 +142,7 @@ public class ReportController {
                 + req.getTitle() + "<br><br>");
         builder.append(req.getContents().replaceAll("\n", "<br>").replaceAll(" ", "&nbsp;"));
         builder.append(
-                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>");
+                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(https://saram.serviz.net/)</font>");
 
         boolean sessionDebug = false;
         Properties props = System.getProperties();

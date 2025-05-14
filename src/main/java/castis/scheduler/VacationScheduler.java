@@ -79,7 +79,7 @@ public class VacationScheduler {
                 .append(vacationHistory.getReason().replaceAll("\n", "<br>").replaceAll(" ", "&nbsp;"))
                 .append("<br>----<br>")
                 .append(
-                        "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.(http://teatime.castis.net/)</font>");
+                        "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.(https://saram.serviz.net/)</font>");
 
         UserDetails userDetails = user.getUserDetails();
         if (userDetails == null) {

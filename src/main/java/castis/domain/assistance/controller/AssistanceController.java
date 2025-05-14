@@ -75,13 +75,15 @@ public class AssistanceController {
         suggestion.setContent(body.getContent());
         suggestion.setSuggester(userService.getUser(user.getUserId()));
         assistanceSuggestionService.createAssistanceSuggestion(suggestion);
-        List<UserDto> admins = userService.getAdminList();
+        User suggester = userService.getUser(user.getUserId());
+        String teamName = suggester.getTeamName();
+        List<UserDto> admins = userService.getAdminListByTeam(teamName);
 
         InternetAddress from = new InternetAddress("kskim@castis.com",
                 MimeUtility.encodeText("사람사업부 전산시스템", "UTF-8", "B"));
 
         String content = "<font style=\"font-family: 맑은 고딕; font-size:10pt\">" + suggestion.getContent() +
-                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>";
+                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(https://saram.serviz.net/)</font>";
 
         admins.forEach(admin -> {
             try {
@@ -113,6 +115,7 @@ public class AssistanceController {
 
         Assistance targetAssistance = assistanceService.getAssistance(assistanceId);
         User applier = userService.getUser(user.getUserId());
+        String teamName = applier.getTeamName();
         AssistanceApply assistanceApply = new AssistanceApply();
         assistanceApply.setApplier(applier);
         assistanceApply.setContent(content);
@@ -138,14 +141,14 @@ public class AssistanceController {
             kakaoMessagingService.sendAssistanceApplyMessage(userDetails.getCellphone(),
                     applier.getRealName(), targetAssistance.getName());
         }
-        List<UserDto> admins = userService.getAdminList();
+        List<UserDto> admins = userService.getAdminListByTeam(teamName);
 
         InternetAddress from = new InternetAddress("kskim@castis.com",
                 MimeUtility.encodeText("사람사업부 전산시스템", "UTF-8", "B"));
 
         String mailContent = "<font style=\"font-family: 맑은 고딕; font-size:10pt\">(" + user.getUsername() + ")님께서<br>("
                 + targetAssistance.getName() + ")를 신청하셨습니다." +
-                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(http://teatime.castis.net/)</font>";
+                "<br><br>이 메일은 IMS(Issue Management System)에서 자동으로 발송한 메일입니다.<br>차 한잔의 여유가 세상을 바꿉니다.(https://saram.serviz.net/)</font>";
         admins.forEach(admin -> {
             try {
                 emailService.sendEmail("[비서서비스 요청알림]", mailContent, from, InternetAddress.parse(admin.getEmail()));

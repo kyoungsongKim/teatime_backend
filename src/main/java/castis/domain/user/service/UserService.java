@@ -169,6 +169,20 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public List<UserDto> getAdminListByTeam(String teamName) {
+        List<String> ADMIN_ROLES = Arrays.asList(
+                UserRole.ROLE_ADMIN.getValue(),
+                UserRole.ROLE_SUPER_ADMIN.getValue()
+        );
+
+        List<User> userList = userRepository.findAllByRoleIn(ADMIN_ROLES);
+
+        return userList.stream()
+                .map(UserDto::new)
+                .filter(userDto -> userDto.getTeamName().equals(teamName))
+                .collect(Collectors.toList());
+    }
+
     public void updateTeamName(User userInfo) {
         userInfo.setTeamName("external");
         userRepository.save(userInfo);
