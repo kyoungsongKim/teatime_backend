@@ -79,6 +79,9 @@ public class SignService {
 
     public UserRole checkIsAdmin(String userId) {
         Authorities authorities = authoritiesRepository.findByUserName(userId);
+        if (authorities == null) {
+            return UserRole.ROLE_USER_BASIC;
+        }
         return authorities.getAuthority();
     }
 }

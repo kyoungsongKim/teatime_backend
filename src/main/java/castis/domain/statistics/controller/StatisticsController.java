@@ -1,5 +1,7 @@
 package castis.domain.statistics.controller;
 
+import castis.domain.agreement.entity.IUserAgreementInfo;
+import castis.domain.agreement.service.AgreementService;
 import castis.domain.monthlysales.dto.MonthlySalesDto;
 import castis.domain.monthlysales.service.MonthlySalesService;
 import castis.domain.service.dto.ServiceChargeDTO;
@@ -9,6 +11,8 @@ import castis.domain.statistics.dto.MonthlyStatisticsDto;
 import castis.domain.statistics.service.StatisticsService;
 import castis.domain.ticket.dto.EventDetailDto;
 import castis.domain.ticket.service.TicketService;
+import castis.domain.user.entity.User;
+import castis.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,6 +38,8 @@ public class StatisticsController {
     private final MonthlySalesService monthlySalesService;
     private final TicketService ticketService;
     private final ServiceService serviceService;
+    private final AgreementService agreementService;
+    private final UserService userService;
 
     @RequestMapping(value = "/monthly", method = RequestMethod.GET)
     public ResponseEntity getMonthlyStatisticsByProject(
@@ -85,10 +91,12 @@ public class StatisticsController {
         List<MonthlySalesDto> monthlySales = monthlySalesService.findAllByUsernameAndYear(userName, year);
         List<Integer> yearList = monthlySalesService.getYearListHasMonthlySales(userName);
         ServiceChargeDTO serviceCharge = serviceService.getServiceChargeByUserIdAndServiceId(userName, 5);
+        User user = userService.getUser(userName);
+        IUserAgreementInfo userInfo = agreementService.getUserAgreementInfo(user.getId());
         HashMap<String, Object> result = new HashMap<>();
         result.put("salesList", monthlySales);
         result.put("yearList", yearList);
-        result.put("targetSales", serviceCharge != null ? serviceCharge.getCharge() : null);
+        result.put("targetSales", userInfo != null ? userInfo.getGuaranteeAmount() : null);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

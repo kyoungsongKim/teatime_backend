@@ -56,6 +56,8 @@ scheduler:
     email-send-cron: 0 0 9 * * *
   notice:
     notice-send-cron: 0 00 13 * * MON,WED,FRI
+    guarantee-expire-notice-cron: 0 0 1 * * *
+    ai-report-cron: 0 * * * * *
     enable: true
     smsNumber: 01071649777
     recvId: kskim
