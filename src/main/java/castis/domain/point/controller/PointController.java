@@ -4,8 +4,11 @@ import castis.domain.point.dto.PointAndLevelDto;
 import castis.domain.point.dto.PointHistoryDto;
 import castis.domain.point.dto.PointSummaryDto;
 import castis.domain.point.service.PointService;
+import castis.domain.security.jwt.AuthProvider;
+import castis.domain.user.CustomUserDetails;
+import castis.domain.user.dto.UserDto;
 import castis.domain.user.entity.User;
-import castis.domain.user.repository.UserRepository;
+import castis.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,7 +27,8 @@ import java.util.List;
 public class PointController {
 
     private final PointService pointService;
-    private final UserRepository userRepository;
+    private final AuthProvider authProvider;
+    private final UserService userService;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public ResponseEntity getPointListDataByReceiver(
@@ -59,9 +63,18 @@ public class PointController {
         log.info("request, uri[{}]", httpServletRequest.getRequestURI());
         List<PointSummaryDto> pointSummaryDtoList = new ArrayList<>();
         List<PointHistoryDto> pointHistoryDtoList = pointService.findAllPointHistory();
-        List<User> userList = userRepository.findAll();
-        if (pointHistoryDtoList != null) {
-            for (User curUser : userList) {
+        CustomUserDetails userDetails = authProvider.getUserDetails(httpServletRequest);
+        List<UserDto> userList;
+        if (userDetails.getRoles().contains("ROLE_ADMIN")) {
+            User user = userService.getUser(userDetails.getUserId());
+            userList = userService.getUserTeamDtoList(user.getTeamName());
+        } else if (userDetails.getRoles().contains("ROLE_SUPER_ADMIN")) {
+            userList = userService.getUserDtoList();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (userList != null && pointHistoryDtoList != null) {
+            for (UserDto curUser : userList) {
                 PointSummaryDto curSummary = new PointSummaryDto();
                 curSummary.setUserId(curUser.getId());
                 curSummary.setRealName(curUser.getRealName());
@@ -150,9 +163,18 @@ public class PointController {
         Integer yearInt = Integer.valueOf(year);
         Integer monthInt = Integer.valueOf(month);
         List<PointHistoryDto> pointHistoryDtoList = pointService.getPointHistoryByYearAndMonth(yearInt, monthInt);
-        List<User> userList = userRepository.findAll();
+        CustomUserDetails userDetails = authProvider.getUserDetails(httpServletRequest);
+        List<UserDto> userList;
+        if (userDetails.getRoles().contains("ROLE_ADMIN")) {
+            User user = userService.getUser(userDetails.getUserId());
+            userList = userService.getUserTeamDtoList(user.getTeamName());
+        } else if (userDetails.getRoles().contains("ROLE_SUPER_ADMIN")) {
+            userList = userService.getUserDtoList();
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
         if (pointHistoryDtoList != null) {
-            for (User curUser : userList) {
+            for (UserDto curUser : userList) {
                 PointSummaryDto curSummary = new PointSummaryDto();
                 curSummary.setUserId(curUser.getId());
                 curSummary.setRealName(curUser.getRealName());
