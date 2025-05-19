@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'com.example'
-version = '1.0.10.rc3-SNAPSHOT'
+version = '1.0.10.rc4-SNAPSHOT'
 sourceCompatibility = '8'
 
 configurations {
