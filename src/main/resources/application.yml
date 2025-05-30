@@ -59,7 +59,7 @@ scheduler:
     guarantee-expire-notice-cron: 0 0 1 * * *
     ai-report-cron: 0 0 2 * * *
     enable: true
-    smsNumber: 01071649777
+    smsNumber: 0100000000
     recvId: kskim
 
 useJwt: true
@@ -69,7 +69,7 @@ uploadLocation:
 
 holiday:
   openApi:
-    serviceKey: CS%2FUp%2FLbENA%2BlEUX1MspXrax6t0tDG1vPi2jlteB4HwvEsqJEzjsCEvqpFVX9kZyBvBMXrzErm9bsFJQwYmHwA%3D%3D
+    serviceKey: test
 
 cbank:
   #  companyId: vhr_servicefee
@@ -85,12 +85,12 @@ cbank:
       url: http://bank.castis.net/cbank/api/v1/account/history
 
 kakao:
-  api-key: NCSWVSZSVEPHMDYP
-  secret: PVI4TYAMCT3GPPQDKRARO7O7Z3MBT9L3
-  pfid: KA01PF220906035048833ynNa3G1G1YN
+  api-key: test
+  secret: test
+  pfid: test
   messaging:
     template:
-      assistance-apply-alarm: KA01TP240119012537734foTq4BqWv70
+      assistance-apply-alarm: test
     url: https://api.coolsms.co.kr
     tel-origin: 01071649777
 
