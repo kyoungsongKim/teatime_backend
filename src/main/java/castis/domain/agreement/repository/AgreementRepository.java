@@ -33,9 +33,9 @@ public interface AgreementRepository
                     "    agreement a ON u.userid = a.user_id " +
                     "LEFT JOIN " +
                     "    user_details ud ON u.userid = ud.userid " +
+                    "    AND (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
                     "WHERE u.userid = ?1 AND " +
                     "    u.teamname LIKE 'saram' AND " +
-                    "    (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
                     "GROUP BY " +
                     "    u.userid, " +
                     "    u.realname"
@@ -59,9 +59,9 @@ public interface AgreementRepository
                     "    agreement a ON u.userid = a.user_id " +
                     "LEFT JOIN " +
                     "    user_details ud ON u.userid = ud.userid " +
+                    "    AND (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
                     "WHERE " +
                     "    u.teamname LIKE 'saram' AND " +
-                    "    (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
                     "GROUP BY " +
                     "    u.userid, " +
                     "    u.realname"
@@ -83,11 +83,11 @@ public interface AgreementRepository
                     "    users u " +
                     "LEFT JOIN " +
                     "    agreement a ON u.userid = a.user_id " +
+                    "    AND (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
                     "LEFT JOIN " +
                     "    user_details ud ON u.userid = ud.userid " +
                     "WHERE " +
-                    "    u.teamname LIKE ?2 AND " +
-                    "    (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
+                    "    u.teamname LIKE ?2 " +
                     "GROUP BY " +
                     "    u.userid, " +
                     "    u.realname"
