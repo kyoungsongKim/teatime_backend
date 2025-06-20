@@ -35,7 +35,7 @@ public interface AgreementRepository
                     "    user_details ud ON u.userid = ud.userid " +
                     "    AND (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
                     "WHERE u.userid = ?1 AND " +
-                    "    u.teamname LIKE 'saram' AND " +
+                    "    u.teamname LIKE 'saram' " +
                     "GROUP BY " +
                     "    u.userid, " +
                     "    u.realname"
@@ -61,7 +61,7 @@ public interface AgreementRepository
                     "    user_details ud ON u.userid = ud.userid " +
                     "    AND (a.type IS NULL OR a.type NOT IN ('GUARANTEE_HISTORY', 'MANAGER_HISTORY', 'JOINED_HISTORY', 'OTHER_HISTORY')) " +
                     "WHERE " +
-                    "    u.teamname LIKE 'saram' AND " +
+                    "    u.teamname LIKE 'saram' " +
                     "GROUP BY " +
                     "    u.userid, " +
                     "    u.realname"
