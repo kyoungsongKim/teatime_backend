@@ -97,6 +97,9 @@ kakao:
 file-system:
   save-directory: /usr/local/imsfileupload/
 
+terms:
+  file-path: /usr/local/imsfileupload/SaramTerms.pdf
+
 # 신입~1년차 = 1년차
 # 1년차~2년차 = 2년차
 # n년차: 휴가 수 형태로 표기
